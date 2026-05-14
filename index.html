@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pocket Chat - Ultimate Full Version</title>
+    <style>
+        :root {
+            --primary-pink: #ffb6c1;
+            --soft-pink: #fff0f5;
+            --white: #ffffff;
+            --text-dark: #5a524e;
+            --gray-text: #999;
+            --radius-lg: 20px;
+            --radius-sm: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: "PingFang SC", sans-serif; }
+        body { height: 100vh; overflow: hidden; background: var(--soft-pink); color: var(--text-dark); }
+
+        @keyframes blurToClear {
+            0% { filter: blur(15px); opacity: 0; transform: scale(1.05); }
+            100% { filter: blur(0); opacity: 1; transform: scale(1); }
+        }
+        .blur-in { animation: blurToClear 1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+        .p-modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 9999; align-items: center; justify-content: center; }
+        .p-modal { width: 80%; background: var(--white); border-radius: var(--radius-lg); padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: scale(0.9); transition: 0.2s; }
+        .p-modal.show { transform: scale(1); }
+        .p-modal-title { font-weight: 600; margin-bottom: 15px; font-size: 18px; color: var(--primary-pink); }
+        .p-modal-body { font-size: 15px; margin-bottom: 25px; line-height: 1.5; color: var(--text-dark); white-space: pre-line; }
+        .p-modal-btns { display: flex; gap: 15px; justify-content: center; }
+        .p-btn { padding: 10px 25px; border-radius: 20px; border: none; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .p-btn-cancel { background: #eee; color: #666; }
+        .p-btn-confirm { background: var(--primary-pink); color: white; font-weight: 600; }
+        .p-btn:active { opacity: 0.7; }
+
+        .view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); display: none; flex-direction: column; z-index: 10; }
+        .view.active { display: flex; }
+
+        #home-view { background: linear-gradient(180deg, #fff0f5, #ffe4e1); align-items: center; z-index: 5; display: flex; }
+        .desktop-clock { margin-top: 80px; font-size: 60px; color: var(--primary-pink); font-weight: 200; }
+        .desktop-loc { font-size: 14px; color: #d8a0a0; margin: 10px 0 40px; cursor: pointer; }
+        .desktop-user { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .user-avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); object-fit: cover; }
+        .user-name { font-size: 20px; font-weight: 500; cursor: pointer; }
+        .app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 60px; width: 80%; }
+        .app-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+        .app-icon { width: 65px; height: 65px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        .nav-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #f8f8f8; flex-shrink: 0; }
+        .nav-title { font-size: 18px; font-weight: 600; color: #444; }
+        .nav-btn { font-size: 24px; color: var(--primary-pink); cursor: pointer; width: 40px; text-align: center; }
+
+        .tab-content { flex: 1; overflow-y: auto; background: var(--white); }
+        .tab-bar { height: 65px; border-top: 1px solid #eee; display: flex; background: #fff; padding-bottom: env(safe-area-inset-bottom); }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ccc; transition: 0.3s; cursor: pointer; }
+        .tab-item.active { color: var(--primary-pink); }
+        .tab-item i { font-size: 24px; margin-bottom: 3px; font-style: normal; }
+        .tab-item span { font-size: 11px; }
+
+        .chat-item { display: flex; padding: 15px; border-bottom: 1px solid #fcfcfc; align-items: center; position: relative; cursor: pointer; user-select: none; }
+        .chat-item:active { background: #fff9fa; }
+        .item-avatar { width: 55px; height: 55px; border-radius: 50%; background: #eee; margin-right: 15px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; border: 1px solid #f0f0f0; }
+        .item-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .item-info { flex: 1; min-width: 0; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .item-name { font-weight: 600; font-size: 17px; }
+        .item-time { font-size: 12px; color: #ccc; }
+        .item-lastmsg { font-size: 14px; color: var(--gray-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .msg-container { flex: 1; overflow-y: auto; background: #fdfafb; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        .msg-time-tag { align-self: center; background: rgba(0,0,0,0.05); color: #999; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin: 10px 0; }
+        .msg-row { display: flex; gap: 12px; max-width: 85%; position: relative; }
+        .msg-row.ai { align-self: flex-start; }
+        .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+        .bubble-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 18px; background: #fff; flex-shrink: 0; border: 1px solid #f0f0f0; }
+        .bubble { padding: 12px 16px; border-radius: 15px; font-size: 15px; line-height: 1.6; word-break: break-all; user-select: none; }
+        .bubble-ai { background: var(--white); color: var(--text-dark); border-top-left-radius: 2px; border: 1px solid #f0f0f0; }
+        .bubble-user { background: var(--primary-pink); color: var(--white); border-top-right-radius: 2px; }
+
+        .input-area { padding: 10px 15px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; gap: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+        .input-area input { flex: 1; height: 40px; border: none; background: #f5f5f5; border-radius: 20px; padding: 0 15px; outline: none; }
+        .send-btn { color: var(--primary-pink); font-weight: 600; padding: 5px 10px; cursor: pointer; }
+
+        .me-header { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 10px solid #f9f9f9; }
+        .envelope-btn { font-size: 30px; margin-top: 10px; color: var(--primary-pink); cursor: pointer; }
+
+        .edit-page { position: fixed; inset: 0; background: var(--soft-pink); z-index: 200; display: none; flex-direction: column; }
+        .edit-card { margin: 20px; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .edit-card textarea { width: 100%; border: none; background: #f9f9f9; border-radius: 10px; padding: 15px; min-height: 200px; outline: none; font-size: 16px; resize: none; }
+
+        .lock-indicator { float: right; color: #ccc; font-size: 12px; font-weight: normal; }
+        .locked-card { opacity: 0.8; cursor: not-allowed !important; }
+
+        .delete-friend-card {
+            margin: 20px;
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        .delete-friend-btn {
+            width: 100%;
+            padding: 16px 20px;
+            background: white;
+            border: none;
+            font-size: 15px;
+            color: #ff4d4d;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .delete-friend-btn:active {
+            background: #fff5f5;
+        }
+        .delete-friend-btn .delete-icon {
+            font-size: 18px;
+        }
+        .delete-friend-hint {
+            text-align: center;
+            padding: 0 20px 16px;
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .qr-pop { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 10000; align-items: center; justify-content: center; }
+        .qr-card {
+            width: 300px;
+            background: linear-gradient(180deg, #fff0f5, #ffe4e1);
+            border-radius: 20px;
+            padding: 40px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-text {
+            color: #c7688c;
+            font-size: 16px;
+            line-height: 2.2;
+            text-shadow: 0 0 3px #ffc8d8, 0 0 6px #ffd6e2;
+            white-space: pre-wrap;
+            text-align: center;
+            font-family: "SimSun", "宋体", serif;
+        }
+
+        .field-input { width: 100%; height: 50px; background: #f9f9f9; border: none; border-radius: var(--radius-sm); padding: 0 15px; outline: none; }
+        .test-btn { height: 50px; background: var(--primary-pink); color: white; border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body onload="app.startHome()">
+
+    <div class="p-modal-mask" id="p-modal-mask">
+        <div class="p-modal" id="p-modal">
+            <div class="p-modal-title" id="p-modal-title">提示</div>
+            <div class="p-modal-body" id="p-modal-body">内容</div>
+            <div class="p-modal-btns">
+                <button class="p-btn p-btn-cancel" id="p-btn-cancel" onclick="app.closeModal()">取消</button>
+                <button class="p-btn p-btn-confirm" id="p-btn-confirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="view active" id="home-view">
+        <div class="desktop-clock" id="d-clock">00:00</div>
+        <div class="desktop-loc" onclick="app.openDeepEdit('userLoc')">📍 <span id="val-location">萌萌星球</span></div>
+        <div class="desktop-user">
+            <img src="" class="user-avatar" id="val-avatar" onclick="app.pickFile('userAvatar')">
+            <div class="user-name" id="val-name" onclick="app.openDeepEdit('userName')">小口袋</div>
+        </div>
+        <div class="app-grid">
+            <div class="app-item" onclick="app.switchView('pocket-view')">
+                <div class="app-icon">🥨</div><div style="font-size:12px;margin-top:5px">Pocket</div>
+            </div>
+            <div class="app-item">
+                <div class="app-icon">🎵</div><div style="font-size:12px;margin-top:5px">音乐</div>
+            </div>
+            <div class="app-item" onclick="app.switchView('api-view')">
+                <div class="app-icon">⚙️</div><div style="font-size:12px;margin-top:5px">API</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="view" id="pocket-view">
+        <div id="tab-chats" class="tab-view active" style="display:flex; flex-direction:column; height:100%;">
+            <div class="nav-header">
+                <div class="nav-btn" onclick="app.switchView('home-view')">🏠</div>
+                <div class="nav-title">Pocket Chat</div>
+                <div class="nav-btn" onclick="app.switchView('create-role-view')">+</div>
+            </div>
+            <div class="tab-content" id="chat-list-container"></div>
+        </div>
+
+        <div id="tab-moments" class="tab-view" style="display:none; flex-direction:column; height:100%;">
+            <div class="nav-header"><div class="nav-title">朋友圈</div></div>
+            <div class="tab-content" style="padding:40px; text-align:center; color:#ccc;">暂无新动态</div>
+        </div>
+
+        <div id="tab-me" class="tab-view" style="display:none; flex-direction:column; height:100%;">
+            <div class="nav-header"><div class="nav-title">我</div></div>
+            <div class="tab-content">
+                <div class="me-header">
+                    <img src="" class="user-avatar" id="me-avatar" onclick="app.pickFile('userAvatar')">
+                    <div class="user-name" id="me-name" onclick="app.openDeepEdit('userName')">用户名</div>
+                    <div style="font-size:13px; color:#bbb;" onclick="app.openDeepEdit('userPid')">口袋码：<span id="val-pocketid">888888</span></div>
+                    <div class="envelope-btn" onclick="app.toggleQR(true)">✉️</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <div class="tab-item active" onclick="app.switchTab('chats')"><i>🥨</i><span>聊天</span></div>
+            <div class="tab-item" onclick="app.switchTab('moments')"><i>🍥</i><span>朋友圈</span></div>
+            <div class="tab-item" onclick="app.switchTab('me')"><i>🫓</i><span>我</span></div>
+        </div>
+    </section>
+
+    <section class="view" id="chat-detail-view">
+        <div class="nav-header">
+            <div class="nav-btn" onclick="app.switchView('pocket-view')">◀</div>
+            <div class="nav-title" id="chat-title">正在加载...</div>
+            <div class="nav-btn" onclick="app.openRoleSettings()">⚙️</div>
+        </div>
+        <div class="msg-container" id="msg-box"></div>
+        <div class="input-area">
+            <input type="text" id="chat-input" placeholder="发送消息..." onkeydown="if(event.key==='Enter') app.sendMessage()">
+            <div class="send-btn" onclick="app.sendMessage()">发送</div>
+        </div>
+    </section>
+
+    <section class="view" id="role-settings-view">
+        <div class="nav-header">
+            <div class="nav-btn" onclick="app.switchView('chat-detail-view')">◀</div>
+            <div class="nav-title">角色设置</div>
+            <div style="width:40px"></div>
+        </div>
+        <div class="tab-content" id="role-settings-content" style="background:#f9f9f9; padding-top:30px;">
+        </div>
+    </section>
+
+    <div class="edit-page" id="deep-edit-view">
+        <div class="nav-header">
+            <div class="nav-btn" onclick="app.closeDeepEdit()" style="font-size:14px;">取消</div>
+            <div class="nav-title" id="edit-page-title">编辑信息</div>
+            <div class="nav-btn" onclick="app.saveDeepEdit()" style="font-size:14px;">确认</div>
+        </div>
+        <div class="edit-card">
+            <textarea id="deep-edit-input"></textarea>
+        </div>
+    </div>
+
+    <section class="view" id="create-role-view">
+        <div class="nav-header">
+            <div class="nav-btn" onclick="app.switchView('pocket-view')">◀</div>
+            <div class="nav-title">新角色</div>
+            <div style="width:40px"></div>
+        </div>
+        <div class="tab-content" style="padding:25px; display:flex; flex-direction:column; gap:20px;">
+            <input class="field-input" id="new-role-name" placeholder="起个名字吧">
+            <div class="field-input" style="height:100px; display:flex; align-items:center; justify-content:center; color:#ccc; border-radius: 50%; width: 100px; margin: 0 auto; border: 1px dashed #ccc;" onclick="app.pickFile('newRoleAvatar')" id="new-role-av-box">头像</div>
+            <textarea class="field-input" id="new-role-prompt" style="height:150px; padding:15px;" placeholder="人设性格描述..."></textarea>
+            <button class="test-btn" onclick="app.confirmCreateRole()">完成创建</button>
+        </div>
+    </section>
+
+    <section class="view" id="api-view">
+        <div class="nav-header">
+            <div class="nav-btn" onclick="app.switchView('home-view')">◀</div>
+            <div class="nav-title">API 配置</div>
+            <div class="nav-btn" onclick="app.saveConfig()" style="font-size:14px;">保存</div>
+        </div>
+        <div class="config-list" style="padding:20px; display:flex; flex-direction:column; gap:15px;">
+            <input class="field-input" id="cfg-url" placeholder="接口地址 (URL)">
+            <input class="field-input" id="cfg-key" type="password" placeholder="API Key (sk-...)">
+            <button class="test-btn" onclick="app.testAPI()">连接测试</button>
+        </div>
+    </section>
+
+    <div class="qr-pop" id="qr-pop" onclick="app.toggleQR(false)">
+        <div class="qr-card">
+            <div class="qr-text">＿＿＿＿
+⊹ ｡*₍ᐢ .  ̫.ᐢ₎ ₍ᐢ. ̫ .⑅ᐢ₎⊹ ･｡
+陳平安の作品
+
+無断転載・改変・販売禁止！！
+
+楽しく遊んでね、ベイビー ⌯>ᴗo⌯ಣ”
+＿＿＿＿＿＿</div>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" hidden accept="image/*">
+
+    <script>
+        const app = {
+            state: {
+                user: JSON.parse(localStorage.getItem('pk_user')) || { homeName: "小口袋", location: "萌萌星球", avatar: "", pid: "888888" },
+                roles: JSON.parse(localStorage.getItem('pk_roles')) || [
+                    { 
+                        id: 1, 
+                        name: "手机小助手", 
+                        avatar: "📱", 
+                        prompt: "你是这个Pocket Chat应用的手机小助手。你的唯一职责是帮助用户解答关于这个手机（即这个Pocket Chat应用代码）的所有功能和使用方法。你可以回答的问题包括但不限于：如何创建新角色、如何修改昵称和头像、如何配置API、如何删除好友、如何发送消息、如何编辑角色人设、如何查看朋友圈、如何更换用户信息等所有应用内的功能操作。如果用户问你与应用功能无关的问题（比如闲聊、询问外部知识、要求写代码、讲笑话等），请统一回复：'这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡'", 
+                        lastMsg: "哪里不会用嘛？可以问问我哦", 
+                        lastTime: "系统", 
+                        moment: "",
+                        isSystem: true 
+                    }
+                ],
+                chats: JSON.parse(localStorage.getItem('pk_chats')) || {},
+                config: JSON.parse(localStorage.getItem('pk_cfg')) || { url: "https://api.deepseek.com/v1", key: "" },
+                activeRoleId: null,
+                editType: null,
+                tempAvatar: "",
+                pressTimer: null
+            },
+
+            init() {
+                this.updateClock(); setInterval(() => this.updateClock(), 1000);
+                this.renderUser(); this.renderRoleList();
+                document.addEventListener('contextmenu', e => e.preventDefault());
+            },
+
+            startHome() {
+                const home = document.getElementById('home-view');
+                home.classList.add('active', 'blur-in');
+                this.init();
+            },
+
+            showModal(title, body, confirmText, onConfirm, showCancel = true) {
+                const mask = document.getElementById('p-modal-mask');
+                document.getElementById('p-modal-title').innerText = title;
+                document.getElementById('p-modal-body').innerText = body;
+                const confirmBtn = document.getElementById('p-btn-confirm');
+                confirmBtn.innerText = confirmText;
+                confirmBtn.onclick = () => { onConfirm(); this.closeModal(); };
+                document.getElementById('p-btn-cancel').style.display = showCancel ? 'block' : 'none';
+                mask.style.display = 'flex';
+                setTimeout(() => document.getElementById('p-modal').classList.add('show'), 10);
+            },
+            closeModal() {
+                document.getElementById('p-modal').classList.remove('show');
+                setTimeout(() => document.getElementById('p-modal-mask').style.display = 'none', 200);
+            },
+
+            switchView(id) {
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active', 'blur-in'));
+                const target = document.getElementById(id);
+                target.classList.add('active');
+                if(id === 'home-view') target.classList.add('blur-in');
+                if(id === 'pocket-view') this.renderRoleList();
+            },
+            switchTab(name) {
+                document.querySelectorAll('.tab-view').forEach(t => t.style.display = 'none');
+                document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+                const tabId = (name==='chats'?'tab-chats':(name==='moments'?'tab-moments':'tab-me'));
+                document.getElementById(tabId).style.display = 'flex';
+                event.currentTarget.classList.add('active');
+            },
+
+            openDeepEdit(type) {
+                const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
+                if (role && role.id === 1 && !type.startsWith('user')) {
+                    this.showModal("系统限制", "手机小助手的核心设定无法被修改 🔐", "知道啦", () => {}, false);
+                    return;
+                }
+                this.state.editType = type;
+                const input = document.getElementById('deep-edit-input');
+                const title = document.getElementById('edit-page-title');
+                if(type === 'userName') { title.innerText = "修改昵称"; input.value = this.state.user.homeName; }
+                else if(type === 'userLoc') { title.innerText = "修改地点"; input.value = this.state.user.location; }
+                else if(type === 'userPid') { title.innerText = "修改口袋码"; input.value = this.state.user.pid; }
+                else if(role) {
+                    if(type === 'roleName') { title.innerText = "修改备注"; input.value = role.name; }
+                    else if(type === 'rolePrompt') { title.innerText = "修改人设"; input.value = role.prompt; }
+                    else if(type === 'roleMoment') { title.innerText = "编辑朋友圈内容"; input.value = role.moment || ""; }
+                }
+                document.getElementById('deep-edit-view').style.display = 'flex';
+            },
+
+            saveDeepEdit() {
+                const val = document.getElementById('deep-edit-input').value;
+                if(this.state.editType.startsWith('user')) {
+                    if(this.state.editType === 'userName') this.state.user.homeName = val;
+                    if(this.state.editType === 'userLoc') this.state.user.location = val;
+                    if(this.state.editType === 'userPid') this.state.user.pid = val;
+                } else {
+                    const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
+                    if(this.state.editType === 'roleName') { role.name = val; document.getElementById('chat-title').innerText = val; }
+                    if(this.state.editType === 'rolePrompt') role.prompt = val;
+                    if(this.state.editType === 'roleMoment') role.moment = val;
+                }
+                this.saveAll(); this.renderUser(); this.openRoleSettings(); this.closeDeepEdit();
+            },
+            closeDeepEdit() { document.getElementById('deep-edit-view').style.display = 'none'; },
+
+            openRoleSettings() {
+                const r = this.state.roles.find(x => x.id === this.state.activeRoleId);
+                if(!r) return;
+                const isAssistant = (r.id === 1);
+                const content = document.getElementById('role-settings-content');
+                let html = `
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <div class="user-avatar" style="border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px; background:white; overflow:hidden; border:1px solid #eee; ${isAssistant?'':'cursor:pointer'}" 
+                             onclick="${isAssistant?'':'app.pickFile(\'roleAvatar\')'}">
+                             ${isAssistant ? '📱' : (r.avatar.startsWith('data') ? `<img src="${r.avatar}" style="width:100%;height:100%;object-fit:cover;">` : '👤')}
+                        </div>
+                    </div>
+                    <div class="edit-card ${isAssistant?'locked-card':''}" onclick="app.openDeepEdit('roleName')">
+                        <div style="font-size:12px; color:#999; margin-bottom:5px;">备注名 ${isAssistant?'<span class="lock-indicator">已锁定</span>':''}</div>
+                        <div style="font-size:16px; font-weight:600;">${r.name}</div>
+                    </div>
+                    <div class="edit-card ${isAssistant?'locked-card':''}" onclick="app.openDeepEdit('rolePrompt')">
+                        <div style="font-size:12px; color:#999; margin-bottom:5px;">角色人设 ${isAssistant?'<span class="lock-indicator">已锁定</span>':''}</div>
+                        <div style="font-size:14px; color:#666; line-height:1.5;">${r.prompt}</div>
+                    </div>
+                `;
+                if(!isAssistant) {
+                    html += `
+                        <div class="edit-card" onclick="app.openDeepEdit('roleMoment')">
+                            <div style="font-size:12px; color:#999; margin-bottom:5px;">朋友圈状态</div>
+                            <div style="color:var(--primary-pink); font-size:14px;">点击编辑朋友圈内容...</div>
+                        </div>
+                        <div class="delete-friend-card">
+                            <button class="delete-friend-btn" onclick="app.deleteRole(${r.id})">
+                                <span class="delete-icon">🗑️</span> 删除这位朋友
+                            </button>
+                            <div class="delete-friend-hint">删除后聊天记录也将消失，且无法找回</div>
+                        </div>
+                    `;
+                }
+                content.innerHTML = html;
+                this.switchView('role-settings-view');
+            },
+
+            deleteRole(id) {
+                if(id === 1) return;
+                this.showModal("删除朋友", "确定要删除这位朋友吗？\n删除后聊天记录也将消失哦\n且无法找回咯", "确定删除", () => {
+                    this.state.roles = this.state.roles.filter(r => r.id !== id);
+                    delete this.state.chats[id];
+                    this.saveAll();
+                    this.renderRoleList();
+                    this.switchView('pocket-view');
+                });
+            },
+
+            async sendMessage() {
+                const input = document.getElementById('chat-input');
+                const text = input.value.trim(); if(!text) return;
+                const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
+                if(!this.state.chats[role.id]) this.state.chats[role.id] = [];
+                this.state.chats[role.id].push({ type: 'user', text, ts: Date.now() });
+                input.value = ""; this.renderMessages();
+                role.lastMsg = text; role.lastTime = this.getClockStr();
+                document.getElementById('chat-title').innerText = "对方正在回复...";
+                const reply = await this.fetchAI(text, role);
+                this.state.chats[role.id].push({ type: 'ai', text: reply, ts: Date.now() });
+                role.lastMsg = reply; role.lastTime = this.getClockStr();
+                document.getElementById('chat-title').innerText = role.name;
+                this.renderMessages(); this.saveAll();
+            },
+
+            async fetchAI(text, role) {
+                if(!this.state.config.key) return "请在设置中配置 API Key ♡";
+                try {
+                    const history = (this.state.chats[role.id] || []).slice(-10).map(m => ({
+                        role: m.type === 'user' ? 'user' : 'assistant',
+                        content: m.text
+                    }));
+                    const r = await fetch(`${this.state.config.url}/chat/completions`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.state.config.key}` },
+                        body: JSON.stringify({ model: "deepseek-chat", messages: [{role:"system",content:role.prompt}, ...history] })
+                    });
+                    const d = await r.json();
+                    let reply = d.choices[0].message.content;
+
+                    if(role.id === 1) {
+                        const appKeywords = ['创建角色', '昵称', '头像', 'API', '配置', '删除', '好友', '发送消息', '人设', '朋友圈', '口袋码', '二维码', '使用方法', '功能', '设置', '聊天', '桌面', 'Pocket', '小口袋', '角色', '编辑', '备注'];
+                        const isAppRelated = appKeywords.some(kw => reply.includes(kw));
+                        const isFallbackReply = reply.includes("这个我还不太清楚呢");
+                        if(!isAppRelated && !isFallbackReply) {
+                            reply = "这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡";
+                        }
+                    }
+
+                    return reply;
+                } catch(e) { return "网络波动中，晚点再聊吧~"; }
+            },
+
+            testAPI() {
+                this.showModal("测试中", "正在尝试建立连接...", "请稍后", () => {}, false);
+                setTimeout(async () => {
+                    try {
+                        if(!this.state.config.key) throw new Error("未配置KEY");
+                        const res = await this.fetchAI("你好", {prompt: "助手", id: 999});
+                        if(res.includes("API Key") || res.includes("波动")) throw new Error("接口返回异常");
+                        this.showModal("连接成功", "等你好久啦♡", "确定", () => {}, false);
+                    } catch(e) {
+                        this.showModal("连接失败", "再试试吧～\n原因: " + e.message, "确定", () => {}, false);
+                    }
+                }, 800);
+            },
+
+            deleteMsg(ts) {
+                this.showModal("确认删除消息", "删除该条消息后将无法找回，且不再计入对话记忆。", "确认删除", () => {
+                    const msgs = this.state.chats[this.state.activeRoleId];
+                    this.state.chats[this.state.activeRoleId] = msgs.filter(m => m.ts !== ts);
+                    this.saveAll();
+                    this.renderMessages();
+                });
+            },
+
+            pickFile(target) {
+                const f = document.getElementById('file-input');
+                f.onchange = e => {
+                    const rd = new FileReader();
+                    rd.onload = ev => {
+                        const b64 = ev.target.result;
+                        if(target === 'userAvatar') this.state.user.avatar = b64;
+                        else if(target === 'roleAvatar') {
+                            const r = this.state.roles.find(x => x.id === this.state.activeRoleId);
+                            r.avatar = b64; this.openRoleSettings();
+                        } else if(target === 'newRoleAvatar') {
+                            this.state.tempAvatar = b64;
+                            document.getElementById('new-role-av-box').innerHTML = `<img src="${b64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                        }
+                        this.saveAll(); this.renderUser();
+                    };
+                    rd.readAsDataURL(e.target.files[0]);
+                };
+                f.click();
+            },
+            renderUser() {
+                document.getElementById('val-location').innerText = this.state.user.location;
+                document.getElementById('val-name').innerText = this.state.user.homeName;
+                document.getElementById('me-name').innerText = this.state.user.homeName;
+                document.getElementById('val-pocketid').innerText = this.state.user.pid;
+                const av = this.state.user.avatar || 'https://api.dicebear.com/7.x/adventurer/svg?seed=user';
+                document.getElementById('val-avatar').src = av; document.getElementById('me-avatar').src = av;
+            },
+            renderRoleList() {
+                const c = document.getElementById('chat-list-container');
+                c.innerHTML = this.state.roles.map(r => `
+                    <div class="chat-item" 
+                         onclick="app.openChat(${r.id})">
+                        <div class="item-avatar">${(r.id===1)?'📱':(r.avatar ? `<img src="${r.avatar}">` : '👤')}</div>
+                        <div class="item-info">
+                            <div class="item-row"><span class="item-name">${r.name}</span><span class="item-time">${r.lastTime}</span></div>
+                            <div class="item-lastmsg">${r.lastMsg}</div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+            openChat(id) {
+                this.state.activeRoleId = id;
+                const r = this.state.roles.find(x => x.id === id);
+                document.getElementById('chat-title').innerText = r.name;
+                this.renderMessages(); this.switchView('chat-detail-view');
+            },
+            renderMessages() {
+                const box = document.getElementById('msg-box');
+                const ms = this.state.chats[this.state.activeRoleId] || [];
+                const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
+                let h = "", last = 0;
+                ms.forEach(m => {
+                    if(m.ts - last > 300000) h += `<div class="msg-time-tag">${new Date(m.ts).getHours()}:${new Date(m.ts).getMinutes().toString().padStart(2,'0')}</div>`;
+                    last = m.ts;
+                    h += `<div class="msg-row ${m.type}">
+                        <div class="bubble-avatar">${m.type==='ai' ? (role.id===1?'📱':(role.avatar?`<img src="${role.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')) : (this.state.user.avatar?`<img src="${this.state.user.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')}</div>
+                        <div class="bubble bubble-${m.type}" ondblclick="app.deleteMsg(${m.ts})">${m.text}</div>
+                    </div>`;
+                });
+                box.innerHTML = h; box.scrollTop = box.scrollHeight;
+            },
+            confirmCreateRole() {
+                const name = document.getElementById('new-role-name').value;
+                if(!name) return;
+                this.state.roles.push({
+                    id: Date.now(), name, avatar: this.state.tempAvatar,
+                    prompt: document.getElementById('new-role-prompt').value || "你好",
+                    lastMsg: "开始聊天吧", lastTime: this.getClockStr(), moment: ""
+                });
+                this.state.tempAvatar = ""; this.saveAll(); this.switchView('pocket-view');
+            },
+            saveConfig() {
+                this.state.config.url = document.getElementById('cfg-url').value;
+                this.state.config.key = document.getElementById('cfg-key').value;
+                this.saveAll(); this.showModal("保存成功", "配置已更新", "确定", () => {}, false);
+            },
+            saveAll() {
+                localStorage.setItem('pk_user', JSON.stringify(this.state.user));
+                localStorage.setItem('pk_roles', JSON.stringify(this.state.roles));
+                localStorage.setItem('pk_chats', JSON.stringify(this.state.chats));
+                localStorage.setItem('pk_cfg', JSON.stringify(this.state.config));
+            },
+            updateClock() { document.getElementById('d-clock').innerText = this.getClockStr(); },
+            getClockStr() { const d = new Date(); return d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0'); },
+            toggleQR(s) { document.getElementById('qr-pop').style.display = s ? 'flex' : 'none'; }
+        };
+    </script>
+</body>
+</html>
