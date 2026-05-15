@@ -13,6 +13,9 @@
             --gray-text: #999;
             --radius-lg: 20px;
             --radius-sm: 12px;
+            --soft-green: #b8d4b8;
+            --soft-green-bg: #e8f5e8;
+            --soft-red: #e8b4b8;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: "PingFang SC", sans-serif; }
@@ -49,8 +52,28 @@
         .app-icon { width: 65px; height: 65px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 
         .nav-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #f8f8f8; flex-shrink: 0; }
-        .nav-title { font-size: 18px; font-weight: 600; color: #444; }
-        .nav-btn { font-size: 24px; color: var(--primary-pink); cursor: pointer; width: 40px; text-align: center; }
+        .nav-title { font-size: 18px; font-weight: 600; color: #444; text-align: center; flex: 1; }
+        .nav-btn { font-size: 24px; color: var(--primary-pink); cursor: pointer; width: 40px; text-align: center; flex-shrink: 0; }
+        .nav-back {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .nav-back::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 14px;
+            height: 14px;
+            border-left: 2.5px solid var(--primary-pink);
+            border-bottom: 2.5px solid var(--primary-pink);
+            border-radius: 3px;
+            transform: translate(-30%, -50%) rotate(45deg);
+        }
 
         .tab-content { flex: 1; overflow-y: auto; background: var(--white); }
         .tab-bar { height: 65px; border-top: 1px solid #eee; display: flex; background: #fff; padding-bottom: env(safe-area-inset-bottom); }
@@ -148,8 +171,115 @@
             font-family: "SimSun", "宋体", serif;
         }
 
-        .field-input { width: 100%; height: 50px; background: #f9f9f9; border: none; border-radius: var(--radius-sm); padding: 0 15px; outline: none; }
-        .test-btn { height: 50px; background: var(--primary-pink); color: white; border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; }
+        .field-input { width: 100%; height: 50px; background: #f9f9f9; border: none; border-radius: var(--radius-sm); padding: 0 15px; outline: none; font-size: 15px; }
+        .field-select { width: 100%; height: 50px; background: #f9f9f9; border: none; border-radius: var(--radius-sm); padding: 0 15px; outline: none; font-size: 15px; color: var(--text-dark); appearance: none; -webkit-appearance: none; cursor: pointer; }
+        .select-wrapper { position: relative; width: 100%; }
+        .select-wrapper::after {
+            content: '▾';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 14px;
+            pointer-events: none;
+        }
+        .test-btn { height: 50px; background: var(--primary-pink); color: white; border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; font-size: 15px; }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .password-wrapper .field-input {
+            padding-right: 50px;
+        }
+        .password-dot {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .password-dot.hidden-state {
+            background: var(--soft-red);
+        }
+        .password-dot.visible-state {
+            background: var(--soft-green);
+        }
+
+        .settings-list { padding: 0; flex: 1; overflow-y: auto; background: #f9f9f9; }
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background: white;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .settings-item:active { background: #fff9fa; }
+        .settings-icon { font-size: 22px; width: 36px; text-align: center; margin-right: 14px; flex-shrink: 0; }
+        .settings-label { font-size: 16px; color: var(--text-dark); flex: 1; }
+        .settings-arrow { color: #ccc; font-size: 14px; }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input { display: none; }
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: #e0e0e0;
+            border-radius: 28px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--soft-green);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(22px);
+        }
+
+        .persona-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: white;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: 0.2s;
+            gap: 12px;
+        }
+        .persona-item:active { background: #fff9fa; }
+        .persona-icon { font-size: 28px; flex-shrink: 0; }
+        .persona-info { flex: 1; min-width: 0; }
+        .persona-name { font-weight: 600; font-size: 16px; }
+        .persona-desc-preview { font-size: 13px; color: var(--gray-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+        .persona-item .toggle-switch { flex-shrink: 0; }
+        .persona-item .toggle-switch .toggle-slider { cursor: pointer; }
+
+        .api-section-label { font-size: 13px; color: #999; margin-bottom: 6px; padding-left: 2px; }
     </style>
 </head>
 <body onload="app.startHome()">
@@ -179,8 +309,8 @@
             <div class="app-item">
                 <div class="app-icon">🎵</div><div style="font-size:12px;margin-top:5px">音乐</div>
             </div>
-            <div class="app-item" onclick="app.switchView('api-view')">
-                <div class="app-icon">⚙️</div><div style="font-size:12px;margin-top:5px">API</div>
+            <div class="app-item" onclick="app.switchView('settings-view')">
+                <div class="app-icon">⚙️</div><div style="font-size:12px;margin-top:5px">设置</div>
             </div>
         </div>
     </section>
@@ -221,7 +351,7 @@
 
     <section class="view" id="chat-detail-view">
         <div class="nav-header">
-            <div class="nav-btn" onclick="app.switchView('pocket-view')">◀</div>
+            <div class="nav-back" onclick="app.switchView('pocket-view')"></div>
             <div class="nav-title" id="chat-title">正在加载...</div>
             <div class="nav-btn" onclick="app.openRoleSettings()">⚙️</div>
         </div>
@@ -234,7 +364,7 @@
 
     <section class="view" id="role-settings-view">
         <div class="nav-header">
-            <div class="nav-btn" onclick="app.switchView('chat-detail-view')">◀</div>
+            <div class="nav-back" onclick="app.switchView('chat-detail-view')"></div>
             <div class="nav-title">角色设置</div>
             <div style="width:40px"></div>
         </div>
@@ -255,7 +385,7 @@
 
     <section class="view" id="create-role-view">
         <div class="nav-header">
-            <div class="nav-btn" onclick="app.switchView('pocket-view')">◀</div>
+            <div class="nav-back" onclick="app.switchView('pocket-view')"></div>
             <div class="nav-title">新角色</div>
             <div style="width:40px"></div>
         </div>
@@ -267,23 +397,123 @@
         </div>
     </section>
 
+    <!-- 设置页 -->
+    <section class="view" id="settings-view">
+        <div class="nav-header">
+            <div class="nav-back" onclick="app.switchView('home-view')"></div>
+            <div class="nav-title">设置</div>
+            <div style="width:40px"></div>
+        </div>
+        <div class="settings-list" id="settings-list">
+            <div class="settings-item" onclick="app.switchView('api-view')">
+                <span class="settings-icon">💡</span>
+                <span class="settings-label">API 配置</span>
+                <span class="settings-arrow">›</span>
+            </div>
+            <div class="settings-item" onclick="app.showModal('即将上线','破限功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)">
+                <span class="settings-icon">🔑</span>
+                <span class="settings-label">破限</span>
+                <span class="settings-arrow">›</span>
+            </div>
+            <div class="settings-item" onclick="app.showModal('即将上线','文风要求功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)">
+                <span class="settings-icon">📃</span>
+                <span class="settings-label">文风要求</span>
+                <span class="settings-arrow">›</span>
+            </div>
+            <div class="settings-item" onclick="app.showModal('即将上线','美化档功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)">
+                <span class="settings-icon">🖌️</span>
+                <span class="settings-label">美化档</span>
+                <span class="settings-arrow">›</span>
+            </div>
+            <div class="settings-item" onclick="app.switchView('persona-list-view')">
+                <span class="settings-icon">🪪</span>
+                <span class="settings-label">用户人设</span>
+                <span class="settings-arrow">›</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- API配置页 -->
     <section class="view" id="api-view">
         <div class="nav-header">
-            <div class="nav-btn" onclick="app.switchView('home-view')">◀</div>
+            <div class="nav-back" onclick="app.switchView('settings-view')"></div>
             <div class="nav-title">API 配置</div>
             <div class="nav-btn" onclick="app.saveConfig()" style="font-size:14px;">保存</div>
         </div>
-        <div class="config-list" style="padding:20px; display:flex; flex-direction:column; gap:15px;">
-            <input class="field-input" id="cfg-url" placeholder="接口地址 (URL)">
-            <input class="field-input" id="cfg-key" type="password" placeholder="API Key (sk-...)">
+        <div class="tab-content" style="padding:20px; display:flex; flex-direction:column; gap:15px; background:#f9f9f9;">
+            <div>
+                <div class="api-section-label">供应商</div>
+                <div class="select-wrapper">
+                    <select class="field-select" id="cfg-provider" onchange="app.onProviderChange()">
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="zhipu">智谱 GLM</option>
+                        <option value="doubao">豆包</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <div class="api-section-label">接口地址</div>
+                <input class="field-input" id="cfg-url" placeholder="接口地址 (URL)">
+            </div>
+            <div>
+                <div class="api-section-label">API Key</div>
+                <div class="password-wrapper">
+                    <input class="field-input" id="cfg-key" type="password" placeholder="API Key">
+                    <div class="password-dot hidden-state" id="pwd-dot" onclick="app.togglePassword()"></div>
+                </div>
+            </div>
+            <div>
+                <div class="api-section-label">模型名称</div>
+                <div class="select-wrapper">
+                    <select class="field-select" id="cfg-model"></select>
+                </div>
+            </div>
             <button class="test-btn" onclick="app.testAPI()">连接测试</button>
+        </div>
+    </section>
+
+    <!-- 人设列表页 -->
+    <section class="view" id="persona-list-view">
+        <div class="nav-header">
+            <div class="nav-back" onclick="app.switchView('settings-view')"></div>
+            <div class="nav-title">用户人设</div>
+            <div class="nav-btn" onclick="app.switchView('create-persona-view')">+</div>
+        </div>
+        <div class="tab-content" id="persona-list-content" style="background:#f9f9f9;"></div>
+    </section>
+
+    <!-- 新建人设页 -->
+    <section class="view" id="create-persona-view">
+        <div class="nav-header">
+            <div class="nav-back" onclick="app.switchView('persona-list-view')"></div>
+            <div class="nav-title">新建人设</div>
+            <div style="width:40px"></div>
+        </div>
+        <div class="tab-content" style="padding:25px; display:flex; flex-direction:column; gap:20px;">
+            <input class="field-input" id="new-persona-name" placeholder="人设名称">
+            <textarea class="field-input" id="new-persona-desc" style="height:200px; padding:15px;" placeholder="人设描述（世界观、性格、身份等）..."></textarea>
+            <button class="test-btn" onclick="app.confirmCreatePersona()">完成创建</button>
+        </div>
+    </section>
+
+    <!-- 编辑人设页 -->
+    <section class="view" id="edit-persona-view">
+        <div class="nav-header">
+            <div class="nav-back" onclick="app.switchView('persona-list-view')"></div>
+            <div class="nav-title">编辑人设</div>
+            <div class="nav-btn" id="persona-delete-btn" onclick="app.deleteCurrentPersona()" style="font-size:16px;">🗑️</div>
+        </div>
+        <div class="tab-content" id="edit-persona-content" style="padding:25px; display:flex; flex-direction:column; gap:20px;">
+            <input class="field-input" id="edit-persona-name" placeholder="人设名称">
+            <textarea class="field-input" id="edit-persona-desc" style="height:200px; padding:15px;" placeholder="人设描述..."></textarea>
+            <button class="test-btn" onclick="app.savePersonaEdit()">保存修改</button>
         </div>
     </section>
 
     <div class="qr-pop" id="qr-pop" onclick="app.toggleQR(false)">
         <div class="qr-card">
             <div class="qr-text">＿＿＿＿
-⊹ ｡*₍ᐢ .  ̫.ᐢ₎ ₍ᐢ. ̫ .⑅ᐢ₎⊹ ･｡
+.°⑅ପ₍ᐢ｡•༝•｡ᐢ₎₍ᐢ｡•༝•｡ᐢ₎ଓ⑅°. 
 陳平安の作品
 
 無断転載・改変・販売禁止！！
@@ -296,6 +526,21 @@
     <input type="file" id="file-input" hidden accept="image/*">
 
     <script>
+        const API_PRESETS = {
+            deepseek: {
+                url: 'https://api.deepseek.com/v1',
+                models: ['deepseek-chat', 'deepseek-reasoner']
+            },
+            zhipu: {
+                url: 'https://open.bigmodel.cn/api/paas/v4',
+                models: ['glm-4-flash', 'glm-4-plus', 'glm-4v-flash', 'glm-4v']
+            },
+            doubao: {
+                url: 'https://ark.cn-beijing.volces.com/api/v3',
+                models: ['doubao-pro-32k', 'doubao-lite-32k', 'doubao-pro-128k']
+            }
+        };
+
         const app = {
             state: {
                 user: JSON.parse(localStorage.getItem('pk_user')) || { homeName: "小口袋", location: "萌萌星球", avatar: "", pid: "888888" },
@@ -304,7 +549,7 @@
                         id: 1, 
                         name: "手机小助手", 
                         avatar: "📱", 
-                        prompt: "你是这个Pocket Chat应用的手机小助手。你的唯一职责是帮助用户解答关于这个手机（即这个Pocket Chat应用代码）的所有功能和使用方法。你可以回答的问题包括但不限于：如何创建新角色、如何修改昵称和头像、如何配置API、如何删除好友、如何发送消息、如何编辑角色人设、如何查看朋友圈、如何更换用户信息等所有应用内的功能操作。如果用户问你与应用功能无关的问题（比如闲聊、询问外部知识、要求写代码、讲笑话等），请统一回复：'这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡'", 
+                        prompt: "你是 Pocket Chat 的「手机小助手」📱\n\n你的职责是帮用户解答这个应用的所有操作问题。\n\n## 你能回答的：\n- 如何创建/删除角色、修改备注和人设\n- 如何配置 API（DeepSeek / 智谱 / 豆包）\n- 如何创建和切换用户人设\n- 如何修改昵称、头像、地点、口袋码\n- 如何发送消息、删除消息\n- 如何查看朋友圈、使用设置页\n- 其他一切关于此应用的操作\n\n## 回复格式：\n1. 用简短清晰的步骤说明，每条前加数字或emoji\n2. 关键按钮用【】标出，比如点击【+】\n3. 每次回复不超过6行\n4. 语气亲切可爱，带点 ♡\n\n## 遇到无关问题时：\n统一回复：「这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡」\n不要展开回答任何与 Pocket Chat 操作无关的内容。", 
                         lastMsg: "哪里不会用嘛？可以问问我哦", 
                         lastTime: "系统", 
                         moment: "",
@@ -312,17 +557,68 @@
                     }
                 ],
                 chats: JSON.parse(localStorage.getItem('pk_chats')) || {},
-                config: JSON.parse(localStorage.getItem('pk_cfg')) || { url: "https://api.deepseek.com/v1", key: "" },
+                config: JSON.parse(localStorage.getItem('pk_cfg')) || { provider: "deepseek", url: "https://api.deepseek.com/v1", key: "", model: "deepseek-chat" },
+                personas: JSON.parse(localStorage.getItem('pk_personas')) || [
+                    { id: 1, name: "默认", desc: "", isSystem: true }
+                ],
+                activePersonaId: JSON.parse(localStorage.getItem('pk_activePid')) || 1,
                 activeRoleId: null,
                 editType: null,
                 tempAvatar: "",
-                pressTimer: null
+                editingPersonaId: null,
+                passwordVisible: false
             },
 
             init() {
                 this.updateClock(); setInterval(() => this.updateClock(), 1000);
                 this.renderUser(); this.renderRoleList();
                 document.addEventListener('contextmenu', e => e.preventDefault());
+            },
+
+            loadConfigInputs() {
+                const cfg = this.state.config;
+                document.getElementById('cfg-provider').value = cfg.provider || 'deepseek';
+                document.getElementById('cfg-url').value = cfg.url || API_PRESETS[cfg.provider]?.url || '';
+                document.getElementById('cfg-key').value = cfg.key || '';
+                document.getElementById('cfg-key').type = this.state.passwordVisible ? 'text' : 'password';
+                this.updatePasswordDot();
+                this.populateModelSelect(cfg.provider);
+            },
+
+            populateModelSelect(provider) {
+                const sel = document.getElementById('cfg-model');
+                const models = API_PRESETS[provider]?.models || [];
+                sel.innerHTML = models.map(m => `<option value="${m}">${m}</option>`).join('');
+                const currentModel = this.state.config.model;
+                if(models.includes(currentModel)) {
+                    sel.value = currentModel;
+                } else if(models.length > 0) {
+                    sel.value = models[0];
+                    this.state.config.model = models[0];
+                }
+            },
+
+            onProviderChange() {
+                const provider = document.getElementById('cfg-provider').value;
+                const preset = API_PRESETS[provider];
+                if(preset) {
+                    document.getElementById('cfg-url').value = preset.url;
+                    this.populateModelSelect(provider);
+                    this.state.config.provider = provider;
+                    this.state.config.url = preset.url;
+                    this.state.config.model = document.getElementById('cfg-model').value;
+                }
+            },
+
+            togglePassword() {
+                this.state.passwordVisible = !this.state.passwordVisible;
+                document.getElementById('cfg-key').type = this.state.passwordVisible ? 'text' : 'password';
+                this.updatePasswordDot();
+            },
+
+            updatePasswordDot() {
+                const dot = document.getElementById('pwd-dot');
+                dot.className = 'password-dot ' + (this.state.passwordVisible ? 'visible-state' : 'hidden-state');
             },
 
             startHome() {
@@ -353,6 +649,8 @@
                 target.classList.add('active');
                 if(id === 'home-view') target.classList.add('blur-in');
                 if(id === 'pocket-view') this.renderRoleList();
+                if(id === 'persona-list-view') this.renderPersonaList();
+                if(id === 'api-view') this.loadConfigInputs();
             },
             switchTab(name) {
                 document.querySelectorAll('.tab-view').forEach(t => t.style.display = 'none');
@@ -387,7 +685,13 @@
                 if(this.state.editType.startsWith('user')) {
                     if(this.state.editType === 'userName') this.state.user.homeName = val;
                     if(this.state.editType === 'userLoc') this.state.user.location = val;
-                    if(this.state.editType === 'userPid') this.state.user.pid = val;
+                    if(this.state.editType === 'userPid') {
+                        const filtered = val.replace(/[^\x00-\x7F]/g, '').slice(0, 10);
+                        if(val !== filtered) {
+                            this.showModal("格式限制", "口袋码最多10位\n只支持数字、字母、符号\n已自动过滤", "知道啦", () => {}, false);
+                        }
+                        this.state.user.pid = filtered;
+                    }
                 } else {
                     const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
                     if(this.state.editType === 'roleName') { role.name = val; document.getElementById('chat-title').innerText = val; }
@@ -448,6 +752,85 @@
                 });
             },
 
+            renderPersonaList() {
+                const c = document.getElementById('persona-list-content');
+                const ap = this.state.personas;
+                c.innerHTML = ap.map(p => `
+                    <div class="persona-item" onclick="app.openEditPersona(${p.id})">
+                        <span class="persona-icon">🪪</span>
+                        <div class="persona-info">
+                            <div class="persona-name">${p.name}${p.isSystem ? ' <span style="font-size:11px;color:#bbb;">(系统)</span>' : ''}</div>
+                            <div class="persona-desc-preview">${p.desc || '暂无描述'}</div>
+                        </div>
+                        <label class="toggle-switch" onclick="event.stopPropagation();">
+                            <input type="checkbox" ${this.state.activePersonaId === p.id ? 'checked' : ''} onchange="app.togglePersona(${p.id})">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                `).join('');
+            },
+
+            togglePersona(id) {
+                this.state.activePersonaId = id;
+                this.saveAll();
+                this.renderPersonaList();
+            },
+
+            openEditPersona(id) {
+                const p = this.state.personas.find(x => x.id === id);
+                if(!p) return;
+                this.state.editingPersonaId = id;
+                document.getElementById('edit-persona-name').value = p.name;
+                document.getElementById('edit-persona-desc').value = p.desc;
+                const deleteBtn = document.getElementById('persona-delete-btn');
+                if(p.isSystem) {
+                    deleteBtn.style.display = 'none';
+                } else {
+                    deleteBtn.style.display = 'block';
+                }
+                this.switchView('edit-persona-view');
+            },
+
+            savePersonaEdit() {
+                const id = this.state.editingPersonaId;
+                const p = this.state.personas.find(x => x.id === id);
+                if(!p || p.isSystem) return;
+                p.name = document.getElementById('edit-persona-name').value || p.name;
+                p.desc = document.getElementById('edit-persona-desc').value;
+                this.saveAll();
+                this.switchView('persona-list-view');
+            },
+
+            deleteCurrentPersona() {
+                const id = this.state.editingPersonaId;
+                const p = this.state.personas.find(x => x.id === id);
+                if(!p) return;
+                if(p.isSystem) {
+                    this.showModal("不能删除哦", "至少保留一个人设哦宝宝～\n不能删 ♡", "知道啦", () => {}, false);
+                    return;
+                }
+                this.showModal("删除人设", `删除不能恢复的宝宝～\n确认好哦\n\n"${p.name}"`, "确定删除", () => {
+                    this.state.personas = this.state.personas.filter(x => x.id !== id);
+                    if(this.state.activePersonaId === id) {
+                        this.state.activePersonaId = 1;
+                    }
+                    this.saveAll();
+                    this.switchView('persona-list-view');
+                });
+            },
+
+            confirmCreatePersona() {
+                const name = document.getElementById('new-persona-name').value.trim();
+                const desc = document.getElementById('new-persona-desc').value.trim();
+                if(!name) return;
+                const newId = Date.now();
+                this.state.personas.push({ id: newId, name, desc, isSystem: false });
+                document.getElementById('new-persona-name').value = "";
+                document.getElementById('new-persona-desc').value = "";
+                this.saveAll();
+                this.switchView('persona-list-view');
+            },
+
             async sendMessage() {
                 const input = document.getElementById('chat-input');
                 const text = input.value.trim(); if(!text) return;
@@ -465,18 +848,35 @@
             },
 
             async fetchAI(text, role) {
-                if(!this.state.config.key) return "请在设置中配置 API Key ♡";
+                const cfg = this.state.config;
+                if(!cfg.key) return "请在设置中配置 API Key ♡";
+
+                const history = (this.state.chats[role.id] || []).slice(-10).map(m => ({
+                    role: m.type === 'user' ? 'user' : 'assistant',
+                    content: m.text
+                }));
+
+                let systemPrompt = role.prompt;
+                if(role.id !== 1) {
+                    const activePersona = this.state.personas.find(p => p.id === this.state.activePersonaId);
+                    if(activePersona && activePersona.desc.trim()) {
+                        systemPrompt = role.prompt + "\n\n【当前用户设定】用户的人设是：" + activePersona.desc + "\n请根据以上设定与用户互动，回应的语气和内容要符合该设定。";
+                    }
+                }
+
                 try {
-                    const history = (this.state.chats[role.id] || []).slice(-10).map(m => ({
-                        role: m.type === 'user' ? 'user' : 'assistant',
-                        content: m.text
-                    }));
-                    const r = await fetch(`${this.state.config.url}/chat/completions`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.state.config.key}` },
-                        body: JSON.stringify({ model: "deepseek-chat", messages: [{role:"system",content:role.prompt}, ...history] })
+                    let reply;
+                    const messages = [{ role: "system", content: systemPrompt }, ...history];
+                    const r = await fetch(`${cfg.url}/chat/completions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${cfg.key}`
+                        },
+                        body: JSON.stringify({ model: cfg.model, messages: messages })
                     });
                     const d = await r.json();
-                    let reply = d.choices[0].message.content;
+                    reply = d.choices?.[0]?.message?.content || "（未获取到回复）";
 
                     if(role.id === 1) {
                         const appKeywords = ['创建角色', '昵称', '头像', 'API', '配置', '删除', '好友', '发送消息', '人设', '朋友圈', '口袋码', '二维码', '使用方法', '功能', '设置', '聊天', '桌面', 'Pocket', '小口袋', '角色', '编辑', '备注'];
@@ -488,17 +888,25 @@
                     }
 
                     return reply;
-                } catch(e) { return "网络波动中，晚点再聊吧~"; }
+                } catch(e) {
+                    return "网络波动中，晚点再聊吧~";
+                }
             },
 
             testAPI() {
-                this.showModal("测试中", "正在尝试建立连接...", "请稍后", () => {}, false);
+                const cfg = this.state.config;
+                if(!cfg.key) {
+                    this.showModal("连接失败", "请先填写 API Key", "确定", () => {}, false);
+                    return;
+                }
+                this.showModal("测试中", `正在测试 ${cfg.provider} 连接...`, "请稍后", () => {}, false);
                 setTimeout(async () => {
                     try {
-                        if(!this.state.config.key) throw new Error("未配置KEY");
-                        const res = await this.fetchAI("你好", {prompt: "助手", id: 999});
-                        if(res.includes("API Key") || res.includes("波动")) throw new Error("接口返回异常");
-                        this.showModal("连接成功", "等你好久啦♡", "确定", () => {}, false);
+                        const res = await this.fetchAI("你好", { prompt: "你是一个助手，请回复'连接成功'", id: 999 });
+                        if(res.includes("API Key") || res.includes("波动") || res.includes("未获取")) {
+                            throw new Error("接口返回异常");
+                        }
+                        this.showModal("连接成功", `等你好久啦 ♡\n${cfg.provider} 连接正常`, "确定", () => {}, false);
                     } catch(e) {
                         this.showModal("连接失败", "再试试吧～\n原因: " + e.message, "确定", () => {}, false);
                     }
@@ -587,15 +995,21 @@
                 this.state.tempAvatar = ""; this.saveAll(); this.switchView('pocket-view');
             },
             saveConfig() {
-                this.state.config.url = document.getElementById('cfg-url').value;
-                this.state.config.key = document.getElementById('cfg-key').value;
-                this.saveAll(); this.showModal("保存成功", "配置已更新", "确定", () => {}, false);
+                const cfg = this.state.config;
+                cfg.provider = document.getElementById('cfg-provider').value;
+                cfg.url = document.getElementById('cfg-url').value;
+                cfg.key = document.getElementById('cfg-key').value;
+                cfg.model = document.getElementById('cfg-model').value;
+                this.saveAll();
+                this.showModal("保存成功", `供应商：${cfg.provider}\n模型：${cfg.model}\n配置已更新`, "确定", () => {}, false);此.showModal("保存成功", `供应商：${cfg.provider} 模型：${cfg.model} 配置已更新`, "确定", () => {}, false);
             },
             saveAll() {
                 localStorage.setItem('pk_user', JSON.stringify(this.state.user));
                 localStorage.setItem('pk_roles', JSON.stringify(this.state.roles));
                 localStorage.setItem('pk_chats', JSON.stringify(this.state.chats));
                 localStorage.setItem('pk_cfg', JSON.stringify(this.state.config));
+                localStorage.setItem('pk_personas', JSON.stringify(this.state.personas));
+                localStorage.setItem('pk_activePid', JSON.stringify(this.state.activePersonaId));
             },
             updateClock() { document.getElementById('d-clock').innerText = this.getClockStr(); },
             getClockStr() { const d = new Date(); return d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0'); },
