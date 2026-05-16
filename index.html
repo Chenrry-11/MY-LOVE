@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pocket Chat - Ultimate Full Version</title><标题>口袋聊天 - 终极完整版</标题>
+    <title>Pocket Chat - Ultimate Full Version</title>
     <style>
         :root {
             --primary-pink: #ffb6c1;
-            --soft-pink: #fff0f5;--浅粉色——浅粉色: #fff0f5;#fff0f5；
+            --soft-pink: #fff0f5;
             --white: #ffffff;
             --text-dark: #5a524e;
             --gray-text: #999;
@@ -33,12 +33,12 @@
         .p-modal-title { font-weight: 600; margin-bottom: 15px; font-size: 18px; color: var(--primary-pink); }
         .p-modal-body { font-size: 15px; margin-bottom: 25px; line-height: 1.5; color: var(--text-dark); white-space: pre-line; }
         .p-modal-btns { display: flex; gap: 15px; justify-content: center; }
-        .p-btn { padding: 10px 25px; border-radius: 20px; border: none; font-size: 14px; cursor: pointer; transition: 0.2s; }        .p-btn { padding: 10px 25px; border-radius: 20px; border: none; font-size: 14px; cursor: 指针; 过渡: 0.2秒; }
+        .p-btn { padding: 10px 25px; border-radius: 20px; border: none; font-size: 14px; cursor: pointer; transition: 0.2s; }
         .p-btn-cancel { background: #eee; color: #666; }
         .p-btn-confirm { background: var(--primary-pink); color: white; font-weight: 600; }
         .p-btn:active { opacity: 0.7; }
 
-        .view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); display: none; flex-direction: column; z-index: 10; }        .视图 { 位置: 固定; 顶部: 0; 左侧: 0; 宽度: 100%; 高度: 100%; 背景: var(--white); display: none; flex-direction: column; z-index: 10; }
+        .view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); display: none; flex-direction: column; z-index: 10; }
         .view.active { display: flex; }
 
         #home-view { background: linear-gradient(180deg, #fff0f5, #ffe4e1); align-items: center; z-index: 5; display: flex; }
@@ -53,9 +53,9 @@
 
         .nav-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #f8f8f8; flex-shrink: 0; }
         .nav-title { font-size: 18px; font-weight: 600; color: #444; text-align: center; flex: 1; }
-        .nav-btn { font-size: 24px; color: var(--primary-pink); cursor: pointer; width: 40px; text-align: center; flex-shrink: 0; }        .nav-btn { font-size: 24px; color: var(--primary-pink); cursor: pointer; width: 40px; text-align: 居中; flex-shrink: 0; }
-        .nav-back {        .返回导航 {
-            display: inline-block;显示: 内联块;
+        .nav-btn { font-size: 24px; color: var(--primary-pink); cursor: pointer; width: 40px; text-align: center; flex-shrink: 0; }
+        .nav-back {
+            display: inline-block;
             width: 40px;
             height: 40px;
             cursor: pointer;
@@ -460,9 +460,9 @@
             <div class="nav-title">新建人设</div>
             <div style="width:40px"></div>
         </div>
-        <div class="tab-content" style="padding:25px; display:flex; flex-direction:column; gap:20px;"><div class="tab-content" style="padding:25px; display:flex; flex-direction:column; gap:20px;">
+        <div class="tab-content" style="padding:25px; display:flex; flex-direction:column; gap:20px;">
             <input class="field-input" id="new-persona-name" placeholder="人设名称">
-            <textarea class="field-input" id="new-persona-desc" style="height:200px; padding:15px;" placeholder="人设描述..."></textarea><textarea class="field-input" id="new-persona-desc" style="height:200px; padding:15px;" placeholder=“人设描述...”></textarea>
+            <textarea class="field-input" id="new-persona-desc" style="height:200px; padding:15px;" placeholder="人设描述..."></textarea>
             <button class="test-btn" onclick="app.confirmCreatePersona()">完成创建</button>
         </div>
     </section>
@@ -475,7 +475,7 @@
         </div>
         <div class="tab-content" id="edit-persona-content" style="padding:25px; display:flex; flex-direction:column; gap:20px;">
             <input class="field-input" id="edit-persona-name" placeholder="人设名称">
-            <textarea class="field-input" id="edit-persona-desc" style="height:200px; padding:15px;" placeholder="人设描述..."></textarea><textarea class="field-input" id="edit-persona-desc" style="height:200px; padding:15px;" placeholder=“人设描述...”></textarea>
+            <textarea class="field-input" id="edit-persona-desc" style="height:200px; padding:15px;" placeholder="人设描述..."></textarea>
             <button class="test-btn" onclick="app.savePersonaEdit()">保存修改</button>
         </div>
     </section>
@@ -497,9 +497,9 @@
     <script>
         // 表情包列表
         const STICKERS = [
-            { file: 'Camera_1040g0k031gmedosgja005omu6b8nojeq4d5f62o.jpg''相机_1040g0k031gmedosgja005omu6b8nojeq4d5f62o.jpg', keywords: ['我错了', '很乖', '听话', '知道了', '对不起', '乖巧', '老实'] },
-            { file: 'Camera_1040g0k031gmedosgja405omu6b8nojeqkidckh8.jpg''相机_1040g0k031gmedosgja405omu6b8nojeqkidckh8.jpg', keywords: ['无聊', '在干嘛', '想你', '人呢', '好闲', '马桶', '发呆'] },
-            { file: 'Camera_1040g0k031gmedosgja505omu6b8nojeqfip6mr0.jpg''相机_1040g0k031gmedosgja505omu6b8nojeqfip6mr0.jpg', keywords: ['害羞', '别夸', '嘻嘻', '不好意思', '讨厌', '托腮'] }
+            { file: 'Emoji/Camera_1040g0k031gmedosgja005omu6b8nojeq4d5f62o.jpg', keywords: ['我错了', '很乖', '听话', '知道了', '对不起', '乖巧', '老实'] },
+            { file: 'Emoji/Camera_1040g0k031gmedosgja405omu6b8nojeqkidckh8.jpg', keywords: ['无聊', '在干嘛', '想你', '人呢', '好闲', '马桶', '发呆'] },
+            { file: 'Emoji/Camera_1040g0k031gmedosgja505omu6b8nojeqfip6mr0.jpg', keywords: ['害羞', '别夸', '嘻嘻', '不好意思', '讨厌', '托腮'] }
         ];
 
         const API_PRESETS = {
@@ -510,13 +510,13 @@
 
         const app = {
             state: {
-                user: JSON.parse(localStorage.getItem('pk_user')) || { homeName: "小口袋", location: "萌萌星球", avatar: "", pid: "888888" },用户:JSON.parse(localStorage.getItem('pk_user'))||{homeName:"小口袋",location:"萌萌星球",avatar:"",pid:"888888"},
-                roles: JSON.parse(localStorage.getItem('pk_roles')) || [角色: JSON.解析(localStorage.getItem('pk_roles')) || [
+                user: JSON.parse(localStorage.getItem('pk_user')) || { homeName: "小口袋", location: "萌萌星球", avatar: "", pid: "888888" },
+                roles: JSON.parse(localStorage.getItem('pk_roles')) || [
                     { id: 1, name: "手机小助手", avatar: "📱", prompt: "你是 Pocket Chat 的「手机小助手」📱\n\n你的职责是帮用户解答这个应用的所有操作问题。\n\n## 你能回答的：\n- 如何创建/删除角色、修改备注和人设\n- 如何配置 API（DeepSeek / 智谱 / 豆包）\n- 如何创建和切换用户人设\n- 如何修改昵称、头像、地点、口袋码\n- 如何发送消息、删除消息\n- 如何查看朋友圈、使用设置页\n- 其他一切关于此应用的操作\n\n## 回复格式：\n1. 用简短清晰的步骤说明，每条前加数字或emoji\n2. 关键按钮用【】标出，比如点击【+】\n3. 每次回复不超过6行\n4. 语气亲切可爱，带点 ♡\n\n## 遇到无关问题时：\n统一回复：「这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡」\n不要展开回答任何与 Pocket Chat 操作无关的内容。", lastMsg: "哪里不会用嘛？可以问问我哦", lastTime: "系统", moment: "", isSystem: true }
                 ],
-                chats: JSON.parse(localStorage.getItem('pk_chats')) || {},聊天: JSON.parse(localStorage.getItem('pk_chats')) || {},
+                chats: JSON.parse(localStorage.getItem('pk_chats')) || {},
                 config: JSON.parse(localStorage.getItem('pk_cfg')) || { provider: "deepseek", url: "https://api.deepseek.com/v1", key: "", model: "deepseek-chat", proxy: "" },
-                personas: JSON.parse(localStorage.getItem('pk_personas')) || [{ id: 1, name: "默认", desc: "", isSystem: true }],人员: JSON.parse(localStorage.getItem('pk_personas')) || [{ id: 1, name: "默认", desc: "", isSystem: true }],
+                personas: JSON.parse(localStorage.getItem('pk_personas')) || [{ id: 1, name: "默认", desc: "", isSystem: true }],
                 activePersonaId: JSON.parse(localStorage.getItem('pk_activePid')) || 1,
                 activeRoleId: null,
                 editType: null,
