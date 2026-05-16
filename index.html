@@ -101,10 +101,26 @@
         .bubble { padding: 12px 16px; border-radius: 15px; font-size: 15px; line-height: 1.6; word-break: break-all; user-select: none; }
         .bubble-ai { background: var(--white); color: var(--text-dark); border-top-left-radius: 2px; border: 1px solid #f0f0f0; }
         .bubble-user { background: var(--primary-pink); color: var(--white); border-top-right-radius: 2px; }
+        .sticker-bubble { background: transparent; padding: 0; border-radius: 10px; overflow: hidden; }
+        .sticker-bubble img { max-width: 100px; max-height: 100px; display: block; border-radius: 10px; }
 
         .input-area { padding: 10px 15px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; gap: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         .input-area input { flex: 1; height: 40px; border: none; background: #f5f5f5; border-radius: 20px; padding: 0 15px; outline: none; }
         .send-btn { color: var(--primary-pink); font-weight: 600; padding: 5px 10px; cursor: pointer; }
+        .plus-btn { font-size: 24px; color: var(--primary-pink); font-weight: 600; padding: 5px 10px; cursor: pointer; }
+
+        .plus-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); z-index: 50; display: none; padding: 15px 20px; border-top: 1px solid #eee; }
+        .plus-panel.show { display: block; }
+        .plus-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; cursor: pointer; font-size: 16px; color: var(--text-dark); }
+        .plus-item:active { opacity: 0.7; }
+        .plus-item-icon { font-size: 24px; }
+
+        .sticker-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); z-index: 51; display: none; padding: 15px; border-top: 1px solid #eee; max-height: 300px; overflow-y: auto; }
+        .sticker-panel.show { display: block; }
+        .sticker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .sticker-item { width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 10px; cursor: pointer; background: #f5f5f5; display: flex; align-items: center; justify-content: center; }
+        .sticker-item img { width: 100%; height: 100%; object-fit: cover; }
+        .sticker-item:active { opacity: 0.7; }
 
         .me-header { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 10px solid #f9f9f9; }
         .envelope-btn { font-size: 30px; margin-top: 10px; color: var(--primary-pink); cursor: pointer; }
@@ -138,12 +154,8 @@
             gap: 8px;
             transition: 0.2s;
         }
-        .delete-friend-btn:active {
-            background: #fff5f5;
-        }
-        .delete-friend-btn .delete-icon {
-            font-size: 18px;
-        }
+        .delete-friend-btn:active { background: #fff5f5; }
+        .delete-friend-btn .delete-icon { font-size: 18px; }
         .delete-friend-hint {
             text-align: center;
             padding: 0 20px 16px;
@@ -190,9 +202,7 @@
             position: relative;
             width: 100%;
         }
-        .password-wrapper .field-input {
-            padding-right: 50px;
-        }
+        .password-wrapper .field-input { padding-right: 50px; }
         .password-dot {
             position: absolute;
             right: 15px;
@@ -204,12 +214,8 @@
             cursor: pointer;
             transition: 0.3s;
         }
-        .password-dot.hidden-state {
-            background: var(--soft-red);
-        }
-        .password-dot.visible-state {
-            background: var(--soft-green);
-        }
+        .password-dot.hidden-state { background: var(--soft-red); }
+        .password-dot.visible-state { background: var(--soft-green); }
 
         .settings-list { padding: 0; flex: 1; overflow-y: auto; background: #f9f9f9; }
         .settings-item {
@@ -253,12 +259,8 @@
             transition: 0.3s;
             box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
-        .toggle-switch input:checked + .toggle-slider {
-            background: var(--soft-green);
-        }
-        .toggle-switch input:checked + .toggle-slider::before {
-            transform: translateX(22px);
-        }
+        .toggle-switch input:checked + .toggle-slider { background: var(--soft-green); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(22px); }
 
         .persona-item {
             display: flex;
@@ -275,11 +277,12 @@
         .persona-info { flex: 1; min-width: 0; }
         .persona-name { font-weight: 600; font-size: 16px; }
         .persona-desc-preview { font-size: 13px; color: var(--gray-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-
-        .persona-item .toggle-switch { flex-shrink: 0; }
-        .persona-item .toggle-switch .toggle-slider { cursor: pointer; }
+        .persona-item .toggle-switch { flex-shrink: 0; cursor: pointer; }
 
         .api-section-label { font-size: 13px; color: #999; margin-bottom: 6px; padding-left: 2px; }
+        .api-hint { font-size: 12px; color: #bbb; margin-top: 4px; padding-left: 2px; line-height: 1.4; }
+
+        input, textarea { user-select: text; -webkit-user-select: text; }
     </style>
 </head>
 <body onload="app.startHome()">
@@ -303,15 +306,9 @@
             <div class="user-name" id="val-name" onclick="app.openDeepEdit('userName')">小口袋</div>
         </div>
         <div class="app-grid">
-            <div class="app-item" onclick="app.switchView('pocket-view')">
-                <div class="app-icon">🥨</div><div style="font-size:12px;margin-top:5px">Pocket</div>
-            </div>
-            <div class="app-item">
-                <div class="app-icon">🎵</div><div style="font-size:12px;margin-top:5px">音乐</div>
-            </div>
-            <div class="app-item" onclick="app.switchView('settings-view')">
-                <div class="app-icon">⚙️</div><div style="font-size:12px;margin-top:5px">设置</div>
-            </div>
+            <div class="app-item" onclick="app.switchView('pocket-view')"><div class="app-icon">🥨</div><div style="font-size:12px;margin-top:5px">Pocket</div></div>
+            <div class="app-item"><div class="app-icon">🎵</div><div style="font-size:12px;margin-top:5px">音乐</div></div>
+            <div class="app-item" onclick="app.switchView('settings-view')"><div class="app-icon">⚙️</div><div style="font-size:12px;margin-top:5px">设置</div></div>
         </div>
     </section>
 
@@ -324,12 +321,10 @@
             </div>
             <div class="tab-content" id="chat-list-container"></div>
         </div>
-
         <div id="tab-moments" class="tab-view" style="display:none; flex-direction:column; height:100%;">
             <div class="nav-header"><div class="nav-title">朋友圈</div></div>
             <div class="tab-content" style="padding:40px; text-align:center; color:#ccc;">暂无新动态</div>
         </div>
-
         <div id="tab-me" class="tab-view" style="display:none; flex-direction:column; height:100%;">
             <div class="nav-header"><div class="nav-title">我</div></div>
             <div class="tab-content">
@@ -341,7 +336,6 @@
                 </div>
             </div>
         </div>
-
         <div class="tab-bar">
             <div class="tab-item active" onclick="app.switchTab('chats')"><i>🥨</i><span>聊天</span></div>
             <div class="tab-item" onclick="app.switchTab('moments')"><i>🍥</i><span>朋友圈</span></div>
@@ -357,8 +351,20 @@
         </div>
         <div class="msg-container" id="msg-box"></div>
         <div class="input-area">
+            <span class="plus-btn" onclick="app.togglePlusPanel()">＋</span>
             <input type="text" id="chat-input" placeholder="发送消息..." onkeydown="if(event.key==='Enter') app.sendMessage()">
             <div class="send-btn" onclick="app.sendMessage()">发送</div>
+        </div>
+        <div class="plus-panel" id="plus-panel">
+            <div class="plus-item" onclick="app.openStickerPanel()">
+                <span class="plus-item-icon">😊</span> 表情包
+            </div>
+            <div class="plus-item" onclick="app.showModal('即将上线','照片功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)">
+                <span class="plus-item-icon">🖼️</span> 照片
+            </div>
+        </div>
+        <div class="sticker-panel" id="sticker-panel">
+            <div class="sticker-grid" id="sticker-grid"></div>
         </div>
     </section>
 
@@ -368,8 +374,7 @@
             <div class="nav-title">角色设置</div>
             <div style="width:40px"></div>
         </div>
-        <div class="tab-content" id="role-settings-content" style="background:#f9f9f9; padding-top:30px;">
-        </div>
+        <div class="tab-content" id="role-settings-content" style="background:#f9f9f9; padding-top:30px;"></div>
     </section>
 
     <div class="edit-page" id="deep-edit-view">
@@ -378,9 +383,7 @@
             <div class="nav-title" id="edit-page-title">编辑信息</div>
             <div class="nav-btn" onclick="app.saveDeepEdit()" style="font-size:14px;">确认</div>
         </div>
-        <div class="edit-card">
-            <textarea id="deep-edit-input"></textarea>
-        </div>
+        <div class="edit-card"><textarea id="deep-edit-input"></textarea></div>
     </div>
 
     <section class="view" id="create-role-view">
@@ -397,7 +400,6 @@
         </div>
     </section>
 
-    <!-- 设置页 -->
     <section class="view" id="settings-view">
         <div class="nav-header">
             <div class="nav-back" onclick="app.switchView('home-view')"></div>
@@ -405,35 +407,28 @@
             <div style="width:40px"></div>
         </div>
         <div class="settings-list" id="settings-list">
-            <div class="settings-item" onclick="app.switchView('api-view')">
-                <span class="settings-icon">💡</span>
-                <span class="settings-label">API 配置</span>
-                <span class="settings-arrow">›</span>
-            </div>
-            <div class="settings-item" onclick="app.showModal('即将上线','破限功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)">
-                <span class="settings-icon">🔑</span>
-                <span class="settings-label">破限</span>
-                <span class="settings-arrow">›</span>
-            </div>
-            <div class="settings-item" onclick="app.showModal('即将上线','文风要求功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)">
-                <span class="settings-icon">📃</span>
-                <span class="settings-label">文风要求</span>
-                <span class="settings-arrow">›</span>
-            </div>
-            <div class="settings-item" onclick="app.showModal('即将上线','美化档功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)">
-                <span class="settings-icon">🖌️</span>
-                <span class="settings-label">美化档</span>
-                <span class="settings-arrow">›</span>
-            </div>
-            <div class="settings-item" onclick="app.switchView('persona-list-view')">
-                <span class="settings-icon">🪪</span>
-                <span class="settings-label">用户人设</span>
-                <span class="settings-arrow">›</span>
-            </div>
+            <div class="settings-item" onclick="app.switchView('api-view')"><span class="settings-icon">💡</span><span class="settings-label">API 配置</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="app.showModal('即将上线','破限功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)"><span class="settings-icon">🔑</span><span class="settings-label">破限</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="app.showModal('即将上线','文风要求功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)"><span class="settings-icon">📃</span><span class="settings-label">文风要求</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="app.showModal('即将上线','美化档功能正在开发中\n敬请期待 ♡','知道啦',()=>{},false)"><span class="settings-icon">🖌️</span><span class="settings-label">美化档</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="app.switchView('persona-list-view')"><span class="settings-icon">🪪</span><span class="settings-label">用户人设</span><span class="settings-arrow">›</span></div>
+            <div class="settings-item" onclick="app.switchView('memory-view')"><span class="settings-icon">💿</span><span class="settings-label">记忆备份</span><span class="settings-arrow">›</span></div>
         </div>
     </section>
 
-    <!-- API配置页 -->
+    <section class="view" id="memory-view">
+        <div class="nav-header">
+            <div class="nav-back" onclick="app.switchView('settings-view')"></div>
+            <div class="nav-title">记忆备份</div>
+            <div style="width:40px"></div>
+        </div>
+        <div class="tab-content" style="padding:30px; display:flex; flex-direction:column; gap:20px; background:#f9f9f9; align-items:center;">
+            <div style="font-size:14px;color:#999;text-align:center;margin-bottom:10px;">你的所有聊天记录、角色、人设<br>都可以打包存起来，不怕丢 ♡</div>
+            <button class="test-btn" onclick="app.exportData()" style="width:80%;">📤 备份数据</button>
+            <button class="test-btn" onclick="app.importData()" style="width:80%;">📥 导入备份</button>
+        </div>
+    </section>
+
     <section class="view" id="api-view">
         <div class="nav-header">
             <div class="nav-back" onclick="app.switchView('settings-view')"></div>
@@ -441,38 +436,15 @@
             <div class="nav-btn" onclick="app.saveConfig()" style="font-size:14px;">保存</div>
         </div>
         <div class="tab-content" style="padding:20px; display:flex; flex-direction:column; gap:15px; background:#f9f9f9;">
-            <div>
-                <div class="api-section-label">供应商</div>
-                <div class="select-wrapper">
-                    <select class="field-select" id="cfg-provider" onchange="app.onProviderChange()">
-                        <option value="deepseek">DeepSeek</option>
-                        <option value="zhipu">智谱 GLM</option>
-                        <option value="doubao">豆包</option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <div class="api-section-label">接口地址</div>
-                <input class="field-input" id="cfg-url" placeholder="接口地址 (URL)">
-            </div>
-            <div>
-                <div class="api-section-label">API Key</div>
-                <div class="password-wrapper">
-                    <input class="field-input" id="cfg-key" type="password" placeholder="API Key">
-                    <div class="password-dot hidden-state" id="pwd-dot" onclick="app.togglePassword()"></div>
-                </div>
-            </div>
-            <div>
-                <div class="api-section-label">模型名称</div>
-                <div class="select-wrapper">
-                    <select class="field-select" id="cfg-model"></select>
-                </div>
-            </div>
+            <div><div class="api-section-label">供应商</div><div class="select-wrapper"><select class="field-select" id="cfg-provider" onchange="app.onProviderChange()"><option value="deepseek">DeepSeek</option><option value="zhipu">智谱 GLM</option><option value="doubao">豆包</option></select></div></div>
+            <div><div class="api-section-label">接口地址</div><input class="field-input" id="cfg-url" placeholder="接口地址 (URL)"></div>
+            <div><div class="api-section-label">API Key</div><div class="password-wrapper"><input class="field-input" id="cfg-key" type="password" placeholder="API Key"><div class="password-dot hidden-state" id="pwd-dot" onclick="app.togglePassword()"></div></div></div>
+            <div><div class="api-section-label">模型名称</div><div class="select-wrapper"><select class="field-select" id="cfg-model"></select></div></div>
+            <div id="proxy-section" style="display:none;"><div class="api-section-label">代理地址（Cloudflare Worker）</div><input class="field-input" id="cfg-proxy" placeholder="https://xxx.workers.dev"><div class="api-hint">智谱/豆包需要代理才能用。<br>去 cloudflare.com 免费注册 → Workers → 创建 → 粘贴教程代码 → 把地址填到这里。</div></div>
             <button class="test-btn" onclick="app.testAPI()">连接测试</button>
         </div>
     </section>
 
-    <!-- 人设列表页 -->
     <section class="view" id="persona-list-view">
         <div class="nav-header">
             <div class="nav-back" onclick="app.switchView('settings-view')"></div>
@@ -482,7 +454,6 @@
         <div class="tab-content" id="persona-list-content" style="background:#f9f9f9;"></div>
     </section>
 
-    <!-- 新建人设页 -->
     <section class="view" id="create-persona-view">
         <div class="nav-header">
             <div class="nav-back" onclick="app.switchView('persona-list-view')"></div>
@@ -491,12 +462,11 @@
         </div>
         <div class="tab-content" style="padding:25px; display:flex; flex-direction:column; gap:20px;">
             <input class="field-input" id="new-persona-name" placeholder="人设名称">
-            <textarea class="field-input" id="new-persona-desc" style="height:200px; padding:15px;" placeholder="人设描述（世界观、性格、身份等）..."></textarea>
+            <textarea class="field-input" id="new-persona-desc" style="height:200px; padding:15px;" placeholder="人设描述..."></textarea>
             <button class="test-btn" onclick="app.confirmCreatePersona()">完成创建</button>
         </div>
     </section>
 
-    <!-- 编辑人设页 -->
     <section class="view" id="edit-persona-view">
         <div class="nav-header">
             <div class="nav-back" onclick="app.switchView('persona-list-view')"></div>
@@ -511,68 +481,96 @@
     </section>
 
     <div class="qr-pop" id="qr-pop" onclick="app.toggleQR(false)">
-        <div class="qr-card">
-            <div class="qr-text">＿＿＿＿
+        <div class="qr-card"><div class="qr-text">＿＿＿＿
 .°⑅ପ₍ᐢ｡•༝•｡ᐢ₎₍ᐢ｡•༝•｡ᐢ₎ଓ⑅°. 
 陳平安の作品
 
 無断転載・改変・販売禁止！！
 
 楽しく遊んでね、ベイビー ⌯>ᴗo⌯ಣ”
-＿＿＿＿＿＿</div>
-        </div>
+＿＿＿＿＿＿</div></div>
     </div>
 
     <input type="file" id="file-input" hidden accept="image/*">
+    <input type="file" id="import-file-input" hidden accept=".txt,.json">
 
     <script>
+        // 表情包列表
+        const STICKERS = [
+            { file: 'Emoji/Camera_1040g0k031gmedosgja005omu6b8nojeq4d5f62o.jpg', keywords: ['我错了', '很乖', '听话', '知道了', '对不起', '乖巧', '老实'] },
+            { file: 'Emoji/Camera_1040g0k031gmedosgja405omu6b8nojeqkidckh8.jpg', keywords: ['无聊', '在干嘛', '想你', '人呢', '好闲', '马桶', '发呆'] },
+            { file: 'Emoji/Camera_1040g0k031gmedosgja505omu6b8nojeqfip6mr0.jpg', keywords: ['害羞', '别夸', '嘻嘻', '不好意思', '讨厌', '托腮'] }
+        ];
+
         const API_PRESETS = {
-            deepseek: {
-                url: 'https://api.deepseek.com/v1',
-                models: ['deepseek-chat', 'deepseek-reasoner']
-            },
-            zhipu: {
-                url: 'https://open.bigmodel.cn/api/paas/v4',
-                models: ['glm-4-flash', 'glm-4-plus', 'glm-4v-flash', 'glm-4v']
-            },
-            doubao: {
-                url: 'https://ark.cn-beijing.volces.com/api/v3',
-                models: ['doubao-pro-32k', 'doubao-lite-32k', 'doubao-pro-128k']
-            }
+            deepseek: { url: 'https://api.deepseek.com/v1', models: ['deepseek-chat', 'deepseek-reasoner'] },
+            zhipu: { url: 'https://open.bigmodel.cn/api/paas/v4', models: ['glm-4-flash', 'glm-4-plus', 'glm-4v-flash', 'glm-4v'] },
+            doubao: { url: 'https://ark.cn-beijing.volces.com/api/v3', models: ['doubao-pro-32k', 'doubao-lite-32k', 'doubao-pro-128k'] }
         };
 
         const app = {
             state: {
                 user: JSON.parse(localStorage.getItem('pk_user')) || { homeName: "小口袋", location: "萌萌星球", avatar: "", pid: "888888" },
                 roles: JSON.parse(localStorage.getItem('pk_roles')) || [
-                    { 
-                        id: 1, 
-                        name: "手机小助手", 
-                        avatar: "📱", 
-                        prompt: "你是 Pocket Chat 的「手机小助手」📱\n\n你的职责是帮用户解答这个应用的所有操作问题。\n\n## 你能回答的：\n- 如何创建/删除角色、修改备注和人设\n- 如何配置 API（DeepSeek / 智谱 / 豆包）\n- 如何创建和切换用户人设\n- 如何修改昵称、头像、地点、口袋码\n- 如何发送消息、删除消息\n- 如何查看朋友圈、使用设置页\n- 其他一切关于此应用的操作\n\n## 回复格式：\n1. 用简短清晰的步骤说明，每条前加数字或emoji\n2. 关键按钮用【】标出，比如点击【+】\n3. 每次回复不超过6行\n4. 语气亲切可爱，带点 ♡\n\n## 遇到无关问题时：\n统一回复：「这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡」\n不要展开回答任何与 Pocket Chat 操作无关的内容。", 
-                        lastMsg: "哪里不会用嘛？可以问问我哦", 
-                        lastTime: "系统", 
-                        moment: "",
-                        isSystem: true 
-                    }
+                    { id: 1, name: "手机小助手", avatar: "📱", prompt: "你是 Pocket Chat 的「手机小助手」📱\n\n你的职责是帮用户解答这个应用的所有操作问题。\n\n## 你能回答的：\n- 如何创建/删除角色、修改备注和人设\n- 如何配置 API（DeepSeek / 智谱 / 豆包）\n- 如何创建和切换用户人设\n- 如何修改昵称、头像、地点、口袋码\n- 如何发送消息、删除消息\n- 如何查看朋友圈、使用设置页\n- 其他一切关于此应用的操作\n\n## 回复格式：\n1. 用简短清晰的步骤说明，每条前加数字或emoji\n2. 关键按钮用【】标出，比如点击【+】\n3. 每次回复不超过6行\n4. 语气亲切可爱，带点 ♡\n\n## 遇到无关问题时：\n统一回复：「这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡」\n不要展开回答任何与 Pocket Chat 操作无关的内容。", lastMsg: "哪里不会用嘛？可以问问我哦", lastTime: "系统", moment: "", isSystem: true }
                 ],
                 chats: JSON.parse(localStorage.getItem('pk_chats')) || {},
-                config: JSON.parse(localStorage.getItem('pk_cfg')) || { provider: "deepseek", url: "https://api.deepseek.com/v1", key: "", model: "deepseek-chat" },
-                personas: JSON.parse(localStorage.getItem('pk_personas')) || [
-                    { id: 1, name: "默认", desc: "", isSystem: true }
-                ],
+                config: JSON.parse(localStorage.getItem('pk_cfg')) || { provider: "deepseek", url: "https://api.deepseek.com/v1", key: "", model: "deepseek-chat", proxy: "" },
+                personas: JSON.parse(localStorage.getItem('pk_personas')) || [{ id: 1, name: "默认", desc: "", isSystem: true }],
                 activePersonaId: JSON.parse(localStorage.getItem('pk_activePid')) || 1,
                 activeRoleId: null,
                 editType: null,
                 tempAvatar: "",
                 editingPersonaId: null,
-                passwordVisible: false
+                passwordVisible: false,
+                creatingRole: false
             },
 
             init() {
                 this.updateClock(); setInterval(() => this.updateClock(), 1000);
                 this.renderUser(); this.renderRoleList();
                 document.addEventListener('contextmenu', e => e.preventDefault());
+                this.initStickerPanel();
+            },
+
+            initStickerPanel() {
+                const grid = document.getElementById('sticker-grid');
+                grid.innerHTML = STICKERS.map(s => `
+                    <div class="sticker-item" onclick="app.sendSticker('${s.file}')">
+                        <img src="${s.file}" loading="lazy">
+                    </div>
+                `).join('');
+            },
+
+            togglePlusPanel() {
+                const panel = document.getElementById('plus-panel');
+                const stickerPanel = document.getElementById('sticker-panel');
+                stickerPanel.classList.remove('show');
+                panel.classList.toggle('show');
+            },
+
+            openStickerPanel() {
+                document.getElementById('plus-panel').classList.remove('show');
+                document.getElementById('sticker-panel').classList.toggle('show');
+            },
+
+            sendSticker(file) {
+                const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
+                if(!role) return;
+                if(!this.state.chats[role.id]) this.state.chats[role.id] = [];
+                this.state.chats[role.id].push({ type: 'user', text: '', sticker: file, ts: Date.now() });
+                role.lastMsg = '[表情包]'; role.lastTime = this.getClockStr();
+                document.getElementById('sticker-panel').classList.remove('show');
+                this.renderMessages(); this.saveAll();
+            },
+
+            getMatchingSticker(replyText) {
+                for(const s of STICKERS) {
+                    for(const kw of s.keywords) {
+                        if(replyText.includes(kw)) return s.file;
+                    }
+                }
+                return null;
             },
 
             loadConfigInputs() {
@@ -581,73 +579,44 @@
                 document.getElementById('cfg-url').value = cfg.url || API_PRESETS[cfg.provider]?.url || '';
                 document.getElementById('cfg-key').value = cfg.key || '';
                 document.getElementById('cfg-key').type = this.state.passwordVisible ? 'text' : 'password';
+                document.getElementById('cfg-proxy').value = cfg.proxy || '';
                 this.updatePasswordDot();
                 this.populateModelSelect(cfg.provider);
+                this.updateProxySection(cfg.provider);
             },
-
+            updateProxySection(provider) { document.getElementById('proxy-section').style.display = (provider === 'deepseek') ? 'none' : 'block'; },
             populateModelSelect(provider) {
                 const sel = document.getElementById('cfg-model');
                 const models = API_PRESETS[provider]?.models || [];
                 sel.innerHTML = models.map(m => `<option value="${m}">${m}</option>`).join('');
-                const currentModel = this.state.config.model;
-                if(models.includes(currentModel)) {
-                    sel.value = currentModel;
-                } else if(models.length > 0) {
-                    sel.value = models[0];
-                    this.state.config.model = models[0];
-                }
+                const cm = this.state.config.model;
+                sel.value = models.includes(cm) ? cm : (models[0] || '');
+                if(!models.includes(cm) && models.length > 0) this.state.config.model = models[0];
             },
-
             onProviderChange() {
-                const provider = document.getElementById('cfg-provider').value;
-                const preset = API_PRESETS[provider];
-                if(preset) {
-                    document.getElementById('cfg-url').value = preset.url;
-                    this.populateModelSelect(provider);
-                    this.state.config.provider = provider;
-                    this.state.config.url = preset.url;
-                    this.state.config.model = document.getElementById('cfg-model').value;
-                }
+                const p = document.getElementById('cfg-provider').value;
+                const preset = API_PRESETS[p];
+                if(preset) { document.getElementById('cfg-url').value = preset.url; this.populateModelSelect(p); this.updateProxySection(p); this.state.config.provider = p; this.state.config.url = preset.url; this.state.config.model = document.getElementById('cfg-model').value; }
             },
+            togglePassword() { this.state.passwordVisible = !this.state.passwordVisible; document.getElementById('cfg-key').type = this.state.passwordVisible ? 'text' : 'password'; this.updatePasswordDot(); },
+            updatePasswordDot() { const d = document.getElementById('pwd-dot'); d.className = 'password-dot ' + (this.state.passwordVisible ? 'visible-state' : 'hidden-state'); },
 
-            togglePassword() {
-                this.state.passwordVisible = !this.state.passwordVisible;
-                document.getElementById('cfg-key').type = this.state.passwordVisible ? 'text' : 'password';
-                this.updatePasswordDot();
-            },
-
-            updatePasswordDot() {
-                const dot = document.getElementById('pwd-dot');
-                dot.className = 'password-dot ' + (this.state.passwordVisible ? 'visible-state' : 'hidden-state');
-            },
-
-            startHome() {
-                const home = document.getElementById('home-view');
-                home.classList.add('active', 'blur-in');
-                this.init();
-            },
-
+            startHome() { document.getElementById('home-view').classList.add('active', 'blur-in'); this.init(); },
             showModal(title, body, confirmText, onConfirm, showCancel = true) {
                 const mask = document.getElementById('p-modal-mask');
                 document.getElementById('p-modal-title').innerText = title;
                 document.getElementById('p-modal-body').innerText = body;
-                const confirmBtn = document.getElementById('p-btn-confirm');
-                confirmBtn.innerText = confirmText;
-                confirmBtn.onclick = () => { onConfirm(); this.closeModal(); };
+                const btn = document.getElementById('p-btn-confirm'); btn.innerText = confirmText;
+                btn.onclick = () => { onConfirm(); this.closeModal(); };
                 document.getElementById('p-btn-cancel').style.display = showCancel ? 'block' : 'none';
-                mask.style.display = 'flex';
-                setTimeout(() => document.getElementById('p-modal').classList.add('show'), 10);
+                mask.style.display = 'flex'; setTimeout(() => document.getElementById('p-modal').classList.add('show'), 10);
             },
-            closeModal() {
-                document.getElementById('p-modal').classList.remove('show');
-                setTimeout(() => document.getElementById('p-modal-mask').style.display = 'none', 200);
-            },
+            closeModal() { document.getElementById('p-modal').classList.remove('show'); setTimeout(() => document.getElementById('p-modal-mask').style.display = 'none', 200); },
 
             switchView(id) {
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active', 'blur-in'));
-                const target = document.getElementById(id);
-                target.classList.add('active');
-                if(id === 'home-view') target.classList.add('blur-in');
+                const t = document.getElementById(id); t.classList.add('active');
+                if(id === 'home-view') t.classList.add('blur-in');
                 if(id === 'pocket-view') this.renderRoleList();
                 if(id === 'persona-list-view') this.renderPersonaList();
                 if(id === 'api-view') this.loadConfigInputs();
@@ -655,185 +624,60 @@
             switchTab(name) {
                 document.querySelectorAll('.tab-view').forEach(t => t.style.display = 'none');
                 document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-                const tabId = (name==='chats'?'tab-chats':(name==='moments'?'tab-moments':'tab-me'));
-                document.getElementById(tabId).style.display = 'flex';
+                document.getElementById(name==='chats'?'tab-chats':(name==='moments'?'tab-moments':'tab-me')).style.display = 'flex';
                 event.currentTarget.classList.add('active');
             },
 
             openDeepEdit(type) {
                 const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
-                if (role && role.id === 1 && !type.startsWith('user')) {
-                    this.showModal("系统限制", "手机小助手的核心设定无法被修改 🔐", "知道啦", () => {}, false);
-                    return;
-                }
+                if(role && role.id === 1 && !type.startsWith('user')) { this.showModal("系统限制", "手机小助手的核心设定无法被修改 🔐", "知道啦", () => {}, false); return; }
                 this.state.editType = type;
-                const input = document.getElementById('deep-edit-input');
-                const title = document.getElementById('edit-page-title');
+                const input = document.getElementById('deep-edit-input'), title = document.getElementById('edit-page-title');
                 if(type === 'userName') { title.innerText = "修改昵称"; input.value = this.state.user.homeName; }
                 else if(type === 'userLoc') { title.innerText = "修改地点"; input.value = this.state.user.location; }
                 else if(type === 'userPid') { title.innerText = "修改口袋码"; input.value = this.state.user.pid; }
-                else if(role) {
-                    if(type === 'roleName') { title.innerText = "修改备注"; input.value = role.name; }
-                    else if(type === 'rolePrompt') { title.innerText = "修改人设"; input.value = role.prompt; }
-                    else if(type === 'roleMoment') { title.innerText = "编辑朋友圈内容"; input.value = role.moment || ""; }
-                }
+                else if(role) { if(type === 'roleName') { title.innerText = "修改备注"; input.value = role.name; } else if(type === 'rolePrompt') { title.innerText = "修改人设"; input.value = role.prompt; } else if(type === 'roleMoment') { title.innerText = "编辑朋友圈内容"; input.value = role.moment || ""; } }
                 document.getElementById('deep-edit-view').style.display = 'flex';
             },
-
             saveDeepEdit() {
                 const val = document.getElementById('deep-edit-input').value;
                 if(this.state.editType.startsWith('user')) {
                     if(this.state.editType === 'userName') this.state.user.homeName = val;
                     if(this.state.editType === 'userLoc') this.state.user.location = val;
-                    if(this.state.editType === 'userPid') {
-                        const filtered = val.replace(/[^\x00-\x7F]/g, '').slice(0, 10);
-                        if(val !== filtered) {
-                            this.showModal("格式限制", "口袋码最多10位\n只支持数字、字母、符号\n已自动过滤", "知道啦", () => {}, false);
-                        }
-                        this.state.user.pid = filtered;
-                    }
+                    if(this.state.editType === 'userPid') { const f = val.replace(/[^\x00-\x7F]/g, '').slice(0,10); if(val !== f) this.showModal("格式限制", "口袋码最多10位\n只支持数字、字母、符号\n已自动过滤", "知道啦", () => {}, false); this.state.user.pid = f; }
                 } else {
                     const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
-                    if(this.state.editType === 'roleName') { role.name = val; document.getElementById('chat-title').innerText = val; }
-                    if(this.state.editType === 'rolePrompt') role.prompt = val;
-                    if(this.state.editType === 'roleMoment') role.moment = val;
+                    if(role) { if(this.state.editType==='roleName') role.name=val; if(this.state.editType==='rolePrompt') role.prompt=val; if(this.state.editType==='roleMoment') role.moment=val; }
                 }
-                this.saveAll(); this.renderUser(); this.openRoleSettings(); this.closeDeepEdit();
+                this.saveAll(); this.renderUser(); this.closeDeepEdit();
+                if(!this.state.editType.startsWith('user')) this.switchView('pocket-view');
             },
             closeDeepEdit() { document.getElementById('deep-edit-view').style.display = 'none'; },
 
             openRoleSettings() {
-                const r = this.state.roles.find(x => x.id === this.state.activeRoleId);
-                if(!r) return;
-                const isAssistant = (r.id === 1);
-                const content = document.getElementById('role-settings-content');
-                let html = `
-                    <div style="text-align:center; margin-bottom:20px;">
-                        <div class="user-avatar" style="border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px; background:white; overflow:hidden; border:1px solid #eee; ${isAssistant?'':'cursor:pointer'}" 
-                             onclick="${isAssistant?'':'app.pickFile(\'roleAvatar\')'}">
-                             ${isAssistant ? '📱' : (r.avatar.startsWith('data') ? `<img src="${r.avatar}" style="width:100%;height:100%;object-fit:cover;">` : '👤')}
-                        </div>
-                    </div>
-                    <div class="edit-card ${isAssistant?'locked-card':''}" onclick="app.openDeepEdit('roleName')">
-                        <div style="font-size:12px; color:#999; margin-bottom:5px;">备注名 ${isAssistant?'<span class="lock-indicator">已锁定</span>':''}</div>
-                        <div style="font-size:16px; font-weight:600;">${r.name}</div>
-                    </div>
-                    <div class="edit-card ${isAssistant?'locked-card':''}" onclick="app.openDeepEdit('rolePrompt')">
-                        <div style="font-size:12px; color:#999; margin-bottom:5px;">角色人设 ${isAssistant?'<span class="lock-indicator">已锁定</span>':''}</div>
-                        <div style="font-size:14px; color:#666; line-height:1.5;">${r.prompt}</div>
-                    </div>
-                `;
-                if(!isAssistant) {
-                    html += `
-                        <div class="edit-card" onclick="app.openDeepEdit('roleMoment')">
-                            <div style="font-size:12px; color:#999; margin-bottom:5px;">朋友圈状态</div>
-                            <div style="color:var(--primary-pink); font-size:14px;">点击编辑朋友圈内容...</div>
-                        </div>
-                        <div class="delete-friend-card">
-                            <button class="delete-friend-btn" onclick="app.deleteRole(${r.id})">
-                                <span class="delete-icon">🗑️</span> 删除这位朋友
-                            </button>
-                            <div class="delete-friend-hint">删除后聊天记录也将消失，且无法找回</div>
-                        </div>
-                    `;
-                }
-                content.innerHTML = html;
-                this.switchView('role-settings-view');
+                const r = this.state.roles.find(x => x.id === this.state.activeRoleId); if(!r) return;
+                const isA = (r.id === 1), c = document.getElementById('role-settings-content');
+                let h = `<div style="text-align:center;margin-bottom:20px;"><div class="user-avatar" style="border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:40px;background:white;overflow:hidden;border:1px solid #eee;${isA?'':'cursor:pointer'}" onclick="${isA?'':'app.pickFile(\'roleAvatar\')'}">${isA?'📱':(r.avatar.startsWith('data')?`<img src="${r.avatar}" style="width:100%;height:100%;object-fit:cover;">`:'👤')}</div></div>
+                <div class="edit-card ${isA?'locked-card':''}" onclick="app.openDeepEdit('roleName')"><div style="font-size:12px;color:#999;margin-bottom:5px;">备注名 ${isA?'<span class="lock-indicator">已锁定</span>':''}</div><div style="font-size:16px;font-weight:600;">${r.name}</div></div>
+                <div class="edit-card ${isA?'locked-card':''}" onclick="app.openDeepEdit('rolePrompt')"><div style="font-size:12px;color:#999;margin-bottom:5px;">角色人设 ${isA?'<span class="lock-indicator">已锁定</span>':''}</div><div style="font-size:14px;color:#666;line-height:1.5;">${r.prompt}</div></div>`;
+                if(!isA) h += `<div class="edit-card" onclick="app.openDeepEdit('roleMoment')"><div style="font-size:12px;color:#999;margin-bottom:5px;">朋友圈状态</div><div style="color:var(--primary-pink);font-size:14px;">点击编辑朋友圈内容...</div></div>
+                <div class="delete-friend-card"><button class="delete-friend-btn" onclick="app.deleteRole(${r.id})"><span class="delete-icon">🗑️</span> 删除这位朋友</button><div class="delete-friend-hint">删除后聊天记录也将消失，且无法找回</div></div>`;
+                c.innerHTML = h; this.switchView('role-settings-view');
             },
+            deleteRole(id) { if(id===1)return; this.showModal("删除朋友","确定要删除这位朋友吗？\n删除后聊天记录也将消失哦\n且无法找回咯","确定删除",()=>{ this.state.roles=this.state.roles.filter(r=>r.id!==id); delete this.state.chats[id]; this.saveAll(); this.renderRoleList(); this.switchView('pocket-view'); }); },
 
-            deleteRole(id) {
-                if(id === 1) return;
-                this.showModal("删除朋友", "确定要删除这位朋友吗？\n删除后聊天记录也将消失哦\n且无法找回咯", "确定删除", () => {
-                    this.state.roles = this.state.roles.filter(r => r.id !== id);
-                    delete this.state.chats[id];
-                    this.saveAll();
-                    this.renderRoleList();
-                    this.switchView('pocket-view');
-                });
-            },
+            renderPersonaList() { const c=document.getElementById('persona-list-content'); c.innerHTML = this.state.personas.map(p=>`<div class="persona-item" onclick="app.openEditPersona(${p.id})"><span class="persona-icon">🪪</span><div class="persona-info"><div class="persona-name">${p.name}${p.isSystem?' <span style="font-size:11px;color:#bbb;">(系统)</span>':''}</div><div class="persona-desc-preview">${p.desc||'暂无描述'}</div></div><label class="toggle-switch" onclick="event.stopPropagation();"><input type="checkbox" ${this.state.activePersonaId===p.id?'checked':''} onchange="app.togglePersona(${p.id})"><span class="toggle-slider"></span></label></div>`).join(''); },
+            togglePersona(id) { this.state.activePersonaId=id; this.saveAll(); this.renderPersonaList(); },
+            openEditPersona(id) { const p=this.state.personas.find(x=>x.id===id); if(!p)return; this.state.editingPersonaId=id; document.getElementById('edit-persona-name').value=p.name; document.getElementById('edit-persona-desc').value=p.desc; document.getElementById('persona-delete-btn').style.display=p.isSystem?'none':'block'; this.switchView('edit-persona-view'); },
+            savePersonaEdit() { const id=this.state.editingPersonaId, p=this.state.personas.find(x=>x.id===id); if(!p||p.isSystem)return; p.name=document.getElementById('edit-persona-name').value||p.name; p.desc=document.getElementById('edit-persona-desc').value; this.saveAll(); this.switchView('persona-list-view'); },
+            deleteCurrentPersona() { const id=this.state.editingPersonaId, p=this.state.personas.find(x=>x.id===id); if(!p)return; if(p.isSystem){ this.showModal("不能删除哦","至少保留一个人设哦宝宝～\n不能删 ♡","知道啦",()=>{},false); return; } this.showModal("删除人设",`删除不能恢复的宝宝～\n确认好哦\n\n"${p.name}"`,"确定删除",()=>{ this.state.personas=this.state.personas.filter(x=>x.id!==id); if(this.state.activePersonaId===id) this.state.activePersonaId=1; this.saveAll(); this.switchView('persona-list-view'); }); },
+            confirmCreatePersona() { const n=document.getElementById('new-persona-name').value.trim(), d=document.getElementById('new-persona-desc').value.trim(); if(!n)return; this.state.personas.push({id:Date.now(),name:n,desc:d,isSystem:false}); document.getElementById('new-persona-name').value=""; document.getElementById('new-persona-desc').value=""; this.saveAll(); this.switchView('persona-list-view'); },
 
-            renderPersonaList() {
-                const c = document.getElementById('persona-list-content');
-                const ap = this.state.personas;
-                c.innerHTML = ap.map(p => `
-                    <div class="persona-item" onclick="app.openEditPersona(${p.id})">
-                        <span class="persona-icon">🪪</span>
-                        <div class="persona-info">
-                            <div class="persona-name">${p.name}${p.isSystem ? ' <span style="font-size:11px;color:#bbb;">(系统)</span>' : ''}</div>
-                            <div class="persona-desc-preview">${p.desc || '暂无描述'}</div>
-                        </div>
-                        <label class="toggle-switch" onclick="event.stopPropagation();">
-                            <input type="checkbox" ${this.state.activePersonaId === p.id ? 'checked' : ''} onchange="app.togglePersona(${p.id})">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                `).join('');
-            },
-
-            togglePersona(id) {
-                this.state.activePersonaId = id;
-                this.saveAll();
-                this.renderPersonaList();
-            },
-
-            openEditPersona(id) {
-                const p = this.state.personas.find(x => x.id === id);
-                if(!p) return;
-                this.state.editingPersonaId = id;
-                document.getElementById('edit-persona-name').value = p.name;
-                document.getElementById('edit-persona-desc').value = p.desc;
-                const deleteBtn = document.getElementById('persona-delete-btn');
-                if(p.isSystem) {
-                    deleteBtn.style.display = 'none';
-                } else {
-                    deleteBtn.style.display = 'block';
-                }
-                this.switchView('edit-persona-view');
-            },
-
-            savePersonaEdit() {
-                const id = this.state.editingPersonaId;
-                const p = this.state.personas.find(x => x.id === id);
-                if(!p || p.isSystem) return;
-                p.name = document.getElementById('edit-persona-name').value || p.name;
-                p.desc = document.getElementById('edit-persona-desc').value;
-                this.saveAll();
-                this.switchView('persona-list-view');
-            },
-
-            deleteCurrentPersona() {
-                const id = this.state.editingPersonaId;
-                const p = this.state.personas.find(x => x.id === id);
-                if(!p) return;
-                if(p.isSystem) {
-                    this.showModal("不能删除哦", "至少保留一个人设哦宝宝～\n不能删 ♡", "知道啦", () => {}, false);
-                    return;
-                }
-                this.showModal("删除人设", `删除不能恢复的宝宝～\n确认好哦\n\n"${p.name}"`, "确定删除", () => {
-                    this.state.personas = this.state.personas.filter(x => x.id !== id);
-                    if(this.state.activePersonaId === id) {
-                        this.state.activePersonaId = 1;
-                    }
-                    this.saveAll();
-                    this.switchView('persona-list-view');
-                });
-            },
-
-            confirmCreatePersona() {
-                const name = document.getElementById('new-persona-name').value.trim();
-                const desc = document.getElementById('new-persona-desc').value.trim();
-                if(!name) return;
-                const newId = Date.now();
-                this.state.personas.push({ id: newId, name, desc, isSystem: false });
-                document.getElementById('new-persona-name').value = "";
-                document.getElementById('new-persona-desc').value = "";
-                this.saveAll();
-                this.switchView('persona-list-view');
-            },
+            exportData() { const data={user:this.state.user,roles:this.state.roles,chats:this.state.chats,config:this.state.config,personas:this.state.personas,activePersonaId:this.state.activePersonaId}; const b=new Blob([JSON.stringify(data,null,2)],{type:'text/plain'}); const a=document.createElement('a'); const now=new Date(); a.href=URL.createObjectURL(b); a.download=`Pocket_Chat_备份_${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日.txt`; a.click(); URL.revokeObjectURL(a.href); this.showModal("备份完成","已经存在你的下载文件夹里啦 ♡","知道啦",()=>{},false); },
+            importData() { const fi=document.getElementById('import-file-input'); fi.onchange=(e)=>{ const file=e.target.files[0]; if(!file)return; this.showModal("正在恢复记忆...","请稍等片刻～","",null,false); document.getElementById('p-btn-cancel').style.display='block'; document.getElementById('p-btn-cancel').onclick=()=>{this.closeModal();fi.value='';}; const r=new FileReader(); r.onload=(ev)=>{ try{ const data=JSON.parse(ev.target.result); if(data.user)this.state.user=data.user; if(data.roles)this.state.roles=data.roles; if(data.chats)this.state.chats=data.chats; if(data.config)this.state.config=data.config; if(data.personas)this.state.personas=data.personas; if(data.activePersonaId)this.state.activePersonaId=data.activePersonaId; this.saveAll(); this.closeModal(); this.showModal("恢复完成","我都想起来了宝宝 ♡","确认",()=>{location.reload();},false); }catch(err){ this.closeModal(); this.showModal("导入失败","这个文件好像不对哦，换一个试试～","知道啦",()=>{},false); } fi.value=''; }; r.readAsText(file); }; fi.click(); },
 
             async sendMessage() {
-                const input = document.getElementById('chat-input');
-                const text = input.value.trim(); if(!text) return;
+                const input = document.getElementById('chat-input'); const text = input.value.trim(); if(!text) return;
                 const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
                 if(!this.state.chats[role.id]) this.state.chats[role.id] = [];
                 this.state.chats[role.id].push({ type: 'user', text, ts: Date.now() });
@@ -843,178 +687,64 @@
                 const reply = await this.fetchAI(text, role);
                 this.state.chats[role.id].push({ type: 'ai', text: reply, ts: Date.now() });
                 role.lastMsg = reply; role.lastTime = this.getClockStr();
+                // 智能表情包
+                if(role.id !== 1) {
+                    const sticker = this.getMatchingSticker(reply);
+                    if(sticker) {
+                        this.state.chats[role.id].push({ type: 'ai', text: '', sticker: sticker, ts: Date.now() + 1 });
+                    }
+                }
                 document.getElementById('chat-title').innerText = role.name;
                 this.renderMessages(); this.saveAll();
             },
 
             async fetchAI(text, role) {
-                const cfg = this.state.config;
-                if(!cfg.key) return "请在设置中配置 API Key ♡";
-
-                const history = (this.state.chats[role.id] || []).slice(-10).map(m => ({
-                    role: m.type === 'user' ? 'user' : 'assistant',
-                    content: m.text
-                }));
-
-                let systemPrompt = role.prompt;
-                if(role.id !== 1) {
-                    const activePersona = this.state.personas.find(p => p.id === this.state.activePersonaId);
-                    if(activePersona && activePersona.desc.trim()) {
-                        systemPrompt = role.prompt + "\n\n【当前用户设定】用户的人设是：" + activePersona.desc + "\n请根据以上设定与用户互动，回应的语气和内容要符合该设定。";
-                    }
-                }
-
+                const cfg = this.state.config; if(!cfg.key) return "请在设置中配置 API Key ♡";
+                const history = (this.state.chats[role.id] || []).filter(m => !m.sticker).slice(-10).map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.text }));
+                let sp = role.prompt;
+                if(role.id !== 1) { const ap = this.state.personas.find(p => p.id === this.state.activePersonaId); if(ap && ap.desc.trim()) sp = role.prompt + "\n\n【当前用户设定】用户的人设是：" + ap.desc + "\n请根据以上设定与用户互动。"; }
                 try {
-                    let reply;
-                    const messages = [{ role: "system", content: systemPrompt }, ...history];
-                    const r = await fetch(`${cfg.url}/chat/completions`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${cfg.key}`
-                        },
-                        body: JSON.stringify({ model: cfg.model, messages: messages })
-                    });
-                    const d = await r.json();
-                    reply = d.choices?.[0]?.message?.content || "（未获取到回复）";
-
-                    if(role.id === 1) {
-                        const appKeywords = ['创建角色', '昵称', '头像', 'API', '配置', '删除', '好友', '发送消息', '人设', '朋友圈', '口袋码', '二维码', '使用方法', '功能', '设置', '聊天', '桌面', 'Pocket', '小口袋', '角色', '编辑', '备注'];
-                        const isAppRelated = appKeywords.some(kw => reply.includes(kw));
-                        const isFallbackReply = reply.includes("这个我还不太清楚呢");
-                        if(!isAppRelated && !isFallbackReply) {
-                            reply = "这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡";
-                        }
+                    let reply; const msgs = [{ role: "system", content: sp }, ...history];
+                    if(cfg.provider === 'deepseek') {
+                        const r = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs}) });
+                        const d = await r.json(); reply = d.choices?.[0]?.message?.content || "（未获取到回复）";
+                    } else {
+                        if(!cfg.proxy) return "请在 API 配置中填写代理地址（Cloudflare Worker）♡";
+                        const r = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs,key:cfg.key}) });
+                        const d = await r.json(); reply = d.choices?.[0]?.message?.content || "（未获取到回复）";
                     }
-
+                    if(role.id === 1) { const akw=['创建角色','昵称','头像','API','配置','删除','好友','发送消息','人设','朋友圈','口袋码','二维码','使用方法','功能','设置','聊天','桌面','Pocket','小口袋','角色','编辑','备注']; if(!akw.some(kw=>reply.includes(kw)) && !reply.includes("这个我还不太清楚呢")) reply = "这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡"; }
                     return reply;
-                } catch(e) {
-                    return "网络波动中，晚点再聊吧~";
-                }
+                } catch(e) { return "网络波动中，晚点再聊吧~"; }
             },
 
-            testAPI() {
-                const cfg = this.state.config;
-                if(!cfg.key) {
-                    this.showModal("连接失败", "请先填写 API Key", "确定", () => {}, false);
-                    return;
-                }
-                this.showModal("测试中", `正在测试 ${cfg.provider} 连接...`, "请稍后", () => {}, false);
-                setTimeout(async () => {
-                    try {
-                        const res = await this.fetchAI("你好", { prompt: "你是一个助手，请回复'连接成功'", id: 999 });
-                        if(res.includes("API Key") || res.includes("波动") || res.includes("未获取")) {
-                            throw new Error("接口返回异常");
-                        }
-                        this.showModal("连接成功", `等你好久啦 ♡\n${cfg.provider} 连接正常`, "确定", () => {}, false);
-                    } catch(e) {
-                        this.showModal("连接失败", "再试试吧～\n原因: " + e.message, "确定", () => {}, false);
-                    }
-                }, 800);
-            },
-
-            deleteMsg(ts) {
-                this.showModal("确认删除消息", "删除该条消息后将无法找回，且不再计入对话记忆。", "确认删除", () => {
-                    const msgs = this.state.chats[this.state.activeRoleId];
-                    this.state.chats[this.state.activeRoleId] = msgs.filter(m => m.ts !== ts);
-                    this.saveAll();
-                    this.renderMessages();
-                });
-            },
-
-            pickFile(target) {
-                const f = document.getElementById('file-input');
-                f.onchange = e => {
-                    const rd = new FileReader();
-                    rd.onload = ev => {
-                        const b64 = ev.target.result;
-                        if(target === 'userAvatar') this.state.user.avatar = b64;
-                        else if(target === 'roleAvatar') {
-                            const r = this.state.roles.find(x => x.id === this.state.activeRoleId);
-                            r.avatar = b64; this.openRoleSettings();
-                        } else if(target === 'newRoleAvatar') {
-                            this.state.tempAvatar = b64;
-                            document.getElementById('new-role-av-box').innerHTML = `<img src="${b64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-                        }
-                        this.saveAll(); this.renderUser();
-                    };
-                    rd.readAsDataURL(e.target.files[0]);
-                };
-                f.click();
-            },
-            renderUser() {
-                document.getElementById('val-location').innerText = this.state.user.location;
-                document.getElementById('val-name').innerText = this.state.user.homeName;
-                document.getElementById('me-name').innerText = this.state.user.homeName;
-                document.getElementById('val-pocketid').innerText = this.state.user.pid;
-                const av = this.state.user.avatar || 'https://api.dicebear.com/7.x/adventurer/svg?seed=user';
-                document.getElementById('val-avatar').src = av; document.getElementById('me-avatar').src = av;
-            },
-            renderRoleList() {
-                const c = document.getElementById('chat-list-container');
-                c.innerHTML = this.state.roles.map(r => `
-                    <div class="chat-item" 
-                         onclick="app.openChat(${r.id})">
-                        <div class="item-avatar">${(r.id===1)?'📱':(r.avatar ? `<img src="${r.avatar}">` : '👤')}</div>
-                        <div class="item-info">
-                            <div class="item-row"><span class="item-name">${r.name}</span><span class="item-time">${r.lastTime}</span></div>
-                            <div class="item-lastmsg">${r.lastMsg}</div>
-                        </div>
-                    </div>
-                `).join('');
-            },
-            openChat(id) {
-                this.state.activeRoleId = id;
-                const r = this.state.roles.find(x => x.id === id);
-                document.getElementById('chat-title').innerText = r.name;
-                this.renderMessages(); this.switchView('chat-detail-view');
-            },
+            testAPI() { const cfg=this.state.config; if(!cfg.key){this.showModal("连接失败","请先填写 API Key","确定",()=>{},false);return;} if(cfg.provider!=='deepseek'&&!cfg.proxy){this.showModal("需要代理","智谱和豆包需要配置代理地址。\n请先部署 Cloudflare Worker，\n把地址填到「代理地址」框。","知道啦",()=>{},false);return;} this.showModal("测试中",`正在测试 ${cfg.provider} 连接...`,"请稍后",()=>{},false); setTimeout(async()=>{try{const res=await this.fetchAI("你好",{prompt:"你是一个助手，请回复'连接成功'",id:999}); if(res.includes("API Key")||res.includes("波动")||res.includes("未获取")) throw new Error("接口返回异常"); this.showModal("连接成功",`等你好久啦 ♡\n${cfg.provider} 连接正常`,"确定",()=>{},false);}catch(e){this.showModal("连接失败","再试试吧～\n原因: "+e.message,"确定",()=>{},false);}},800); },
+            deleteMsg(ts) { this.showModal("确认删除消息","删除该条消息后将无法找回，且不再计入对话记忆。","确认删除",()=>{ const ms=this.state.chats[this.state.activeRoleId]; this.state.chats[this.state.activeRoleId]=ms.filter(m=>m.ts!==ts); this.saveAll(); this.renderMessages(); }); },
+            pickFile(target) { const f=document.getElementById('file-input'); f.onchange=e=>{ const rd=new FileReader(); rd.onload=ev=>{ const b64=ev.target.result; if(target==='userAvatar')this.state.user.avatar=b64; else if(target==='roleAvatar'){ const r=this.state.roles.find(x=>x.id===this.state.activeRoleId); r.avatar=b64; this.openRoleSettings(); } else if(target==='newRoleAvatar'){ this.state.tempAvatar=b64; document.getElementById('new-role-av-box').innerHTML=`<img src="${b64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; } this.saveAll(); this.renderUser(); }; rd.readAsDataURL(e.target.files[0]); }; f.click(); },
+            renderUser() { document.getElementById('val-location').innerText=this.state.user.location; document.getElementById('val-name').innerText=this.state.user.homeName; document.getElementById('me-name').innerText=this.state.user.homeName; document.getElementById('val-pocketid').innerText=this.state.user.pid; const av=this.state.user.avatar||'https://api.dicebear.com/7.x/adventurer/svg?seed=user'; document.getElementById('val-avatar').src=av; document.getElementById('me-avatar').src=av; },
+            renderRoleList() { const c=document.getElementById('chat-list-container'); c.innerHTML=this.state.roles.map(r=>`<div class="chat-item" onclick="app.openChat(${r.id})"><div class="item-avatar">${(r.id===1)?'📱':(r.avatar?`<img src="${r.avatar}">`:'👤')}</div><div class="item-info"><div class="item-row"><span class="item-name">${r.name}</span><span class="item-time">${r.lastTime}</span></div><div class="item-lastmsg">${r.lastMsg}</div></div></div>`).join(''); },
+            openChat(id) { this.state.activeRoleId=id; const r=this.state.roles.find(x=>x.id===id); document.getElementById('chat-title').innerText=r.name; this.renderMessages(); this.switchView('chat-detail-view'); },
             renderMessages() {
-                const box = document.getElementById('msg-box');
-                const ms = this.state.chats[this.state.activeRoleId] || [];
-                const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
-                let h = "", last = 0;
-                ms.forEach(m => {
+                const box=document.getElementById('msg-box'); const ms=this.state.chats[this.state.activeRoleId]||[]; const role=this.state.roles.find(r=>r.id===this.state.activeRoleId);
+                let h="", last=0;
+                ms.forEach(m=>{
                     if(m.ts - last > 300000) h += `<div class="msg-time-tag">${new Date(m.ts).getHours()}:${new Date(m.ts).getMinutes().toString().padStart(2,'0')}</div>`;
                     last = m.ts;
-                    h += `<div class="msg-row ${m.type}">
-                        <div class="bubble-avatar">${m.type==='ai' ? (role.id===1?'📱':(role.avatar?`<img src="${role.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')) : (this.state.user.avatar?`<img src="${this.state.user.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')}</div>
-                        <div class="bubble bubble-${m.type}" ondblclick="app.deleteMsg(${m.ts})">${m.text}</div>
-                    </div>`;
+                    if(m.sticker) {
+                        h += `<div class="msg-row ${m.type}"><div class="bubble-avatar">${m.type==='ai' ? (role.id===1?'📱':(role.avatar?`<img src="${role.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')) : (this.state.user.avatar?`<img src="${this.state.user.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')}</div><div class="bubble sticker-bubble"><img src="${m.sticker}"></div></div>`;
+                    } else {
+                        h += `<div class="msg-row ${m.type}"><div class="bubble-avatar">${m.type==='ai' ? (role.id===1?'📱':(role.avatar?`<img src="${role.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')) : (this.state.user.avatar?`<img src="${this.state.user.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')}</div><div class="bubble bubble-${m.type}" ondblclick="app.deleteMsg(${m.ts})">${m.text}</div></div>`;
+                    }
                 });
                 box.innerHTML = h; box.scrollTop = box.scrollHeight;
             },
-            confirmCreateRole() {
-                const name = document.getElementById('new-role-name').value;
-                if(!name) return;
-                this.state.roles.push({
-                    id: Date.now(), name, avatar: this.state.tempAvatar,
-                    prompt: document.getElementById('new-role-prompt').value || "你好",
-                    lastMsg: "开始聊天吧", lastTime: this.getClockStr(), moment: ""
-                });
-                this.state.tempAvatar = ""; this.saveAll(); this.switchView('pocket-view');
-            },
-            saveConfig() {
-                const cfg = this.state.config;
-                cfg.provider = document.getElementById('cfg-provider').value;
-                cfg.url = document.getElementById('cfg-url').value;
-                cfg.key = document.getElementById('cfg-key').value;
-                cfg.model = document.getElementById('cfg-model').value;
-                this.saveAll();
-                this.showModal("保存成功", `供应商：${cfg.provider}\n模型：${cfg.model}\n配置已更新`, "确定", () => {}, false);
-            },
-            saveAll() {
-                localStorage.setItem('pk_user', JSON.stringify(this.state.user));
-                localStorage.setItem('pk_roles', JSON.stringify(this.state.roles));
-                localStorage.setItem('pk_chats', JSON.stringify(this.state.chats));
-                localStorage.setItem('pk_cfg', JSON.stringify(this.state.config));
-                localStorage.setItem('pk_personas', JSON.stringify(this.state.personas));
-                localStorage.setItem('pk_activePid', JSON.stringify(this.state.activePersonaId));
-            },
+            confirmCreateRole() { if(this.state.creatingRole)return; this.state.creatingRole=true; const n=document.getElementById('new-role-name').value; if(!n){this.state.creatingRole=false;return;} this.state.roles.push({id:Date.now(),name:n,avatar:this.state.tempAvatar,prompt:document.getElementById('new-role-prompt').value||"你好",lastMsg:"开始聊天吧",lastTime:this.getClockStr(),moment:""}); document.getElementById('new-role-name').value=""; document.getElementById('new-role-prompt').value=""; this.state.tempAvatar=""; document.getElementById('new-role-av-box').innerHTML="头像"; this.saveAll(); this.state.creatingRole=false; this.switchView('pocket-view'); },
+            saveConfig() { const cfg=this.state.config; cfg.provider=document.getElementById('cfg-provider').value; cfg.url=document.getElementById('cfg-url').value; cfg.key=document.getElementById('cfg-key').value; cfg.model=document.getElementById('cfg-model').value; cfg.proxy=document.getElementById('cfg-proxy').value; this.saveAll(); this.showModal("保存成功",`供应商：${cfg.provider}\n模型：${cfg.model}\n配置已更新`,"确定",()=>{},false); },
+            saveAll() { localStorage.setItem('pk_user',JSON.stringify(this.state.user)); localStorage.setItem('pk_roles',JSON.stringify(this.state.roles)); localStorage.setItem('pk_chats',JSON.stringify(this.state.chats)); localStorage.setItem('pk_cfg',JSON.stringify(this.state.config)); localStorage.setItem('pk_personas',JSON.stringify(this.state.personas)); localStorage.setItem('pk_activePid',JSON.stringify(this.state.activePersonaId)); },
             updateClock() { document.getElementById('d-clock').innerText = this.getClockStr(); },
-            getClockStr() { const d = new Date(); return d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0'); },
+            getClockStr() { const d=new Date(); return d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().padStart(2,'0'); },
             toggleQR(s) { document.getElementById('qr-pop').style.display = s ? 'flex' : 'none'; }
         };
     </script>
 </body>
-    </html>
+</html>
