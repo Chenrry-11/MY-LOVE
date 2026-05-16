@@ -1001,7 +1001,7 @@
                 cfg.key = document.getElementById('cfg-key').value;
                 cfg.model = document.getElementById('cfg-model').value;
                 this.saveAll();
-                this.showModal("保存成功", `供应商：${cfg.provider}\n模型：${cfg.model}\n配置已更新`, "确定", () => {}, false);此.showModal("保存成功", `供应商：${cfg.provider} 模型：${cfg.model} 配置已更新`, "确定", () => {}, false);
+                this.showModal("保存成功", `供应商：${cfg.provider}\n模型：${cfg.model}\n配置已更新`, "确定", () => {}, false);
             },
             saveAll() {
                 localStorage.setItem('pk_user', JSON.stringify(this.state.user));
@@ -1017,4 +1017,4 @@
         };
     </script>
 </body>
-</html>
+    </html>
