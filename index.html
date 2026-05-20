@@ -129,12 +129,37 @@
 
         .envelope-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.6); z-index: 97; display: none; }
         .envelope-overlay.show { display: block; }
-        .envelope-wrap { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; height: 200px; cursor: pointer; z-index: 98; perspective: 1200px; }
+        .envelope-wrap {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; height: 200px;
+            cursor: pointer; z-index: 98; perspective: 1200px;
+        }
         .envelope-wrap.hidden { display: none; }
-        .envelope-wrap .envelope { position: absolute; inset: 0; background: #ffffff; border-radius: 12px; z-index: 2; box-shadow: 0 8px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08); background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35"><path fill="%23999" d="M17.5 2l1.8 5.5H25l-4.5 3.3 1.7 5.2-4.7-3.5-4.7 3.5 1.7-5.2L10 7.5h5.7L17.5 2z"/></svg>'); background-size: 35px 35px; background-position: 5px 5px; transition: all 0.7s ease; }
-        .envelope-wrap .envelope-flap { position: absolute; top: 0; left: 0; width: 0; height: 0; border-left: 140px solid transparent; border-right: 140px solid transparent; border-top: 80px solid #f0f0f0; z-index: 3; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.1)); transform-origin: top center; transform: rotateX(-60deg); transition: transform 0.5s ease, opacity 0.7s ease; backface-visibility: hidden; }
-        .envelope-wrap .letter-in-envelope { position: absolute; bottom: 8px; left: 12px; right: 12px; height: 180px; background: #f0e9d8; border-radius: 8px 8px 0 0; z-index: 1; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-        .envelope-wrap .letter-show { position: absolute; top: 50%; left: 50%; width: 340px; height: 420px; background: #f0e9d8; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: translate(-50%,-50%) scale(0.9); opacity: 0; z-index: 10; transition: all 0.7s ease; pointer-events: auto; cursor: pointer; }
+        .envelope-wrap .envelope {
+            position: absolute; inset: 0; background: #ffffff; border-radius: 12px; z-index: 2;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35"><path fill="%23999" d="M17.5 2l1.8 5.5H25l-4.5 3.3 1.7 5.2-4.7-3.5-4.7 3.5 1.7-5.2L10 7.5h5.7L17.5 2z"/></svg>');
+            background-size: 35px 35px; background-position: 5px 5px;
+            transition: all 0.7s ease;
+        }
+        .envelope-wrap .envelope-flap {
+            position: absolute; top: 0; left: 0; width: 0; height: 0;
+            border-left: 140px solid transparent; border-right: 140px solid transparent; border-top: 80px solid #f0f0f0;
+            z-index: 3; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.1));
+            transform-origin: top center; transform: rotateX(-60deg);
+            transition: transform 0.5s ease, opacity 0.7s ease; backface-visibility: hidden;
+        }
+        .envelope-wrap .letter-in-envelope {
+            position: absolute; bottom: 8px; left: 12px; right: 12px; height: 180px;
+            background: #f0e9d8; border-radius: 8px 8px 0 0; z-index: 1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .envelope-wrap .letter-show {
+            position: absolute; top: 50%; left: 50%; width: 340px; height: 420px;
+            background: #f0e9d8; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translate(-50%,-50%) scale(0.9); opacity: 0; z-index: 10;
+            transition: all 0.7s ease; pointer-events: auto; cursor: pointer;
+        }
         .envelope-wrap.step-1 .envelope-flap { transform: rotateX(180deg); }
         .envelope-wrap.step-2 .letter-in-envelope { transform: translateY(-70px) rotate(5deg); }
         .envelope-wrap.step-3 .letter-in-envelope, .envelope-wrap.step-3 .envelope { opacity: 0; transform: scale(1.05); }
@@ -161,6 +186,27 @@
         .memory-item .memory-del { color: #ccc; cursor: pointer; font-size: 18px; padding: 4px; }
         .memory-item .memory-del:active { color: #ff4d4d; }
 
+        /* 朋友圈 */
+        .moment-card { background: #fff; margin-bottom: 10px; padding: 16px 20px; }
+        .moment-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .moment-avatar { width: 44px; height: 44px; border-radius: 50%; background: #ffe0e5; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .moment-name { font-weight: 600; font-size: 16px; }
+        .moment-time { font-size: 12px; color: #bbb; }
+        .moment-content { font-size: 15px; line-height: 1.6; margin-bottom: 12px; color: #333; }
+        .moment-actions { display: flex; gap: 20px; align-items: center; margin-bottom: 8px; }
+        .moment-like { color: #999; font-size: 14px; cursor: pointer; }
+        .moment-like.liked { color: #ff6b81; }
+        .moment-comment-btn { color: #999; font-size: 14px; cursor: pointer; }
+        .moment-delete { color: #ccc; font-size: 14px; cursor: pointer; margin-left: auto; }
+        .moment-comments { background: #f9f9f9; border-radius: 8px; padding: 10px 12px; margin-top: 6px; }
+        .moment-comment { font-size: 14px; line-height: 1.5; margin-bottom: 4px; }
+        .moment-comment .c-user { color: var(--primary-pink); font-weight: 500; }
+        .moment-comment .c-reply { color: #666; margin-top: 2px; padding-left: 8px; border-left: 2px solid #eee; }
+        .comment-input-row { display: flex; gap: 8px; margin-top: 8px; }
+        .comment-input-row input { flex: 1; height: 34px; border: none; background: #f0f0f0; border-radius: 17px; padding: 0 12px; outline: none; font-size: 14px; }
+        .comment-input-row .comment-send { color: var(--primary-pink); font-weight: 600; font-size: 14px; cursor: pointer; padding: 0 8px; }
+
+        /* 文风 */
         .style-item { display: flex; align-items: center; padding: 16px 20px; background: #fff; border-bottom: 1px solid #f5f5f5; cursor: pointer; gap: 12px; transition: 0.2s; }
         .style-item:active { background: #fff9fa; }
         .style-item.active { background: #fff5f7; }
@@ -223,7 +269,8 @@
     </style>
 </head>
 <body onload="app.startHome()">
-        <div class="p-modal-mask" id="p-modal-mask"><div class="p-modal" id="p-modal"><div class="p-modal-title" id="p-modal-title">提示</div><div class="p-modal-body" id="p-modal-body">内容</div><div class="p-modal-btns"><button class="p-btn p-btn-cancel" id="p-btn-cancel" onclick="app.closeModal()">取消</button><button class="p-btn p-btn-confirm" id="p-btn-confirm">确定</button></div></div></div>
+
+    <div class="p-modal-mask" id="p-modal-mask"><div class="p-modal" id="p-modal"><div class="p-modal-title" id="p-modal-title">提示</div><div class="p-modal-body" id="p-modal-body">内容</div><div class="p-modal-btns"><button class="p-btn p-btn-cancel" id="p-btn-cancel" onclick="app.closeModal()">取消</button><button class="p-btn p-btn-confirm" id="p-btn-confirm">确定</button></div></div></div>
 
     <div class="envelope-overlay" id="envelopeOverlay"></div>
     <div class="envelope-wrap hidden" id="envelopeWrap" onclick="app.envelopeClick()"><div class="envelope"></div><div class="envelope-flap"></div><div class="letter-in-envelope"></div><div class="letter-show"></div></div>
@@ -243,7 +290,7 @@
 
     <section class="view" id="pocket-view">
         <div id="tab-chats" class="tab-view active" style="display:flex;flex-direction:column;height:100%;"><div class="nav-header"><div class="nav-btn" onclick="app.switchView('home-view')">🏠</div><div class="nav-title">Pocket Chat</div><div class="nav-btn" onclick="app.switchView('create-role-view')">+</div></div><div class="tab-content" id="chat-list-container"></div></div>
-        <div id="tab-moments" class="tab-view" style="display:none;flex-direction:column;height:100%;"><div class="nav-header"><div class="nav-title">朋友圈</div></div><div class="tab-content" style="padding:40px;text-align:center;color:#ccc;">暂无新动态</div></div>
+        <div id="tab-moments" class="tab-view" style="display:none;flex-direction:column;height:100%;"><div class="nav-header"><div class="nav-title">🍥 朋友圈</div></div><div class="tab-content" id="moments-container" style="background:#f9f9f9;"></div></div>
         <div id="tab-me" class="tab-view" style="display:none;flex-direction:column;height:100%;"><div class="nav-header"><div class="nav-title">我</div></div><div class="tab-content"><div class="me-header"><img src="" class="user-avatar" id="me-avatar" onclick="app.pickFile('userAvatar')"><div class="user-name" id="me-name" onclick="app.openDeepEdit('userName')">用户名</div><div style="font-size:13px;color:#bbb;" onclick="app.openDeepEdit('userPid')">口袋码：<span id="val-pocketid">888888</span></div><div class="envelope-btn" onclick="app.toggleQR(true)">✉️</div></div></div></div>
         <div class="tab-bar"><div class="tab-item active" onclick="app.switchTab('chats')"><i>🥨</i><span>聊天</span></div><div class="tab-item" onclick="app.switchTab('moments')"><i>🍥</i><span>朋友圈</span></div><div class="tab-item" onclick="app.switchTab('me')"><i>🫓</i><span>我</span></div></div>
     </section>
@@ -269,7 +316,6 @@
 
     <section class="view" id="role-letters-view"><div class="nav-header"><div class="nav-back" onclick="app.switchView('chat-detail-view')"></div><div class="nav-title" id="role-letters-title">他的信</div><div class="nav-btn" id="role-letter-request-btn" onclick="app.requestRoleLetter()">📫</div></div><div class="tab-content" id="role-letters-content" style="background:#f9f9f9;"></div></section>
     <section class="view" id="role-memory-view"><div class="nav-header"><div class="nav-back" onclick="app.switchView('chat-detail-view')"></div><div class="nav-title" id="role-memory-title">他的记忆</div><div style="width:40px"></div></div><div class="tab-content" id="role-memory-content" style="background:#f9f9f9;"></div></section>
-
     <section class="view" id="role-settings-view"><div class="nav-header"><div class="nav-back" onclick="app.switchView('chat-detail-view')"></div><div class="nav-title">角色设置</div><div style="width:40px"></div></div><div class="tab-content" id="role-settings-content" style="background:#f9f9f9;padding-top:30px;"></div></section>
     <div class="edit-page" id="deep-edit-view"><div class="nav-header"><div class="nav-btn" onclick="app.closeDeepEdit()" style="font-size:14px;">取消</div><div class="nav-title" id="edit-page-title">编辑信息</div><div class="nav-btn" onclick="app.saveDeepEdit()" style="font-size:14px;">确认</div></div><div class="edit-card"><textarea id="deep-edit-input"></textarea></div></div>
     <section class="view" id="create-role-view"><div class="nav-header"><div class="nav-back" onclick="app.switchView('pocket-view')"></div><div class="nav-title">新角色</div><div style="width:40px"></div></div><div class="tab-content" style="padding:25px;display:flex;flex-direction:column;gap:20px;"><input class="field-input" id="new-role-name" placeholder="起个名字吧"><div class="field-input" style="height:100px;display:flex;align-items:center;justify-content:center;color:#ccc;border-radius:50%;width:100px;margin:0 auto;border:1px dashed #ccc;" onclick="app.pickFile('newRoleAvatar')" id="new-role-av-box">头像</div><textarea class="field-input" id="new-role-prompt" style="height:150px;padding:15px;" placeholder="人设性格描述..."></textarea><button class="test-btn" onclick="app.confirmCreateRole()">完成创建</button></div></section>
@@ -278,7 +324,7 @@
     <section class="view" id="memory-view"><div class="nav-header"><div class="nav-back" onclick="app.switchView('settings-view')"></div><div class="nav-title">记忆备份</div><div style="width:40px"></div></div><div class="tab-content" style="padding:30px;display:flex;flex-direction:column;gap:20px;background:#f9f9f9;align-items:center;"><div style="font-size:14px;color:#999;text-align:center;margin-bottom:10px;">你的所有聊天记录、角色、人设<br>都可以打包存起来，不怕丢 ♡</div><button class="test-btn" onclick="app.exportData()" style="width:80%;">📤 备份数据</button><button class="test-btn" onclick="app.importData()" style="width:80%;">📥 导入备份</button></div></section>
 
     <section class="view" id="style-view">
-        <div class="nav-header"><div class="nav-back" onclick="app.switchView('settings-view')"></div><div class="nav-title">📃 文风要求</div><div style="width:40px"></div></div>
+        <div class="nav-header"><div class="nav-back" onclick="app.switchView('settings-view')"></div><div class="nav-title">📃 文风要求</div><div class="nav-btn" onclick="app.switchView('create-style-view')">+</div></div>
         <div class="tab-content" style="background:#f9f9f9;">
             <div style="font-size:13px;color:#bbb;padding:16px 20px 8px;">当前启用的文风</div>
             <div id="active-style" style="padding:0 20px 10px;font-size:14px;color:var(--primary-pink);"></div>
@@ -288,9 +334,17 @@
             <div class="style-list" id="custom-list"></div>
             <div style="padding:0 20px 20px;font-size:12px;color:#ccc;">左滑可删除自定义文风</div>
             <div style="display:flex;gap:12px;padding:0 20px 20px;">
-                <button class="btn btn-outline" onclick="addCustom()" style="flex:1;height:46px;border:none;border-radius:23px;font-size:15px;cursor:pointer;font-weight:600;background:#fff;color:var(--primary-pink);border:1.5px solid var(--primary-pink);">＋ 新建文风</button>
                 <button class="btn btn-outline" onclick="importStyles()" style="flex:1;height:46px;border:none;border-radius:23px;font-size:15px;cursor:pointer;font-weight:600;background:#fff;color:var(--primary-pink);border:1.5px solid var(--primary-pink);">📥 导入文风</button>
             </div>
+        </div>
+    </section>
+
+    <section class="view" id="create-style-view">
+        <div class="nav-header"><div class="nav-back" onclick="app.switchView('style-view')"></div><div class="nav-title">新建文风</div><div style="width:40px"></div></div>
+        <div class="tab-content" style="padding:25px;display:flex;flex-direction:column;gap:20px;">
+            <input class="field-input" id="new-style-name" placeholder="文风名称">
+            <textarea class="field-input" id="new-style-desc" style="height:200px;padding:15px;" placeholder="文风描述（AI会根据这个调整回复风格）..."></textarea>
+            <button class="test-btn" onclick="app.confirmCreateStyle()">完成创建</button>
         </div>
     </section>
 
@@ -299,7 +353,18 @@
     <section class="view" id="persona-list-view"><div class="nav-header"><div class="nav-back" onclick="app.switchView('settings-view')"></div><div class="nav-title">用户人设</div><div class="nav-btn" onclick="app.switchView('create-persona-view')">+</div></div><div class="tab-content" id="persona-list-content" style="background:#f9f9f9;"></div></section>
     <section class="view" id="create-persona-view"><div class="nav-header"><div class="nav-back" onclick="app.switchView('persona-list-view')"></div><div class="nav-title">新建人设</div><div style="width:40px"></div></div><div class="tab-content" style="padding:25px;display:flex;flex-direction:column;gap:20px;"><input class="field-input" id="new-persona-name" placeholder="人设名称"><textarea class="field-input" id="new-persona-desc" style="height:200px;padding:15px;" placeholder="人设描述..."></textarea><button class="test-btn" onclick="app.confirmCreatePersona()">完成创建</button></div></section>
     <section class="view" id="edit-persona-view"><div class="nav-header"><div class="nav-back" onclick="app.switchView('persona-list-view')"></div><div class="nav-title">编辑人设</div><div class="nav-btn" id="persona-delete-btn" onclick="app.deleteCurrentPersona()" style="font-size:16px;">🗑️</div></div><div class="tab-content" id="edit-persona-content" style="padding:25px;display:flex;flex-direction:column;gap:20px;"><input class="field-input" id="edit-persona-name" placeholder="人设名称"><textarea class="field-input" id="edit-persona-desc" style="height:200px;padding:15px;" placeholder="人设描述..."></textarea><button class="test-btn" onclick="app.savePersonaEdit()">保存修改</button></div></section>
-    <div class="qr-pop" id="qr-pop" onclick="app.toggleQR(false)"><div class="qr-card"><div class="qr-text">＿＿＿＿.°⑅ପ₍ᐢ｡•༝•｡ᐢ₎₍ᐢ｡•༝•｡ᐢ₎ଓ⑅°. 陳平安の作品無断転載・改変・販売禁止！！楽しく遊んでね、ベイビー ⌯>ᴗo⌯ಣ”＿＿＿＿＿＿</div></div></div>
+    <div class="qr-pop" id="qr-pop" onclick="app.toggleQR(false)">
+        <div class="qr-card">
+            <div class="qr-text">＿＿＿＿
+.°⑅ପ₍ᐢ｡•༝•｡ᐢ₎₍ᐢ｡•༝•｡ᐢ₎ଓ⑅°. 
+陳平安の作品
+
+無断転載・改変・販売禁止！！
+
+楽しく遊んでね、ベイビー ⌯>ᴗo⌯ಣ”
+＿＿＿＿＿＿</div>
+        </div>
+    </div>
     <input type="file" id="file-input" hidden accept="image/*">
     <input type="file" id="import-file-input" hidden accept=".txt,.json">
     <input type="file" id="import-style-file" hidden accept=".txt,.json">
@@ -315,8 +380,6 @@
             zhipu: { url: 'https://open.bigmodel.cn/api/paas/v4', models: ['glm-4-flash', 'glm-4-plus', 'glm-4v-flash', 'glm-4v'] },
             doubao: { url: 'https://ark.cn-beijing.volces.com/api/v3', models: ['doubao-pro-32k', 'doubao-lite-32k', 'doubao-pro-128k'] }
         };
-
-        // 预置文风
         const PRESET_STYLES = [
             { id: 'preset_chat', name: '📱 手机聊天', desc: '你正在和用户用手机应用打字聊天。这是一对一的远程陪伴场景，不是剧情演绎。\n\n【核心规则】\n1. 禁止用括号写动作、神态、心理活动。例如（笑）、（凑近）、（脸红）这类描写全部禁止\n2. 每次回复1-3句话。简短精炼，像真人发消息\n3. 用词自然、干净。不要过度使用"呀、嘛、嘻嘻"等叠词和语气词\n4. 这是手机聊天，用户就是与你手机聊天的人。不要用第三人称描述自己，直接说话\n5. 保持角色的性格和语气，但要像在发消息，不是在写小说' }
         ];
@@ -331,6 +394,7 @@
                 activePersonaId: JSON.parse(localStorage.getItem('pk_activePid')) || 1,
                 activeStyleId: localStorage.getItem('pk_activeStyle') || 'preset_chat',
                 customStyles: JSON.parse(localStorage.getItem('pk_customStyles')) || [],
+                moments: JSON.parse(localStorage.getItem('pk_moments')) || [],
                 activeRoleId: null, editType: null, tempAvatar: "", editingPersonaId: null,
                 passwordVisible: false, creatingRole: false,
                 pendingLetterDate: JSON.parse(localStorage.getItem('pk_pendingLetter')) || null,
@@ -345,54 +409,26 @@
                 this.updateMailboxBadge(); this.initLetterCloseBtn();
             },
 
-            /* 获取当前启用的文风内容 */
-            getActiveStyleContent() {
-                const all = [...PRESET_STYLES, ...this.state.customStyles];
-                const active = all.find(s => s.id === this.state.activeStyleId);
-                return active ? active.desc : '';
-            },
-
+            getActiveStyleContent() { const all = [...PRESET_STYLES, ...this.state.customStyles]; const active = all.find(s => s.id === this.state.activeStyleId); return active ? active.desc : ''; },
             closeAllPanels() { document.getElementById('plus-panel').classList.remove('show'); document.getElementById('sticker-panel').classList.remove('show'); },
 
-            showEnvelope(letterContent) {
-                this.state.envelopeStep = 0; this.state.envelopeLetterContent = letterContent;
-                const wrap = document.getElementById('envelopeWrap');
-                wrap.className = 'envelope-wrap'; document.getElementById('envelopeOverlay').classList.add('show'); wrap.classList.remove('hidden');
-                setTimeout(() => { wrap.classList.add('step-1'); this.state.envelopeStep = 1; }, 300);
-                setTimeout(() => { wrap.classList.add('step-2'); this.state.envelopeStep = 2; }, 800);
-                setTimeout(() => { wrap.classList.add('step-3'); this.state.envelopeStep = 3; }, 1300);
-                setTimeout(() => { wrap.classList.add('step-4'); this.state.envelopeStep = 4; }, 2000);
-            },
+            showEnvelope(letterContent) { this.state.envelopeStep = 0; this.state.envelopeLetterContent = letterContent; const wrap = document.getElementById('envelopeWrap'); wrap.className = 'envelope-wrap'; document.getElementById('envelopeOverlay').classList.add('show'); wrap.classList.remove('hidden'); setTimeout(() => { wrap.classList.add('step-1'); this.state.envelopeStep = 1; }, 300); setTimeout(() => { wrap.classList.add('step-2'); this.state.envelopeStep = 2; }, 800); setTimeout(() => { wrap.classList.add('step-3'); this.state.envelopeStep = 3; }, 1300); setTimeout(() => { wrap.classList.add('step-4'); this.state.envelopeStep = 4; }, 2000); },
             envelopeClick() { if (this.state.envelopeStep === 4) { this.hideEnvelope(); this.showFullLetter(this.state.envelopeLetterContent); } },
             hideEnvelope() { const wrap = document.getElementById('envelopeWrap'); wrap.classList.add('hidden'); wrap.className = 'envelope-wrap hidden'; document.getElementById('envelopeOverlay').classList.remove('show'); this.state.envelopeStep = 0; },
-
             showLetterToast(title, time) { const existing = document.getElementById('letter-toast'); if (existing) existing.remove(); const toast = document.createElement('div'); toast.id = 'letter-toast'; toast.className = 'toast-letter'; toast.innerHTML = `<div class="toast-icon">📬</div><div class="toast-body"><div class="toast-title">${title}</div></div><div class="toast-time">${time}</div>`; toast.onclick = () => { this.switchView('mailbox-view'); toast.remove(); }; document.body.appendChild(toast); setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 400); }, 4000); },
             getLetters(roleId) { const role = this.state.roles.find(r => r.id === roleId); return role ? (role.letters || []) : []; },
             saveLetters(roleId, letters) { const role = this.state.roles.find(r => r.id === roleId); if (role) { role.letters = letters; this.saveAll(); } },
             getMemories(roleId) { const role = this.state.roles.find(r => r.id === roleId); return role ? (role.memories || []) : []; },
             saveMemories(roleId, memories) { const role = this.state.roles.find(r => r.id === roleId); if (role) { role.memories = memories; this.saveAll(); } },
 
-            async extractMemories(role) {
-                const cfg = this.state.config; if (!cfg.key) return;
-                const msgs = (this.state.chats[role.id] || []).filter(m => !m.sticker).slice(-40);
-                if (msgs.length < 10) return;
-                const historyText = msgs.map(m => (m.type === 'user' ? '用户' : role.name) + '：' + m.text).join('\n');
-                const prompt = `以下是${role.name}和用户的聊天记录。请从中提取1-3条值得记住的信息（比如用户的喜好、经历、约定等）。每条一句话，用"用户"开头。如果没什么值得记的就回复"无"。\n\n${historyText}`;
-                try {
-                    const msgs2 = [{ role: "system", content: "你是一个记忆助手。从对话中提取值得记住的信息。" }, { role: "user", content: prompt }]; let reply;
-                    if (cfg.provider === 'deepseek') { const resp = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs2}) }); const d = await resp.json(); reply = d.choices?.[0]?.message?.content || ''; }
-                    else { if (!cfg.proxy) return; const resp = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs2,key:cfg.key}) }); const d = await resp.json(); reply = d.choices?.[0]?.message?.content || ''; }
-                    if (reply && reply !== '无') { const newMemories = reply.split('\n').filter(l => l.trim() && !l.includes('无')).map(l => l.replace(/^\d+\.\s*/, '').trim()); const existing = this.getMemories(role.id); const merged = [...existing]; newMemories.forEach(m => { if (!merged.includes(m)) merged.push(m); }); if (merged.length > 30) merged.splice(0, merged.length - 30); this.saveMemories(role.id, merged); }
-                } catch(e) {}
-            },
+            async extractMemories(role) { const cfg = this.state.config; if (!cfg.key) return; const msgs = (this.state.chats[role.id] || []).filter(m => !m.sticker).slice(-40); if (msgs.length < 10) return; const historyText = msgs.map(m => (m.type === 'user' ? '用户' : role.name) + '：' + m.text).join('\n'); const prompt = `以下是${role.name}和用户的聊天记录。请从中提取1-3条值得记住的信息。每条一句话，用"用户"开头。如果没什么值得记的就回复"无"。\n\n${historyText}`; try { const msgs2 = [{ role: "system", content: "你是一个记忆助手。" }, { role: "user", content: prompt }]; let reply; if (cfg.provider === 'deepseek') { const resp = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs2}) }); const d = await resp.json(); reply = d.choices?.[0]?.message?.content || ''; } else { if (!cfg.proxy) return; const resp = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs2,key:cfg.key}) }); const d = await resp.json(); reply = d.choices?.[0]?.message?.content || ''; } if (reply && reply !== '无') { const newMemories = reply.split('\n').filter(l => l.trim() && !l.includes('无')).map(l => l.replace(/^\d+\.\s*/, '').trim()); const existing = this.getMemories(role.id); const merged = [...existing]; newMemories.forEach(m => { if (!merged.includes(m)) merged.push(m); }); if (merged.length > 30) merged.splice(0, merged.length - 30); this.saveMemories(role.id, merged); } } catch(e) {} },
 
-            async getEmotionScore(history) { const cfg = this.state.config; if (!cfg.key) return 0; try { const msgs = [{ role: "system", content: "评估以下对话的情绪浓度，只回复1到10的数字。1=日常闲聊，5=有些情绪，10=很深的情感流露。" }, ...history.map(m => ({ role: m.role, content: m.content }))]; let r; if (cfg.provider === 'deepseek') { const resp = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs}) }); const d = await resp.json(); r = d.choices?.[0]?.message?.content || '0'; } else { if (!cfg.proxy) return 0; const resp = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs,key:cfg.key}) }); const d = await resp.json(); r = d.choices?.[0]?.message?.content || '0'; } return parseInt(r) || 0; } catch(e) { return 0; } },
+            async getEmotionScore(history) { const cfg = this.state.config; if (!cfg.key) return 0; try { const msgs = [{ role: "system", content: "评估以下对话的情绪浓度，只回复1到10的数字。" }, ...history.map(m => ({ role: m.role, content: m.content }))]; let r; if (cfg.provider === 'deepseek') { const resp = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs}) }); const d = await resp.json(); r = d.choices?.[0]?.message?.content || '0'; } else { if (!cfg.proxy) return 0; const resp = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs,key:cfg.key}) }); const d = await resp.json(); r = d.choices?.[0]?.message?.content || '0'; } return parseInt(r) || 0; } catch(e) { return 0; } },
 
-            async generateLetter(role, triggerType) { const cfg = this.state.config; if (!cfg.key) return null; let letterPrompt = ''; if (triggerType === 'emotion') letterPrompt = `你是${role.name}。昨晚跟用户聊天时有些话没说完，辗转反侧后写了一封信。写出来。200字以内。语气自然，像真的手写信。开头"用户："，结尾"—— ${role.name}"。`; else if (triggerType === 'random') letterPrompt = `你是${role.name}。突然想给用户写封信，没什么特别的事，就是想ta了。写出来。200字以内。语气自然。开头"用户："，结尾"—— ${role.name}"。`; else if (triggerType === 'manual') letterPrompt = `你是${role.name}。用户让你写封信给ta，写吧。200字以内。开头"用户："，结尾"—— ${role.name}"。`; try { const msgs = [{ role: "system", content: role.prompt }, { role: "user", content: letterPrompt }]; let reply; if (cfg.provider === 'deepseek') { const resp = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs}) }); const d = await resp.json(); reply = d.choices?.[0]?.message?.content || ''; } else { if (!cfg.proxy) return null; const resp = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs,key:cfg.key}) }); const d = await resp.json(); reply = d.choices?.[0]?.message?.content || ''; } return reply; } catch(e) { return null; } },
+            async generateLetter(role, triggerType) { const cfg = this.state.config; if (!cfg.key) return null; let letterPrompt = ''; if (triggerType === 'emotion') letterPrompt = `你是${role.name}。昨晚跟用户聊天时有些话没说完，写了一封信。200字以内。开头"用户："，结尾"—— ${role.name}"。`; else if (triggerType === 'manual') letterPrompt = `你是${role.name}。用户让你写封信。200字以内。开头"用户："，结尾"—— ${role.name}"。`; try { const msgs = [{ role: "system", content: role.prompt }, { role: "user", content: letterPrompt }]; let reply; if (cfg.provider === 'deepseek') { const resp = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs}) }); const d = await resp.json(); reply = d.choices?.[0]?.message?.content || ''; } else { if (!cfg.proxy) return null; const resp = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs,key:cfg.key}) }); const d = await resp.json(); reply = d.choices?.[0]?.message?.content || ''; } return reply; } catch(e) { return null; } },
 
             checkPendingLetter() { const p = this.state.pendingLetterDate; if (!p) return; const today = new Date().toDateString(); if (p !== today) { this.state.pendingLetterDate = null; localStorage.setItem('pk_pendingLetter', JSON.stringify(null)); } },
             setPendingLetter() { const today = new Date().toDateString(); this.state.pendingLetterDate = today; localStorage.setItem('pk_pendingLetter', JSON.stringify(today)); },
-
             async deliverPendingLetter() { const pending = this.state.pendingLetterDate; if (!pending) return; const today = new Date().toDateString(); if (pending !== today) return; const roleId = this.state.roles.find(r => r.id !== 1)?.id; if (!roleId) return; const role = this.state.roles.find(r => r.id === roleId); const letterContent = await this.generateLetter(role, 'emotion'); if (letterContent) { const letters = this.getLetters(roleId); letters.push({ id: Date.now().toString(), content: letterContent, date: today, read: false }); this.saveLetters(roleId, letters); this.showLetterToast(`${role.name}来信`, new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})); } this.state.pendingLetterDate = null; localStorage.setItem('pk_pendingLetter', JSON.stringify(null)); this.updateMailboxBadge(); },
 
             async requestRoleLetter() { const roleId = this.state.activeRoleId; if (!roleId) return; const role = this.state.roles.find(r => r.id === roleId); if (!role || role.id === 1) return; const name = role.name; document.getElementById('p-modal-title').innerText = '写信中'; document.getElementById('p-modal-body').innerText = `${name}正在给你写信...`; document.getElementById('p-btn-cancel').style.display = 'block'; document.getElementById('p-btn-cancel').onclick = () => this.closeModal(); const confirmBtn = document.getElementById('p-btn-confirm'); confirmBtn.innerText = '后台写信'; confirmBtn.style.display = 'block'; confirmBtn.className = 'p-btn p-btn-bg'; confirmBtn.onclick = () => { this.closeModal(); this.backgroundWriteLetter(role); }; document.getElementById('p-modal-mask').style.display = 'flex'; setTimeout(() => document.getElementById('p-modal').classList.add('show'), 10); },
@@ -414,7 +450,79 @@
             deleteMailboxLetter(roleId, id) { this.showModal("删除信件", "确定要删除这封信吗？\n删了就不能恢复了哦", "确定删除", () => { const letters = this.getLetters(parseInt(roleId)).filter(l => l.id !== id); this.saveLetters(parseInt(roleId), letters); this.renderMailbox(); this.updateMailboxBadge(); }); },
             bindSwipe() { document.querySelectorAll('.letter-list-item').forEach(item => { let startX = 0; item.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }); item.addEventListener('touchend', e => { const diff = startX - e.changedTouches[0].clientX; if (diff > 50) item.classList.add('swiped'); else if (diff < -30) item.classList.remove('swiped'); }); }); },
 
-            /* 文风管理 */
+            /* 朋友圈 */
+            renderMoments() {
+                const container = document.getElementById('moments-container');
+                if (this.state.moments.length === 0) {
+                    container.innerHTML = '<div style="padding:60px;text-align:center;color:#ccc;">暂无动态</div>';
+                    return;
+                }
+                container.innerHTML = this.state.moments.slice().reverse().map(m => {
+                    const role = this.state.roles.find(r => r.id === m.roleId);
+                    const roleName = role ? role.name : '未知';
+                    const roleAvatar = role ? (role.avatar && role.avatar.startsWith('data') ? `<img src="${role.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : (role.id === 1 ? '📱' : '👤')) : '👤';
+                    return `
+                    <div class="moment-card" id="moment-${m.id}">
+                        <div class="moment-header">
+                            <div class="moment-avatar">${roleAvatar}</div>
+                            <div style="flex:1;"><div class="moment-name">${roleName}</div></div>
+                            <div class="moment-time">${m.time}</div>
+                        </div>
+                        <div class="moment-content">${m.content}</div>
+                        <div class="moment-actions">
+                            <span class="moment-like ${m.liked ? 'liked' : ''}" onclick="app.toggleMomentLike('${m.id}')">💓 ${m.likes || ''}</span>
+                            <span class="moment-comment-btn" onclick="app.showMomentComment('${m.id}')">💬 评论</span>
+                            <span class="moment-delete" onclick="app.deleteMoment('${m.id}')">删除</span>
+                        </div>
+                        ${m.comments && m.comments.length > 0 ? `
+                        <div class="moment-comments">
+                            ${m.comments.map(c => `
+                                <div class="moment-comment"><span class="c-user">${c.user}</span>：${c.text}</div>
+                                ${c.reply ? `<div class="moment-comment c-reply"><span class="c-user">${roleName}</span>：${c.reply}</div>` : ''}
+                            `).join('')}
+                        </div>` : ''}
+                        <div class="comment-input-row" id="comment-row-${m.id}" style="display:none;">
+                            <input type="text" id="comment-input-${m.id}" placeholder="写评论...">
+                            <span class="comment-send" onclick="app.sendMomentComment('${m.id}')">发送</span>
+                        </div>
+                    </div>`;
+                }).join('');
+            },
+
+            toggleMomentLike(id) {
+                const m = this.state.moments.find(x => x.id === id);
+                if (!m) return;
+                m.liked = !m.liked;
+                m.likes = (m.likes || 0) + (m.liked ? 1 : -1);
+                if (m.likes < 0) m.likes = 0;
+                this.saveAll(); this.renderMoments();
+            },
+
+            showMomentComment(id) {
+                const row = document.getElementById('comment-row-' + id);
+                if (row) { row.style.display = 'flex'; setTimeout(() => document.getElementById('comment-input-' + id).focus(), 100); }
+            },
+
+            sendMomentComment(id) {
+                const input = document.getElementById('comment-input-' + id);
+                const text = input.value.trim();
+                if (!text) return;
+                const m = this.state.moments.find(x => x.id === id);
+                if (!m) return;
+                if (!m.comments) m.comments = [];
+                m.comments.push({ user: '用户', text, reply: '知道了～' });
+                input.value = '';
+                this.saveAll(); this.renderMoments();
+            },
+
+            deleteMoment(id) {
+                this.showModal("删除动态", "确定删除这条朋友圈吗？", "确定删除", () => {
+                    this.state.moments = this.state.moments.filter(m => m.id !== id);
+                    this.saveAll(); this.renderMoments();
+                });
+            },
+
+            /* 文风 */
             renderStylePage() {
                 const all = [...PRESET_STYLES, ...this.state.customStyles];
                 const active = all.find(s => s.id === this.state.activeStyleId);
@@ -424,6 +532,7 @@
             },
             setActiveStyle(id) { this.state.activeStyleId = id; localStorage.setItem('pk_activeStyle', id); this.renderStylePage(); },
             deleteStyle(id) { this.state.customStyles = this.state.customStyles.filter(s => s.id !== id); if (this.state.activeStyleId === id) this.state.activeStyleId = 'preset_chat'; localStorage.setItem('pk_customStyles', JSON.stringify(this.state.customStyles)); localStorage.setItem('pk_activeStyle', this.state.activeStyleId); this.renderStylePage(); },
+            confirmCreateStyle() { const n = document.getElementById('new-style-name').value.trim(); const d = document.getElementById('new-style-desc').value.trim(); if (!n || !d) return; this.state.customStyles.push({ id: 'c' + Date.now(), name: n, desc: d }); document.getElementById('new-style-name').value = ''; document.getElementById('new-style-desc').value = ''; localStorage.setItem('pk_customStyles', JSON.stringify(this.state.customStyles)); this.switchView('style-view'); },
 
             /* ====== 原有逻辑 ====== */
             initStickerPanel() { const grid = document.getElementById('sticker-grid'); grid.innerHTML = STICKERS.map(s => `<div class="sticker-item" onclick="app.sendSticker('${s.file}')"><img src="${s.file}" loading="lazy"></div>`).join(''); },
@@ -441,7 +550,7 @@
             showModal(title, body, confirmText, onConfirm, showCancel = true) { const mask = document.getElementById('p-modal-mask'); document.getElementById('p-modal-title').innerText = title; document.getElementById('p-modal-body').innerText = body; const btn = document.getElementById('p-btn-confirm'); btn.className = 'p-btn p-btn-confirm'; if (confirmText) { btn.innerText = confirmText; btn.style.display = 'block'; btn.onclick = () => { onConfirm(); this.closeModal(); }; } else { btn.style.display = 'none'; } document.getElementById('p-btn-cancel').style.display = showCancel ? 'block' : 'none'; mask.style.display = 'flex'; setTimeout(() => document.getElementById('p-modal').classList.add('show'), 10); },
             closeModal() { document.getElementById('p-modal').classList.remove('show'); setTimeout(() => document.getElementById('p-modal-mask').style.display = 'none', 200); },
             switchView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active', 'blur-in')); const t = document.getElementById(id); t.classList.add('active'); if(id === 'home-view') t.classList.add('blur-in'); if(id === 'pocket-view') this.renderRoleList(); if(id === 'persona-list-view') this.renderPersonaList(); if(id === 'api-view') this.loadConfigInputs(); if(id === 'mailbox-view') { this.renderMailbox(); this.updateMailboxBadge(); } if(id === 'home-view') { this.deliverPendingLetter(); } if(id === 'style-view') { this.renderStylePage(); } },
-            switchTab(name) { document.querySelectorAll('.tab-view').forEach(t => t.style.display = 'none'); document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active')); document.getElementById(name==='chats'?'tab-chats':(name==='moments'?'tab-moments':'tab-me')).style.display = 'flex'; event.currentTarget.classList.add('active'); },
+            switchTab(name) { document.querySelectorAll('.tab-view').forEach(t => t.style.display = 'none'); document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active')); document.getElementById(name==='chats'?'tab-chats':(name==='moments'?'tab-moments':'tab-me')).style.display = 'flex'; if (name === 'moments') this.renderMoments(); event.currentTarget.classList.add('active'); },
             openDeepEdit(type) { const role = this.state.roles.find(r => r.id === this.state.activeRoleId); if(role && role.id === 1 && !type.startsWith('user')) { this.showModal("系统限制", "手机小助手的核心设定无法被修改 🔐", "知道啦", () => {}, false); return; } this.state.editType = type; const input = document.getElementById('deep-edit-input'), title = document.getElementById('edit-page-title'); if(type === 'userName') { title.innerText = "修改昵称"; input.value = this.state.user.homeName; } else if(type === 'userLoc') { title.innerText = "修改地点"; input.value = this.state.user.location; } else if(type === 'userPid') { title.innerText = "修改口袋码"; input.value = this.state.user.pid; } else if(role) { if(type === 'roleName') { title.innerText = "修改备注"; input.value = role.name; } else if(type === 'rolePrompt') { title.innerText = "修改人设"; input.value = role.prompt; } else if(type === 'roleMoment') { title.innerText = "编辑朋友圈内容"; input.value = role.moment || ""; } } document.getElementById('deep-edit-view').style.display = 'flex'; },
             saveDeepEdit() { const val = document.getElementById('deep-edit-input').value; if(this.state.editType.startsWith('user')) { if(this.state.editType === 'userName') this.state.user.homeName = val; if(this.state.editType === 'userLoc') this.state.user.location = val; if(this.state.editType === 'userPid') { const f = val.replace(/[^\x00-\x7F]/g, '').slice(0,10); if(val !== f) this.showModal("格式限制", "口袋码最多10位\n只支持数字、字母、符号\n已自动过滤", "知道啦", () => {}, false); this.state.user.pid = f; } } else { const role = this.state.roles.find(r => r.id === this.state.activeRoleId); if(role) { if(this.state.editType==='roleName') role.name=val; if(this.state.editType==='rolePrompt') role.prompt=val; if(this.state.editType==='roleMoment') role.moment=val; } } this.saveAll(); this.renderUser(); this.closeDeepEdit(); if(!this.state.editType.startsWith('user')) this.switchView('pocket-view'); },
             closeDeepEdit() { document.getElementById('deep-edit-view').style.display = 'none'; },
@@ -453,48 +562,10 @@
             savePersonaEdit() { const id=this.state.editingPersonaId, p=this.state.personas.find(x=>x.id===id); if(!p||p.isSystem)return; p.name=document.getElementById('edit-persona-name').value||p.name; p.desc=document.getElementById('edit-persona-desc').value; this.saveAll(); this.switchView('persona-list-view'); },
             deleteCurrentPersona() { const id=this.state.editingPersonaId, p=this.state.personas.find(x=>x.id===id); if(!p)return; if(p.isSystem){ this.showModal("不能删除哦","至少保留一个人设哦宝宝～\n不能删 ♡","知道啦",()=>{},false); return; } this.showModal("删除人设",`删除不能恢复的宝宝～\n确认好哦\n\n"${p.name}"`,"确定删除",()=>{ this.state.personas=this.state.personas.filter(x=>x.id!==id); if(this.state.activePersonaId===id) this.state.activePersonaId=1; this.saveAll(); this.switchView('persona-list-view'); }); },
             confirmCreatePersona() { const n=document.getElementById('new-persona-name').value.trim(), d=document.getElementById('new-persona-desc').value.trim(); if(!n)return; this.state.personas.push({id:Date.now(),name:n,desc:d,isSystem:false}); document.getElementById('new-persona-name').value=""; document.getElementById('new-persona-desc').value=""; this.saveAll(); this.switchView('persona-list-view'); },
-            exportData() { const data={user:this.state.user,roles:this.state.roles,chats:this.state.chats,config:this.state.config,personas:this.state.personas,activePersonaId:this.state.activePersonaId,activeStyleId:this.state.activeStyleId,customStyles:this.state.customStyles}; const b=new Blob([JSON.stringify(data,null,2)],{type:'text/plain'}); const a=document.createElement('a'); const now=new Date(); a.href=URL.createObjectURL(b); a.download=`屿野来信_备份_${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日.txt`; a.click(); URL.revokeObjectURL(a.href); this.showModal("备份完成","已经存在你的下载文件夹里啦 ♡","知道啦",()=>{},false); },
-            importData() { const fi=document.getElementById('import-file-input'); fi.onchange=(e)=>{ const file=e.target.files[0]; if(!file)return; this.showModal("正在恢复记忆...","请稍等片刻～","",null,false); document.getElementById('p-btn-cancel').style.display='block'; document.getElementById('p-btn-cancel').onclick=()=>{this.closeModal();fi.value='';}; const r=new FileReader(); r.onload=(ev)=>{ try{ const data=JSON.parse(ev.target.result); if(data.user)this.state.user=data.user; if(data.roles)this.state.roles=data.roles; if(data.chats)this.state.chats=data.chats; if(data.config)this.state.config=data.config; if(data.personas)this.state.personas=data.personas; if(data.activePersonaId)this.state.activePersonaId=data.activePersonaId; if(data.activeStyleId)this.state.activeStyleId=data.activeStyleId; if(data.customStyles)this.state.customStyles=data.customStyles; this.saveAll(); this.closeModal(); this.showModal("恢复完成","我都想起来了宝宝 ♡","确认",()=>{location.reload();},false); }catch(err){ this.closeModal(); this.showModal("导入失败","这个文件好像不对哦，换一个试试～","知道啦",()=>{},false); } fi.value=''; }; r.readAsText(file); }; fi.click(); },
-            async sendMessage() {
-                const input = document.getElementById('chat-input'); const text = input.value.trim(); if(!text) return;
-                // 暴力正则拦截
-                const violenceRegex = /(杀了他|杀死|砍死|捅死|自杀|自残|割腕|跳楼|毒打|暴打|虐杀|折磨死|血淋淋|血流|开枪|击毙)/;
-                if (violenceRegex.test(text)) {
-                    this.showModal("内容拦截", "检测到暴力或血腥内容，已拦截。\n请保持温柔交流哦 ♡", "知道啦", () => {}, false);
-                    input.value = ""; return;
-                }
-                const role = this.state.roles.find(r => r.id === this.state.activeRoleId);
-                if(!this.state.chats[role.id]) this.state.chats[role.id] = [];
-                this.state.chats[role.id].push({ type: 'user', text, ts: Date.now() });
-                input.value = ""; input.style.height = '40px'; this.renderMessages();
-                role.lastMsg = text; role.lastTime = this.getClockStr();
-                document.getElementById('chat-title').innerText = "对方正在回复...";
-                const reply = await this.fetchAI(text, role);
-                this.state.chats[role.id].push({ type: 'ai', text: reply, ts: Date.now() });
-                role.lastMsg = reply; role.lastTime = this.getClockStr();
-                if(role.id !== 1) { const sticker = this.getMatchingSticker(reply); if(sticker) this.state.chats[role.id].push({ type: 'ai', text: '', sticker: sticker, ts: Date.now() + 1 }); }
-                document.getElementById('chat-title').innerText = role.name;
-                this.renderMessages(); this.saveAll();
-                if(role.id !== 1) { const recentHistory = (this.state.chats[role.id] || []).filter(m => !m.sticker).slice(-6).map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.text })); const score = await this.getEmotionScore(recentHistory); if (score >= 7 && Math.random() < (score >= 9 ? 1 : 0.2)) this.setPendingLetter(); if (Math.random() < 0.3) this.extractMemories(role); }
-            },
-            async fetchAI(text, role) {
-                const cfg = this.state.config; if(!cfg.key) return "请在设置中配置 API Key ♡";
-                const history = (this.state.chats[role.id] || []).filter(m => !m.sticker).slice(-40).map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.text }));
-                let sp = role.prompt;
-                const memories = this.getMemories(role.id);
-                if (memories.length > 0) sp = "【关于用户的记忆】\n" + memories.map(m => "- " + m).join('\n') + "\n\n" + sp;
-                if(role.id !== 1) { const ap = this.state.personas.find(p => p.id === this.state.activePersonaId); if(ap && ap.desc.trim()) sp = sp + "\n\n【当前用户设定】" + ap.desc + "\n请根据以上设定与用户互动。"; }
-                // 文风注入
-                const styleContent = this.getActiveStyleContent();
-                if (styleContent) sp = sp + "\n\n【文风要求】\n" + styleContent;
-                try {
-                    let reply; const msgs = [{ role: "system", content: sp }, ...history];
-                    if(cfg.provider === 'deepseek') { const r = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs}) }); const d = await r.json(); reply = d.choices?.[0]?.message?.content || "（未获取到回复）"; }
-                    else { if(!cfg.proxy) return "请在 API 配置中填写代理地址（Cloudflare Worker）♡"; const r = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs,key:cfg.key}) }); const d = await r.json(); reply = d.choices?.[0]?.message?.content || "（未获取到回复）"; }
-                    if(role.id === 1) { const akw=['创建角色','昵称','头像','API','配置','删除','好友','发送消息','人设','朋友圈','口袋码','二维码','使用方法','功能','设置','聊天','桌面','Pocket','小口袋','角色','编辑','备注']; if(!akw.some(kw=>reply.includes(kw)) && !reply.includes("这个我还不太清楚呢")) reply = "这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡"; }
-                    return reply;
-                } catch(e) { return "网络波动中，晚点再聊吧~"; }
-            },
+            exportData() { const data={user:this.state.user,roles:this.state.roles,chats:this.state.chats,config:this.state.config,personas:this.state.personas,activePersonaId:this.state.activePersonaId,activeStyleId:this.state.activeStyleId,customStyles:this.state.customStyles,moments:this.state.moments}; const b=new Blob([JSON.stringify(data,null,2)],{type:'text/plain'}); const a=document.createElement('a'); const now=new Date(); a.href=URL.createObjectURL(b); a.download=`屿野来信_备份_${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日.txt`; a.click(); URL.revokeObjectURL(a.href); this.showModal("备份完成","已经存在你的下载文件夹里啦 ♡","知道啦",()=>{},false); },
+            importData() { const fi=document.getElementById('import-file-input'); fi.onchange=(e)=>{ const file=e.target.files[0]; if(!file)return; this.showModal("正在恢复记忆...","请稍等片刻～","",null,false); document.getElementById('p-btn-cancel').style.display='block'; document.getElementById('p-btn-cancel').onclick=()=>{this.closeModal();fi.value='';}; const r=new FileReader(); r.onload=(ev)=>{ try{ const data=JSON.parse(ev.target.result); if(data.user)this.state.user=data.user; if(data.roles)this.state.roles=data.roles; if(data.chats)this.state.chats=data.chats; if(data.config)this.state.config=data.config; if(data.personas)this.state.personas=data.personas; if(data.activePersonaId)this.state.activePersonaId=data.activePersonaId; if(data.activeStyleId)this.state.activeStyleId=data.activeStyleId; if(data.customStyles)this.state.customStyles=data.customStyles; if(data.moments)this.state.moments=data.moments; this.saveAll(); this.closeModal(); this.showModal("恢复完成","我都想起来了宝宝 ♡","确认",()=>{location.reload();},false); }catch(err){ this.closeModal(); this.showModal("导入失败","这个文件好像不对哦，换一个试试～","知道啦",()=>{},false); } fi.value=''; }; r.readAsText(file); }; fi.click(); },
+            async sendMessage() { const input = document.getElementById('chat-input'); const text = input.value.trim(); if(!text) return; const violenceRegex = /(杀了他|杀死|砍死|捅死|自杀|自残|割腕|跳楼|毒打|暴打|虐杀|折磨死|血淋淋|血流|开枪|击毙)/; if (violenceRegex.test(text)) { this.showModal("内容拦截", "检测到暴力或血腥内容，已拦截。\n请保持温柔交流哦 ♡", "知道啦", () => {}, false); input.value = ""; return; } const role = this.state.roles.find(r => r.id === this.state.activeRoleId); if(!this.state.chats[role.id]) this.state.chats[role.id] = []; this.state.chats[role.id].push({ type: 'user', text, ts: Date.now() }); input.value = ""; input.style.height = '40px'; this.renderMessages(); role.lastMsg = text; role.lastTime = this.getClockStr(); document.getElementById('chat-title').innerText = "对方正在回复..."; const reply = await this.fetchAI(text, role); this.state.chats[role.id].push({ type: 'ai', text: reply, ts: Date.now() }); role.lastMsg = reply; role.lastTime = this.getClockStr(); if(role.id !== 1) { const sticker = this.getMatchingSticker(reply); if(sticker) this.state.chats[role.id].push({ type: 'ai', text: '', sticker: sticker, ts: Date.now() + 1 }); } document.getElementById('chat-title').innerText = role.name; this.renderMessages(); this.saveAll(); if(role.id !== 1) { const recentHistory = (this.state.chats[role.id] || []).filter(m => !m.sticker).slice(-6).map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.text })); const score = await this.getEmotionScore(recentHistory); if (score >= 7 && Math.random() < (score >= 9 ? 1 : 0.2)) this.setPendingLetter(); if (Math.random() < 0.3) this.extractMemories(role); } },
+            async fetchAI(text, role) { const cfg = this.state.config; if(!cfg.key) return "请在设置中配置 API Key ♡"; const history = (this.state.chats[role.id] || []).filter(m => !m.sticker).slice(-40).map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.text })); let sp = role.prompt; const memories = this.getMemories(role.id); if (memories.length > 0) sp = "【关于用户的记忆】\n" + memories.map(m => "- " + m).join('\n') + "\n\n" + sp; if(role.id !== 1) { const ap = this.state.personas.find(p => p.id === this.state.activePersonaId); if(ap && ap.desc.trim()) sp = sp + "\n\n【当前用户设定】" + ap.desc + "\n请根据以上设定与用户互动。"; } const styleContent = this.getActiveStyleContent(); if (styleContent) sp = sp + "\n\n【文风要求】\n" + styleContent; try { let reply; const msgs = [{ role: "system", content: sp }, ...history]; if(cfg.provider === 'deepseek') { const r = await fetch(`${cfg.url}/chat/completions`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`}, body: JSON.stringify({model:cfg.model,messages:msgs}) }); const d = await r.json(); reply = d.choices?.[0]?.message?.content || "（未获取到回复）"; } else { if(!cfg.proxy) return "请在 API 配置中填写代理地址（Cloudflare Worker）♡"; const r = await fetch(cfg.proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url:`${cfg.url}/chat/completions`,model:cfg.model,messages:msgs,key:cfg.key}) }); const d = await r.json(); reply = d.choices?.[0]?.message?.content || "（未获取到回复）"; } if(role.id === 1) { const akw=['创建角色','昵称','头像','API','配置','删除','好友','发送消息','人设','朋友圈','口袋码','二维码','使用方法','功能','设置','聊天','桌面','Pocket','小口袋','角色','编辑','备注']; if(!akw.some(kw=>reply.includes(kw)) && !reply.includes("这个我还不太清楚呢")) reply = "这个我还不太清楚呢～你可以问问我关于这个手机的使用方法哦 ♡"; } return reply; } catch(e) { return "网络波动中，晚点再聊吧~"; } },
             testAPI() { const cfg=this.state.config; if(!cfg.key){this.showModal("连接失败","请先填写 API Key","确定",()=>{},false);return;} if(cfg.provider!=='deepseek'&&!cfg.proxy){this.showModal("需要代理","智谱和豆包需要配置代理地址。\n请先部署 Cloudflare Worker，\n把地址填到「代理地址」框。","知道啦",()=>{},false);return;} this.showModal("测试中",`正在测试 ${cfg.provider} 连接...`,"请稍后",()=>{},false); setTimeout(async()=>{try{const res=await this.fetchAI("你好",{prompt:"你是一个助手，请回复'连接成功'",id:999}); if(res.includes("API Key")||res.includes("波动")||res.includes("未获取")) throw new Error("接口返回异常"); this.showModal("连接成功",`等你好久啦 ♡\n${cfg.provider} 连接正常`,"确定",()=>{},false);}catch(e){this.showModal("连接失败","再试试吧～\n原因: "+e.message,"确定",()=>{},false);}},800); },
             deleteMsg(ts) { this.showModal("确认删除消息","删除该条消息后将无法找回，且不再计入对话记忆。","确认删除",()=>{ const ms=this.state.chats[this.state.activeRoleId]; this.state.chats[this.state.activeRoleId]=ms.filter(m=>m.ts!==ts); this.saveAll(); this.renderMessages(); }); },
             pickFile(target) { const f=document.getElementById('file-input'); f.onchange=e=>{ const rd=new FileReader(); rd.onload=ev=>{ const b64=ev.target.result; if(target==='userAvatar')this.state.user.avatar=b64; else if(target==='roleAvatar'){ const r=this.state.roles.find(x=>x.id===this.state.activeRoleId); r.avatar=b64; this.openRoleSettings(); } else if(target==='newRoleAvatar'){ this.state.tempAvatar=b64; document.getElementById('new-role-av-box').innerHTML=`<img src="${b64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; } this.saveAll(); this.renderUser(); }; rd.readAsDataURL(e.target.files[0]); }; f.click(); },
@@ -504,14 +575,12 @@
             renderMessages() { const box=document.getElementById('msg-box'); const ms=this.state.chats[this.state.activeRoleId]||[]; const role=this.state.roles.find(r=>r.id===this.state.activeRoleId); let h="", last=0; ms.forEach(m=>{ if(m.ts - last > 300000) h += `<div class="msg-time-tag">${new Date(m.ts).getHours()}:${new Date(m.ts).getMinutes().toString().padStart(2,'0')}</div>`; last = m.ts; if(m.sticker) h += `<div class="msg-row ${m.type}"><div class="bubble-avatar">${m.type==='ai' ? (role.id===1?'📱':(role.avatar?`<img src="${role.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')) : (this.state.user.avatar?`<img src="${this.state.user.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')}</div><div class="bubble sticker-bubble" ondblclick="app.deleteMsg(${m.ts})"><img src="${m.sticker}"></div></div>`; else h += `<div class="msg-row ${m.type}"><div class="bubble-avatar">${m.type==='ai' ? (role.id===1?'📱':(role.avatar?`<img src="${role.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')) : (this.state.user.avatar?`<img src="${this.state.user.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:'👤')}</div><div class="bubble bubble-${m.type}" ondblclick="app.deleteMsg(${m.ts})">${m.text}</div></div>`; }); box.innerHTML = h; box.scrollTop = box.scrollHeight; },
             confirmCreateRole() { if(this.state.creatingRole)return; this.state.creatingRole=true; const n=document.getElementById('new-role-name').value; if(!n){this.state.creatingRole=false;return;} this.state.roles.push({id:Date.now(),name:n,avatar:this.state.tempAvatar,prompt:document.getElementById('new-role-prompt').value||"你好",lastMsg:"开始聊天吧",lastTime:this.getClockStr(),moment:"",letters:[],memories:[]}); document.getElementById('new-role-name').value=""; document.getElementById('new-role-prompt').value=""; this.state.tempAvatar=""; document.getElementById('new-role-av-box').innerHTML="头像"; this.saveAll(); this.state.creatingRole=false; this.switchView('pocket-view'); },
             saveConfig() { const cfg=this.state.config; cfg.provider=document.getElementById('cfg-provider').value; cfg.url=document.getElementById('cfg-url').value; cfg.key=document.getElementById('cfg-key').value; cfg.model=document.getElementById('cfg-model').value; cfg.proxy=document.getElementById('cfg-proxy').value; this.saveAll(); this.showModal("保存成功",`供应商：${cfg.provider}\n模型：${cfg.model}\n配置已更新`,"确定",()=>{},false); },
-            saveAll() { localStorage.setItem('pk_user',JSON.stringify(this.state.user)); localStorage.setItem('pk_roles',JSON.stringify(this.state.roles)); localStorage.setItem('pk_chats',JSON.stringify(this.state.chats)); localStorage.setItem('pk_cfg',JSON.stringify(this.state.config)); localStorage.setItem('pk_personas',JSON.stringify(this.state.personas)); localStorage.setItem('pk_activePid',JSON.stringify(this.state.activePersonaId)); localStorage.setItem('pk_pendingLetter',JSON.stringify(this.state.pendingLetterDate)); localStorage.setItem('pk_activeStyle',this.state.activeStyleId); localStorage.setItem('pk_customStyles',JSON.stringify(this.state.customStyles)); },
+            saveAll() { localStorage.setItem('pk_user',JSON.stringify(this.state.user)); localStorage.setItem('pk_roles',JSON.stringify(this.state.roles)); localStorage.setItem('pk_chats',JSON.stringify(this.state.chats)); localStorage.setItem('pk_cfg',JSON.stringify(this.state.config)); localStorage.setItem('pk_personas',JSON.stringify(this.state.personas)); localStorage.setItem('pk_activePid',JSON.stringify(this.state.activePersonaId)); localStorage.setItem('pk_pendingLetter',JSON.stringify(this.state.pendingLetterDate)); localStorage.setItem('pk_activeStyle',this.state.activeStyleId); localStorage.setItem('pk_customStyles',JSON.stringify(this.state.customStyles)); localStorage.setItem('pk_moments',JSON.stringify(this.state.moments)); },
             updateClock() { document.getElementById('d-clock').innerText = this.getClockStr(); },
             getClockStr() { const d=new Date(); return d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().padStart(2,'0'); },
             toggleQR(s) { document.getElementById('qr-pop').style.display = s ? 'flex' : 'none'; }
         };
 
-        // 全局函数
-        function addCustom() { const name = prompt('文风名称：'); if (!name) return; const desc = prompt('文风描述：'); if (!desc) return; app.state.customStyles.push({ id: 'c' + Date.now(), name, desc }); localStorage.setItem('pk_customStyles', JSON.stringify(app.state.customStyles)); app.renderStylePage(); }
         function importStyles() { const fi = document.getElementById('import-style-file'); fi.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { try { const data = JSON.parse(ev.target.result); if (data.templates && Array.isArray(data.templates)) { data.templates.forEach(t => { app.state.customStyles.push({ id: 'c' + Date.now() + Math.random(), name: t.name, desc: t.desc }); }); localStorage.setItem('pk_customStyles', JSON.stringify(app.state.customStyles)); app.renderStylePage(); alert('导入成功！'); } else { alert('文件格式不对哦～'); } } catch (err) { alert('文件解析失败，换一个试试～'); } fi.value = ''; }; reader.readAsText(file); }; fi.click(); }
     </script>
 </body>
