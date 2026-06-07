@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>屿野来信 · Isle & Ink</title>
     <style>
+/* 呼吸圆思考气泡 */
+.thinking-bubble {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--bubble-char);
+    border-radius: 50%;
+    margin: 8px 0;
+    animation: breathe 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes breathe {
+    0% { transform: scale(0.8); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.8); opacity: 0.6; }
+}
 :root {
     --bg-main: #e8edf2;
     --bg-container: #f4f4f7;
@@ -45,7 +63,7 @@
     --accent-soft: #3a4048;
     --font-serif: "Noto Serif SC", "STSong", "SimSun", "Songti SC", serif;
 }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; } /* 只对需要禁止选中的元素生效，不对全局生效 */ .msg-wrapper, .chat-bubble, .traces-card-item, .letter-list-item, .history-item, .packet-card, .role-list-item, .home-widget-text, .card-preview-title, .card-preview-summary, .static-review-title, .static-review-summary, .review-bubble-item, .review-body-text-pure {     user-select: none;     -webkit-user-select: none; }
         body { background: linear-gradient(160deg, #dce3ea 0%, #c8d6e0 40%, #e2d8cf 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; } [data-theme="dark"] body { background: linear-gradient(160deg, #1a1c22 0%, #20242c 40%, #1e2026 100%); }
         .phone-container { width: 100%; max-width: 480px; height: 100vh; height: 100dvh; background: var(--bg-container); position: relative; overflow: hidden; display: flex; flex-direction: column; }
         .splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-container); z-index: 999; display: flex; justify-content: center; align-items: center; transition: opacity 1.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 1.4s; }
@@ -105,7 +123,7 @@
         .home-footer-tag { margin-top: auto; padding-top: 30px; text-align: center; font-size: 10px; color: var(--text-sub); letter-spacing: 1.5px; font-weight: 500; }
         .home-footer-tag span { font-size: 9px; text-transform: uppercase; margin-left: 4px; }
         .nav-header { height: 64px; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; background: transparent; z-index: 10; flex-shrink: 0; border-bottom: 1px solid var(--border-light); }
-        .nav-title { font-size: 20px; color: var(--text-main); font-weight: 600; text-align: center; flex: 1; }
+        .nav-title { font-size: 20px; color: var(--text-main); font-weight: 600; text-align: center; flex: 1; } /* 仅瞬间页面标题缩小 */ #traces-view .nav-title, #traces-editor-view .nav-title, #traces-review-view .nav-title {     font-size: 16px; }
         .nav-title span { font-size: 12px; color: var(--text-light); margin-left: 6px; font-weight: 400; }
         .nav-back-btn { width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
         .nav-back-btn::before { content: ''; position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; border-left: 2px solid var(--text-main); border-bottom: 2px solid var(--text-main); border-radius: 2px; transform: translate(-30%, -50%) rotate(45deg); }
@@ -189,11 +207,563 @@
     transform: translateX(-50%) translateY(-20px);
     transition: all 0.3s ease;
 }
+/* ========== 瞬息编辑器样式（Gemini 移植版） ========== */
+.center-summary-box {
+    text-align: center;
+    padding: 12px 20px;
+    background: rgba(0,0,0,0.025);
+    border-radius: 18px;
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.5;
+    max-width: 800px;
+    margin: 16px auto 4px auto;
+    font-family: var(--font-serif);
+    outline: none;
+    border: 1px dashed transparent;
+    transition: border 0.2s;
+}
+.center-summary-box:focus {
+    border: 1px dashed var(--text-light);
+    background: #fffdf3;
+}
+
+/* 对话框样式 */
+.msg-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+    position: relative;
+    margin-bottom: 12px;
+}
+.msg-wrapper.me {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+.msg-wrapper.ai {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+.chat-bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-family: var(--font-serif);
+    font-size: 14.5px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+.chat-bubble.me {
+    background: var(--bubble-me);
+    color: var(--text-main);
+    border-bottom-right-radius: 4px;
+}
+.chat-bubble.ai {
+    background: var(--bubble-char);
+    color: var(--text-main);
+    border-top-left-radius: 4px;
+}
+.msg-more-trigger {
+    font-size: 14px;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 2px 8px;
+    margin-top: 2px;
+    user-select: none;
+    opacity: 0.6;
+}
+
+/* 文章样式 */
+.article-guide-block {
+    background: transparent;
+    border-left: 3px solid var(--accent-soft);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-family: var(--font-serif);
+    font-size: 14px;
+    color: var(--text-sub);
+    line-height: 1.6;
+    font-style: italic;
+}
+.article-output-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    position: relative;
+}
+.article-output-box {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: var(--text-main);
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+.article-block-title {
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.user-raw-text-box {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    color: var(--text-main);
+    line-height: 1.6;
+}
+.block-more-trigger {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 16px;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* 飞出动画 */
+.animation-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2500;
+    pointer-events: none;
+    background: rgba(0,0,0,0);
+    transition: background 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+}
+.animation-overlay.stage-open {
+    opacity: 1;
+    pointer-events: auto;
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(4px);
+}
+.fly-card {
+    width: 300px;
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid var(--border-box);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    transform: scale(0.9) translateY(40px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.animation-overlay.stage-open .fly-card {
+    transform: scale(1) translateY(0);
+}
+.fly-card.fly-away-anim {
+    animation: flyAway 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes flyAway {
+    0% { transform: scale(1) translateY(0); opacity: 1; }
+    100% { transform: scale(0.6) translateY(-300px); opacity: 0; }
+}
+.card-tag {
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+}
+.card-preview-title {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+    padding: 6px;
+    border-radius: 8px;
+    outline: none;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid transparent;
+}
+.card-preview-summary {
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.5;
+    padding: 8px;
+    outline: none;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid transparent;
+    resize: vertical;
+}
+.confirm-stage-btn {
+    margin-top: 12px;
+    width: 100%;
+    padding: 10px;
+    background: var(--text-main);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
 @keyframes toastIn {
     from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 .toast-letter .toast-time { font-size: 12px; color: var(--text-sub); text-align: right; }
+
+        /* ========== 瞬息高级沙盒 UI ========== */
+        .center-summary-box { text-align: center; padding: 12px 20px; background: rgba(0,0,0,0.025); border-radius: 18px; font-size: 13px; color: var(--text-sub); line-height: 1.5; max-width: 800px; margin: 16px auto 4px auto; font-family: var(--font-serif); outline: none; border: 1px dashed transparent; transition: border 0.2s; }
+        .center-summary-box:focus { border: 1px dashed var(--text-light); background: #fffdf3; }
+        .center-summary-box {
+    display: none;
+}
+.center-summary-box.show {
+    display: block;
+}
+
+        
+        /* ========== 瞬息编辑器 - 修复输入框布局 ========== */
+#traces-editor-view {
+    background: var(--bg-container);
+}
+
+#traces-editor-view .interactive-container {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+#traces-editor-view .interactive-container.active {
+    display: flex;
+}
+
+#traces-editor-view .interactive-scroller {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+}
+
+#traces-editor-view .interactive-footer {
+    padding: 12px 24px;
+    background: var(--bg-container);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+#traces-editor-view .chat-textarea {
+    flex: 1;
+    height: 38px;
+    max-height: 120px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+    resize: none;
+    line-height: 1.4;
+    overflow-y: auto;
+    font-family: inherit;
+}
+
+#traces-editor-view .chat-textarea:focus {
+    border-color: var(--accent);
+}
+
+#traces-editor-view .chat-send-btn {
+    height: 34px;
+    padding: 0 16px;
+    background: var(--text-main);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#traces-editor-view .chat-send-btn:active {
+    transform: scale(0.96);
+}
+
+/* 修复气泡靠右样式 */
+#traces-editor-view .msg-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+    position: relative;
+    margin-bottom: 12px;
+}
+
+#traces-editor-view .msg-wrapper.me {
+    align-self: flex-end;
+    align-items: flex-end;
+    margin-left: auto;
+}
+
+#traces-editor-view .msg-wrapper.ai {
+    align-self: flex-start;
+    align-items: flex-start;
+    margin-right: auto;
+}
+
+#traces-editor-view .chat-bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-family: var(--font-serif);
+    font-size: 14.5px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+#traces-editor-view .chat-bubble.me {
+    background: var(--bubble-me);
+    color: var(--text-main);
+    border-bottom-right-radius: 4px;
+}
+
+#traces-editor-view .chat-bubble.ai {
+    background: var(--bubble-char);
+    color: var(--text-main);
+    border-top-left-radius: 4px;
+}
+
+#traces-editor-view .msg-more-trigger {
+    font-size: 14px;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 2px 8px;
+    margin-top: 2px;
+    user-select: none;
+    opacity: 0.6;
+}
+        
+        /* 气泡与更多按钮 */
+        .msg-wrapper { display: flex; flex-direction: column; max-width: 75%; position: relative; margin-bottom: 12px; }
+        .msg-wrapper.me { align-self: flex-end; align-items: flex-end; }
+        .msg-wrapper.ai { align-self: flex-start; align-items: flex-start; }
+        .chat-bubble { padding: 14px 18px; border-radius: 16px; font-family: var(--font-serif); font-size: 14.5px; line-height: 1.6; text-align: justify; transition: background 0.2s, outline 0.2s; }
+        .chat-bubble.me { background: #eaeaec; color: var(--text-main); border-bottom-right-radius: 4px; }
+        .chat-bubble.ai { background: #ffffff; color: var(--text-main); border-top-left-radius: 4px; border: 1px solid var(--border-light); }
+        .msg-more-trigger { font-size: 16px; color: var(--text-light); cursor: pointer; padding: 2px 8px; margin-top: 2px; user-select: none; transition: color 0.2s; letter-spacing: 1px; }
+
+        /* 文章纯净流（无卡片框） */
+        .article-guide-block { padding: 8px 16px; position: relative; font-family: var(--font-serif); font-size: 14px; color: var(--text-light); line-height: 1.6; margin-bottom: 4px; font-style: italic; }
+        .article-output-block { padding: 12px 16px; position: relative; margin-bottom: 8px; }
+        .article-output-box { font-family: var(--font-serif); font-size: 15px; color: var(--text-main); line-height: 1.8; text-align: justify; transition: background 0.2s, outline 0.2s; white-space: pre-wrap; }
+        .block-more-trigger { position: absolute; bottom: -8px; right: 14px; font-size: 18px; color: var(--text-light); cursor: pointer; user-select: none; padding: 4px; letter-spacing: 1px; }
+
+        /* 确认阶段舞台 & 飞出动画 */
+        .animation-overlay { position: absolute; inset: 0; z-index: 2500; pointer-events: none; background: rgba(0,0,0,0); transition: background 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; }
+        .animation-overlay.stage-open { opacity: 1; pointer-events: auto; background: rgba(0,0,0,0.25); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        .fly-card { width: 320px; background: var(--bg-card); border-radius: 18px; padding: 24px; border: 1px solid var(--border-box); box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 14px; text-align: left; transform: scale(0.9) translateY(40px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .animation-overlay.stage-open .fly-card { transform: scale(1) translateY(0); }
+        .fly-card.fly-away-anim { animation: flyAwaySequence 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes flyAwaySequence { 0% { transform: scale(1) translateY(0); opacity: 1; } 100% { transform: scale(0.8) translateY(-450px); opacity: 0; } }
+        .card-tag { font-size: 10px; color: var(--text-light); letter-spacing: 1px; font-weight: 600; }
+        .card-preview-title { font-family: var(--font-serif); font-size: 15.5px; font-weight: 600; color: var(--text-main); line-height: 1.4; padding: 4px; border-radius: 4px; outline: none; border: none; width: 100%; transition: background 0.2s; }
+        .card-preview-title:hover, .card-preview-title:focus { background: rgba(0,0,0,0.03); }
+        .card-preview-summary { font-family: var(--font-serif); font-size: 12px; color: var(--text-sub); line-height: 1.5; border-left: 2px solid var(--text-light); padding-left: 8px; outline: none; border: none; width: 100%; resize: none; height: 80px; transition: background 0.2s; }
+        .card-preview-summary:hover, .card-preview-summary:focus { background: rgba(0,0,0,0.03); }
+        .chat-bracket-styled { font-size: 12.5px; color: rgba(26,26,26,0.4); font-style: italic; font-family: var(--font-serif); display: inline; }
+        .editable-active-focus { outline: 2px dashed #1a1a1a !important; background: #fffdf3 !important; padding: 6px; border-radius: 8px; }
+
+        .confirm-stage-btn { margin-top: 18px; width: 100%; padding: 12px; background: var(--text-main); color: #ffffff; border: none; border-radius: 12px; font-size: 13.5px; font-weight: 500; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+/* 操作菜单弹窗样式 - bottom-sheet 版本 */
+.bottom-sheet-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 20000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.bottom-sheet-mask.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.bottom-sheet {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg-container);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 24px 30px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    border-top: 1px solid var(--border-light);
+}
+
+.bottom-sheet-mask.show .bottom-sheet {
+    transform: translateY(0);
+}
+
+.bottom-sheet .sheet-title {
+    font-size: 13px;
+    color: var(--text-sub);
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.bottom-sheet .sheet-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bottom-sheet .sheet-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 15px;
+    color: var(--text-main);
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+}
+
+.bottom-sheet .sheet-btn.cancel {
+    background: transparent;
+    color: var(--text-sub);
+    border: none;
+    margin-top: 4px;
+}
+
+/* 操作菜单弹窗样式 - 旧版保留兼容 */
+.traces-action-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 5000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.traces-action-mask.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+.traces-action-sheet {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg-container);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 24px 30px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    border-top: 1px solid var(--border-light);
+}
+.traces-action-mask.show .traces-action-sheet {
+    transform: translateY(0);
+}
+.sheet-title {
+    font-size: 13px;
+    color: var(--text-sub);
+    text-align: center;
+    margin-bottom: 16px;
+}
+.sheet-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.sheet-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 15px;
+    color: var(--text-main);
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+}
+.sheet-btn.cancel {
+    background: transparent;
+    color: var(--text-sub);
+    border: none;
+    margin-top: 4px;
+}
+.traces-action-mask.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+.traces-action-sheet {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg-container);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 24px 30px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    border-top: 1px solid var(--border-light);
+}
+.traces-action-mask.show .traces-action-sheet {
+    transform: translateY(0);
+}
+.sheet-title {
+    font-size: 13px;
+    color: var(--text-sub);
+    text-align: center;
+    margin-bottom: 16px;
+}
+.sheet-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.sheet-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 15px;
+    color: var(--text-main);
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+}
+.sheet-btn.cancel {
+    background: transparent;
+    color: var(--text-sub);
+    border: none;
+    margin-top: 4px;
+}
+
+/* ========== 文章生成 Loading ========== */
+#traces-article-writing-loader {
+    ...
+}
 /* ========== 文章生成 Loading ========== */
 #traces-article-writing-loader {
     position: absolute;
@@ -480,7 +1050,7 @@
 .role-edit-panel-title { font-size: 15px; font-weight: 600; color: var(--text-main); }
 .role-edit-panel-body { flex: 1; overflow-y: auto; padding: 16px; }
 .role-edit-panel-body::-webkit-scrollbar { display: none; }
-.role-edit-textarea { width: 100%; height: 60vh; background: var(--bg-box); border: 1px solid var(--border-box); border-radius: 14px; padding: 14px; font-family: var(--font-serif); font-size: 14px; color: var(--text-main); line-height: 1.7; outline: none; resize: none; }
+.role-edit-textarea { width: 100%; height: 60vh; background: var(--bg-box); border: 1px solid var(--border-box); border-radius: 14px; padding: 14px; font-family: var(--font-serif); font-size: 14px; color: var(--text-main); line-height: 1.7; outline: none; resize: none; } [data-theme="dark"] .role-edit-textarea { background: #2a2c30; color: #f0f0f0; }
 .role-edit-panel-footer { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border-light); flex-shrink: 0; }
 .role-edit-btn { flex: 1; padding: 12px; border-radius: 12px; font-size: 14px; cursor: pointer; border: none; }
 .role-edit-btn-cancel { background: var(--bg-box); color: var(--text-sub); border: 1px solid var(--border-box); }
@@ -603,12 +1173,45 @@
 </div>
 
 <div class="view-panel" id="create-role-view"><div class="nav-header"><div class="nav-back-btn" onclick="app.navigateTo('pocket')"></div><div class="nav-title">新角色</div><div style="width:40px;"></div></div><div class="scroll-content" style="padding:25px;display:flex;flex-direction:column;gap:20px;"><input class="field-input" id="new-role-name" placeholder="起个名字吧" style="width:100%;background:var(--bg-card);border:none;border-radius:12px;padding:14px;font-size:15px;color:var(--text-main);outline:none;"><div id="new-role-av-box" onclick="app.pickFile('newRoleAvatar')" style="width:100px;height:100px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;margin:0 auto;border:1px dashed var(--border-light);cursor:pointer;font-size:13px;color:var(--text-sub);">头像</div><textarea id="new-role-prompt" placeholder="人设性格描述..." style="width:100%;height:150px;background:var(--bg-card);border:none;border-radius:12px;padding:14px;font-size:14px;color:var(--text-main);outline:none;resize:none;line-height:1.5;"></textarea><button onclick="app.confirmCreateRole()" style="width:100%;padding:14px;background:var(--text-main);color:var(--bg-container);border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;">完成创建</button></div></div>
-<div class="view-panel" id="role-settings-view">     <div class="nav-header"><div class="nav-back-btn" onclick="app.navigateTo('chat-detail')"></div><div class="nav-title" id="role-card-title">角色卡</div><div style="width:40px;"></div></div>     <div class="role-card-tabs">         <button class="role-tab active" onclick="app.switchRoleTab('archive')">档案</button>         <button class="role-tab" onclick="app.switchRoleTab('relation')">关系</button>         <button class="role-tab" onclick="app.switchRoleTab('life')">生活</button>     </div>     <div class="scroll-content" id="role-card-body" style="padding:14px;"></div>      <!-- 子页面：经历/习惯/观点/目标 -->     <div class="role-subpage" id="sub-experiences">         <div class="role-subpage-nav"><span class="role-subpage-back" onclick="app.closeRoleSubPage('experiences')">← 返回</span><span class="role-subpage-title">经历</span></div>         <div class="role-subpage-body" id="sub-exp-list"></div>         <div class="role-subpage-input-row"><input class="role-subpage-input" id="sub-exp-input" placeholder="新增一条经历…"><button class="role-subpage-add-btn" onclick="app.addRoleSubItem('experiences')">添加</button></div>     </div>     <div class="role-subpage" id="sub-habits">         <div class="role-subpage-nav"><span class="role-subpage-back" onclick="app.closeRoleSubPage('habits')">← 返回</span><span class="role-subpage-title">习惯</span></div>         <div class="role-subpage-body" id="sub-hab-list"></div>         <div class="role-subpage-input-row"><input class="role-subpage-input" id="sub-hab-input" placeholder="新增一条习惯…"><button class="role-subpage-add-btn" onclick="app.addRoleSubItem('habits')">添加</button></div>     </div>     <div class="role-subpage" id="sub-views">         <div class="role-subpage-nav"><span class="role-subpage-back" onclick="app.closeRoleSubPage('views')">← 返回</span><span class="role-subpage-title">观点</span></div>         <div class="role-subpage-body" id="sub-view-list"></div>         <div class="role-subpage-input-row"><input class="role-subpage-input" id="sub-view-input" placeholder="新增一条观点…"><button class="role-subpage-add-btn" onclick="app.addRoleSubItem('views')">添加</button></div>     </div>     <div class="role-subpage" id="sub-goals">         <div class="role-subpage-nav"><span class="role-subpage-back" onclick="app.closeRoleSubPage('goals')">← 返回</span><span class="role-subpage-title">目标</span></div>         <div class="role-subpage-body" id="sub-goal-list"></div>         <div class="role-subpage-input-row"><input class="role-subpage-input" id="sub-goal-input" placeholder="新增一个目标…"><button class="role-subpage-add-btn" onclick="app.addRoleSubItem('goals')">添加</button></div>     </div>      <!-- 编辑弹窗 -->     <div class="role-edit-overlay" id="role-edit-overlay" onclick="app.closeRoleEditor()">         <div class="role-edit-panel" onclick="event.stopPropagation()">             <div class="role-edit-panel-header"><div class="role-edit-panel-title" id="role-edit-title">编辑</div></div>             <div class="role-edit-panel-body"><textarea class="role-edit-textarea" id="role-edit-textarea" placeholder="请输入内容…"></textarea></div>             <div class="role-edit-panel-footer">                 <button class="role-edit-btn role-edit-btn-cancel" onclick="app.closeRoleEditor()">取消</button>                 <button class="role-edit-btn role-edit-btn-save" onclick="app.saveRoleEditor()">保存</button>             </div>         </div>     </div>      <!-- 选择弹窗 -->     <div class="role-picker-mask" id="role-picker-mask" onclick="app.closeRolePicker()">         <div class="role-picker-box" onclick="event.stopPropagation()">             <div class="role-picker-title" id="role-picker-title">选择</div>             <div id="role-picker-list"></div>             <button class="role-picker-close" onclick="app.closeRolePicker()">取消</button>         </div>     </div>      <!-- 删除确认弹窗 -->     <div class="role-confirm-mask" id="role-confirm-mask">         <div class="role-confirm-box">             <div class="role-confirm-text" id="role-confirm-text">确定删除吗？</div>             <div class="role-confirm-btns">                 <button class="role-confirm-btn role-confirm-btn-cancel" onclick="app.closeRoleConfirm()">取消</button>                 <button class="role-confirm-btn role-confirm-btn-danger" id="role-confirm-ok" onclick="app.execRoleConfirm()">删除</button>             </div>         </div>     </div> </div>
+<div class="view-panel" id="role-settings-view">     <div class="nav-header"><div class="nav-back-btn" onclick="app.navigateTo('chat-detail')"></div><div class="nav-title" id="role-card-title">角色卡</div><div style="width:40px;"></div></div>     <div class="role-card-tabs">         <button class="role-tab active" onclick="app.switchRoleTab('archive')">档案</button>         <button class="role-tab" onclick="app.switchRoleTab('relation')">关系</button>         <button class="role-tab" onclick="app.switchRoleTab('life')">生活</button>     </div>     <div class="scroll-content" id="role-card-body" style="padding:14px;"></div>      <!-- 子页面：经历/习惯/观点/目标 -->    <div class="role-subpage" id="sub-experiences">
+    <div class="role-subpage-nav">
+        <span class="role-subpage-back" onclick="app.closeRoleSubPage('experiences')">← 返回</span>
+        <span class="role-subpage-title">经历</span>
+        <span class="role-subpage-ai-btn" style="position:absolute; right:16px; font-size:14px; color:var(--accent); cursor:pointer;" onclick="app.aiExtractSubItems('experiences')">✨ AI提取</span>
+    </div>
+    <div class="role-subpage-body" id="sub-exp-list"></div>
+    <div class="role-subpage-input-row"><input class="role-subpage-input" id="sub-exp-input" placeholder="新增一条经历…"><button class="role-subpage-add-btn" onclick="app.addRoleSubItem('experiences')">添加</button></div>
+</div>     <div class="role-subpage" id="sub-habits">
+    <div class="role-subpage-nav">
+        <span class="role-subpage-back" onclick="app.closeRoleSubPage('habits')">← 返回</span>
+        <span class="role-subpage-title">习惯</span>
+        <span class="role-subpage-ai-btn" style="position:absolute; right:16px; font-size:14px; color:var(--accent); cursor:pointer;" onclick="app.aiExtractSubItems('habits')">✨ AI提取</span>
+    </div>
+    <div class="role-subpage-body" id="sub-hab-list"></div>
+    <div class="role-subpage-input-row"><input class="role-subpage-input" id="sub-hab-input" placeholder="新增一条习惯…"><button class="role-subpage-add-btn" onclick="app.addRoleSubItem('habits')">添加</button></div>
+</div>     <div class="role-subpage" id="sub-views">
+    <div class="role-subpage-nav">
+        <span class="role-subpage-back" onclick="app.closeRoleSubPage('views')">← 返回</span>
+        <span class="role-subpage-title">观点</span>
+        <span class="role-subpage-ai-btn" style="position:absolute; right:16px; font-size:14px; color:var(--accent); cursor:pointer;" onclick="app.aiExtractSubItems('views')">✨ AI提取</span>
+    </div>
+    <div class="role-subpage-body" id="sub-view-list"></div>
+    <div class="role-subpage-input-row"><input class="role-subpage-input" id="sub-view-input" placeholder="新增一条观点…"><button class="role-subpage-add-btn" onclick="app.addRoleSubItem('views')">添加</button></div>
+</div>    <div class="role-subpage" id="sub-goals">
+    <div class="role-subpage-nav">
+        <span class="role-subpage-back" onclick="app.closeRoleSubPage('goals')">← 返回</span>
+        <span class="role-subpage-title">目标</span>
+        <span class="role-subpage-ai-btn" style="position:absolute; right:16px; font-size:14px; color:var(--accent); cursor:pointer;" onclick="app.aiExtractSubItems('goals')">✨ AI提取</span>
+    </div>
+    <div class="role-subpage-body" id="sub-goal-list"></div>
+    <div class="role-subpage-input-row"><input class="role-subpage-input" id="sub-goal-input" placeholder="新增一个目标…"><button class="role-subpage-add-btn" onclick="app.addRoleSubItem('goals')">添加</button></div>
+</div>   
+<!-- 编辑弹窗 -->     <div class="role-edit-overlay" id="role-edit-overlay" onclick="app.closeRoleEditor()">         <div class="role-edit-panel" onclick="event.stopPropagation()">             <div class="role-edit-panel-header"><div class="role-edit-panel-title" id="role-edit-title">编辑</div></div>             <div class="role-edit-panel-body"><textarea class="role-edit-textarea" id="role-edit-textarea" placeholder="请输入内容…"></textarea></div>             <div class="role-edit-panel-footer">                 <button class="role-edit-btn role-edit-btn-cancel" onclick="app.closeRoleEditor()">取消</button>                 <button class="role-edit-btn role-edit-btn-save" onclick="app.saveRoleEditor()">保存</button>             </div>         </div>     </div>      <!-- 选择弹窗 -->     <div class="role-picker-mask" id="role-picker-mask" onclick="app.closeRolePicker()">         <div class="role-picker-box" onclick="event.stopPropagation()">             <div class="role-picker-title" id="role-picker-title">选择</div>             <div id="role-picker-list"></div>             <button class="role-picker-close" onclick="app.closeRolePicker()">取消</button>         </div>     </div>      <!-- 删除确认弹窗 -->     <div class="role-confirm-mask" id="role-confirm-mask">         <div class="role-confirm-box">             <div class="role-confirm-text" id="role-confirm-text">确定删除吗？</div>             <div class="role-confirm-btns">                 <button class="role-confirm-btn role-confirm-btn-cancel" onclick="app.closeRoleConfirm()">取消</button>                 <button class="role-confirm-btn role-confirm-btn-danger" id="role-confirm-ok" onclick="app.execRoleConfirm()">删除</button>             </div>         </div>     </div> </div>
 <div class="view-panel" id="role-memory-view"><div class="nav-header"><div class="nav-back-btn" onclick="app.navigateTo('chat-detail')"></div><div class="nav-title" id="role-memory-title">他的记忆</div><div style="width:40px;"></div></div><div class="scroll-content" id="role-memory-content" style="padding:16px;"></div></div>
 <div class="view-panel" id="mailbox-view"><div class="nav-header"><div class="nav-back-btn" onclick="app.navigateTo('home')"></div><div class="nav-title">📬 信箱</div><div style="width:40px;"></div></div><div class="scroll-content" id="mailbox-content" style="padding:16px;"></div></div>
 <div class="view-panel" id="worldbook-config-view">
     <div class="nav-header">
-        <div class="nav-back-btn" onclick="app.navigateTo('settings')"></div>
+        <div class="nav-back-btn" onclick="app.navigateTo('role-settings')"></div>
         <div class="nav-title">世界书</div>
         <div class="nav-action-btn" onclick="app.openWorldbookEditor(null)">+</div>
     </div>
@@ -645,16 +1248,71 @@
     </div>
 </div>
 <div class="view-panel" id="persona-edit-view"><div class="nav-header"><div class="nav-back-btn" onclick="app.navigateTo('persona-config')"></div><div class="nav-title" id="persona-edit-title">编辑人设</div><div class="nav-action-btn" id="persona-delete-btn" onclick="app.deleteCurrentPersona()" style="font-size:14px;display:none;">删除</div></div><div class="scroll-content" style="padding:25px;display:flex;flex-direction:column;gap:20px;"><input class="field-input" id="edit-persona-name" placeholder="人设名称" style="width:100%;background:var(--bg-card);border:none;border-radius:12px;padding:14px;font-size:15px;color:var(--text-main);outline:none;"><textarea class="field-input" id="edit-persona-desc" placeholder="描述角色眼中的你..." style="width:100%;height:200px;background:var(--bg-card);border:none;border-radius:12px;padding:14px;font-size:14px;color:var(--text-main);outline:none;resize:none;line-height:1.6;"></textarea><button onclick="app.savePersonaEdit()" style="width:100%;padding:14px;background:var(--text-main);color:var(--bg-container);border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;">保存</button></div></div>
-<div class="view-panel" id="memory-backup-view"><div class="nav-header"><div class="nav-back-btn" onclick="app.navigateTo('settings')"></div><div class="nav-title">记忆备份</div><div style="width:40px;"></div></div><div class="scroll-content" style="padding:30px;display:flex;flex-direction:column;gap:16px;align-items:center;"><div style="font-size:14px;color:var(--text-sub);text-align:center;">所有聊天记录、角色、人设都可以打包存起来</div><button onclick="app.exportData()" style="width:80%;padding:14px;background:var(--text-main);color:var(--bg-container);border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;">📤 备份数据</button><button onclick="app.importData()" style="width:80%;padding:14px;background:var(--bg-card);color:var(--text-main);border:1px solid var(--border-light);border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;">📥 导入备份</button></div></div>
+<div class="view-panel" id="memory-backup-view">
+    <div class="nav-header">
+        <div class="nav-back-btn" onclick="app.navigateTo('settings')"></div>
+        <div class="nav-title">记忆备份</div>
+        <div style="width:40px;"></div>
+    </div>
+    <div class="scroll-content" style="padding:30px;display:flex;flex-direction:column;gap:16px;align-items:center;">
+        <div style="font-size:14px;color:var(--text-sub);text-align:center;">所有聊天记录、角色、人设都可以打包存起来</div>
+        <button onclick="app.exportData()" style="width:80%;padding:14px;background:var(--text-main);color:var(--bg-container);border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;">📤 备份数据</button>
+        <button onclick="app.importData()" style="width:80%;padding:14px;background:var(--bg-card);color:var(--text-main);border:1px solid var(--border-light);border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;">📥 导入备份</button>
+    </div>
+</div>
+
+<div class="view-panel" id="log-manager-view">
+    <div class="nav-header" style="position: relative; justify-content: center;">
+        <div class="nav-back-btn" onclick="app.navigateTo('role-settings')" style="position: absolute; left: 16px;"></div>
+        <div class="nav-title" style="text-align: center; margin: 0 auto;">日志管理</div>
+        <div class="nav-action-btn" id="log-batch-delete-btn" onclick="app.batchDeleteLogs()" style="font-size:13px; display:none; position: absolute; right: 16px;">删除选中</div>
+    </div>
+    <div class="scroll-content" style="padding:0;">
+        <div id="log-manager-toolbar" style="padding:12px 16px; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; gap:12px; align-items:center;">
+                <span id="log-select-all" onclick="app.toggleSelectAllLogs()" style="font-size:14px; color:var(--accent); cursor:pointer;">全选</span>
+                <span id="log-clear-all" onclick="app.clearAllLogs()" style="font-size:14px; color:var(--text-sub); cursor:pointer;">清空全部</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-sub);" id="log-manager-count">共 0 条</div>
+        </div>
+        <div id="log-manager-list" style="padding:8px 16px;"></div>
+    </div>
+</div>
 <input type="file" id="import-file-input" hidden accept=".txt,.json">
 
 <div class="view-panel" id="traces-view"><div class="nav-header"><div class="nav-back-btn" onclick="app.navigateTo('home')"></div><div class="nav-title">瞬息<span>Traces</span></div><div class="nav-action-btn" onclick="app.tracesToggleViewMode()" id="traces-view-toggle" style="font-size:20px;">⊞</div></div><div id="traces-char-row" style="padding:16px 24px 8px;display:flex;gap:16px;overflow-x:auto;flex-shrink:0;"></div><div id="traces-album-container" style="flex:1;display:flex;align-items:center;overflow-x:auto;padding:0 24px 24px;gap:16px;scroll-snap-type:x mandatory;"></div></div>
-<div class="view-panel" id="traces-editor-view"><div class="nav-header"><div class="nav-back-btn" onclick="app.tracesExitEditor()"></div><div class="nav-title" id="traces-editor-title">对话互动<span>Chat</span></div><div class="nav-action-btn" onclick="app.tracesOpenPreview()">✓</div></div><div class="scroll-content" id="traces-editor-stage" style="padding:16px 24px;display:flex;flex-direction:column;gap:16px;"></div>
-<div id="traces-article-writing-loader">
-    <div class="writing-text">屿野正在为你落笔...</div>
-    <div class="writing-bar-track"><div class="writing-bar-thumb"></div></div>
+<div class="view-panel" id="traces-editor-view">
+    <div class="nav-header">
+        <div class="nav-back-btn" onclick="app.tracesExitEditor()"></div>
+        <div class="nav-title" id="traces-editor-title">对话互动</div>
+        <div class="nav-action-btn" onclick="app.triggerFinalGeneration()">✓</div>
+    </div>
+    
+    <div class="center-summary-box" id="centerSummary" contenteditable="true"></div>
+
+    <!-- 对话流容器 -->
+    <div class="interactive-container" id="dialogueView">
+        <div class="interactive-scroller" id="chatScroller"></div>
+        <div class="interactive-footer">
+            <textarea class="chat-textarea" id="chatInput" placeholder="请输入内容……" rows="1"></textarea>
+            <button class="chat-send-btn" onclick="app.sendDialogueTurn()">发送</button>
+        </div>
+    </div>
+
+    <!-- 文章流容器 -->
+    <div class="interactive-container" id="articleView">
+        <div class="interactive-scroller" id="articleScroller"></div>
+        <div class="interactive-footer">
+            <textarea class="chat-textarea" id="articleInput" placeholder="请输入引导诉求……" rows="1"></textarea>
+            <button class="chat-send-btn" onclick="app.sendArticleTurn()">发送</button>
+        </div>
+    </div>
+    
+    <div id="traces-article-writing-loader">
+        <div class="writing-text">屿野正在为你落笔...</div>
+        <div class="writing-bar-track"><div class="writing-bar-thumb"></div></div>
+    </div>
 </div>
-<div style="padding:12px 16px;display:flex;align-items:flex-end;gap:8px;flex-shrink:0;border-top:1px solid var(--border-light);"><textarea id="traces-editor-input" placeholder="输入内容..." style="flex:1;background:var(--bg-card);border:none;border-radius:14px;padding:12px 14px;font-size:14px;outline:none;resize:none;height:44px;max-height:90px;line-height:1.4;color:var(--text-main);"></textarea><button onclick="app.tracesSendContent()" style="height:44px;width:58px;background:var(--text-main);color:var(--bg-container);border:none;border-radius:14px;font-size:13px;font-weight:500;cursor:pointer;flex-shrink:0;">发送</button></div></div>
 <div class="view-panel" id="traces-review-view"><div class="nav-header"><div class="nav-back-btn" onclick="app.tracesExitReview()"></div><div class="nav-title">剧情回顾<span>Review</span></div><div style="width:40px;"></div></div><div class="scroll-content" id="traces-review-stage" style="padding:20px 24px;display:flex;flex-direction:column;"></div></div>
 
 <!-- 第一步：是否有前导剧情 -->
@@ -694,8 +1352,26 @@
     <div class="scroll-content" id="traces-context-list" style="padding:8px 0;"></div>
 </div>
 <div class="preview-overlay" id="pop-preview-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:100;display:none;justify-content:center;align-items:center;" onclick="this.style.display='none'"><div style="width:85%;background:var(--bg-container);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:16px;border:1px solid var(--border-light);" onclick="event.stopPropagation()"><div style="font-size:16px;font-weight:600;color:var(--text-main);text-align:center;">✨ 确认生成的记忆卡片</div><div><div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">卡片标题</div><input type="text" id="traces-preview-title" style="width:100%;background:var(--bg-card);border:none;border-radius:12px;padding:10px 12px;font-size:14px;color:var(--text-main);outline:none;"></div><div><div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">AI 提炼核心主旨</div><textarea id="traces-preview-summary" style="width:100%;height:90px;background:var(--bg-card);border:none;border-radius:12px;padding:10px 12px;font-size:13px;color:var(--text-main);outline:none;resize:none;line-height:1.5;"></textarea></div><div style="display:flex;gap:10px;"><button onclick="app.tracesClosePreview()" style="flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;background:var(--bg-card);color:var(--text-sub);cursor:pointer;">取消</button><button onclick="app.tracesSaveAndAnimate()" style="flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;background:var(--text-main);color:var(--bg-container);cursor:pointer;font-weight:600;">打包存档</button></div></div></div>
-<div class="preview-overlay" id="pop-action-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:100;display:none;justify-content:center;align-items:flex-end;" onclick="app.tracesCloseActionSheet()"><div style="width:100%;background:var(--bg-container);border-radius:24px 24px 0 0;padding:20px 24px 24px;display:flex;flex-direction:column;gap:8px;" onclick="event.stopPropagation()"><button onclick="app.tracesEditNode()" style="width:100%;padding:14px;text-align:center;font-size:15px;color:var(--text-main);background:var(--bg-card);border-radius:14px;border:none;cursor:pointer;">修改</button><button id="traces-regen-btn" onclick="app.tracesRegenerateNode()" style="width:100%;padding:14px;text-align:center;font-size:15px;color:var(--text-main);background:var(--bg-card);border-radius:14px;border:none;cursor:pointer;">重说</button><button onclick="app.tracesDeleteNode()" style="width:100%;padding:14px;text-align:center;font-size:15px;color:var(--text-main);background:var(--bg-card);border-radius:14px;border:none;cursor:pointer;">删除</button><button onclick="app.tracesCloseActionSheet()" style="width:100%;padding:14px;text-align:center;font-size:15px;background:#000;color:#fff;border-radius:14px;border:none;cursor:pointer;font-weight:600;margin-top:8px;">取消</button></div></div>
-<div class="preview-overlay" id="pop-edit-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:110;display:none;justify-content:center;align-items:flex-end;"><div style="width:100%;background:var(--bg-container);border-radius:24px 24px 0 0;padding:20px 24px 24px;display:flex;flex-direction:column;gap:14px;" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:15px;font-weight:600;color:var(--text-main);">换一句话</div><div style="font-size:13px;color:var(--text-sub);cursor:pointer;" onclick="app.tracesCloseEditPanel()">取消</div></div><div style="position:relative;background:var(--bg-card);border-radius:14px;padding:12px;"><textarea id="traces-edit-textarea" oninput="app.tracesUpdateEditCounter()" style="width:100%;height:100px;background:transparent;border:none;outline:none;font-size:14px;color:var(--text-main);line-height:1.5;resize:none;"></textarea><div style="text-align:right;font-size:11px;color:#c7c7cc;" id="traces-edit-counter">0/200</div></div><button onclick="app.tracesSubmitEdit()" style="width:100%;padding:12px;text-align:center;font-size:14px;font-weight:600;color:#fff;background:var(--text-main);border:none;border-radius:12px;cursor:pointer;">提交修改</button></div></div>
+<div class="bottom-sheet-mask" id="actionMenuMask" onclick="app.tracesCloseActionSheet()">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
+        <div class="sheet-title" id="menuTitle">选项</div>
+        <div class="sheet-options" id="menuOptionsSlot"></div>
+        <button class="sheet-btn cancel" onclick="app.tracesCloseActionSheet()">取消</button>
+    </div>
+</div>
+
+
+<!-- 飞出动画弹窗 -->
+    <div class="animation-overlay" id="stageOverlay" onclick="app.closeStageOverlay()">
+        <div class="fly-card" id="flyCard" onclick="event.stopPropagation()">
+            <div class="card-tag"># 瞬息留痕 <span style="float:right; font-size:10px;">点击文字可直接修改</span></div>
+
+        <div class="card-preview-title" id="cardTitle" contenteditable="true">标题</div>
+        <div class="card-preview-summary" id="cardSummary" contenteditable="true" style="min-height:80px;">摘要...</div>
+        <button class="confirm-stage-btn" onclick="app.commitCardFlyAway()">确认并收入记录轴</button>
+    </div>
+</div>
+
 <div id="traces-anim-layer" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:200;background:rgba(255,255,255,0.92);display:none;justify-content:center;align-items:center;pointer-events:none;"><div style="width:80%;max-height:440px;background:var(--bg-card);border-radius:24px;padding:28px;box-shadow:0 15px 35px rgba(0,0,0,0.08);display:flex;flex-direction:column;justify-content:space-between;"><div><div style="font-size:11px;color:var(--text-sub);letter-spacing:0.5px;">TRACES ALBUM</div><div style="font-size:19px;color:var(--text-main);margin-top:12px;font-weight:600;" id="traces-anim-title"></div><div style="font-size:13px;color:var(--text-sub);line-height:1.6;margin-top:14px;" id="traces-anim-summary"></div></div><div style="font-size:11px;color:#c7c7cc;margin-top:20px;">MEMORY RECORDED</div></div></div>
 
 <div class="qr-pop" id="qr-pop" onclick="app.toggleQR(false)" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:10000;align-items:center;justify-content:center;"><div style="width:300px;background:var(--bg-box);backdrop-filter:blur(20px);border-radius:20px;padding:40px 30px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border-box);"><div style="color:var(--text-main);font-size:16px;line-height:2.2;white-space:pre-wrap;text-align:center;font-family:'SimSun','宋体',serif;">＿＿＿＿
@@ -818,6 +1494,10 @@ case 'beautify-config':
     tv = $('beautify-config-view');
     app.currentView = 'beautify-config';
     break;
+    case 'log-manager':
+    tv = $('log-manager-view');
+    app.currentView = 'log-manager';
+    break;
             case 'create-role': tv = $('create-role-view'); app.currentView = 'create-role'; break;
             case 'chat-detail': tv = $('chat-detail-view'); app.currentView = 'chat-detail'; break;
             case 'role-settings': tv = $('role-settings-view'); app.currentView = 'role-settings'; break;
@@ -833,6 +1513,30 @@ case 'beautify-config':
         var pp = $('pocket-plus-panel'); if (pp) pp.style.display = 'none';
         var sb = document.getElementById('pocket-sticker-bar'); if (sb) sb.style.display = 'none';
     },
+
+// 显示呼吸圆（在AI回复的位置）
+showThinkingBubble: function() {
+    // 如果已经存在，不再重复添加
+    if (document.getElementById('thinking-bubble')) return;
+    var container = document.getElementById('chat-detail-messages');
+    if (!container) {
+        // 尝试瞬息的滚动容器
+        container = document.getElementById('chatScroller');
+    }
+    if (!container) return;
+    var bubbleDiv = document.createElement('div');
+    bubbleDiv.id = 'thinking-bubble';
+    bubbleDiv.className = 'msg-wrapper ai';
+    bubbleDiv.innerHTML = '<div class="thinking-bubble"></div>';
+    container.appendChild(bubbleDiv);
+    container.scrollTop = container.scrollHeight;
+},
+
+// 移除呼吸圆
+removeThinkingBubble: function() {
+    var bubble = document.getElementById('thinking-bubble');
+    if (bubble) bubble.remove();
+},
 
     toggleTheme() {
         var r = document.documentElement; var c = r.getAttribute('data-theme');
@@ -932,91 +1636,109 @@ case 'beautify-config':
         app.renderChatMessages(); app.navigateTo('chat-detail');
     },
 
-    renderChatMessages() {
-        var box = document.getElementById('chat-detail-messages'); if (!box) return;
-        var allMs = app.chats[app.activeRoleId] || []; var role = app.roles.find(function(r) { return r.id === app.activeRoleId; });
-        var SHOW_COUNT = app._chatShowCount || 30;
-        var recentMs = allMs.slice(-SHOW_COUNT);
-        var h = '';
-        var last = 0;
-
-        if (allMs.length > SHOW_COUNT) {
-            h = '<div id="chat-load-more" style="text-align:center;color:var(--text-sub);padding:12px;font-size:13px;cursor:pointer;" onclick="app._chatShowCount = (app._chatShowCount||30) + 20; app.renderChatMessages();">↑ 查看更多历史消息</div>';
-        }
-recentMs.forEach(function(m) {
-    if (m.ts - last > 300000) {
-        var d = new Date(m.ts);
-        h += '<div style="text-align:center;color:var(--text-sub);font-size:11px;padding:4px 0;">' + d.getHours() + ':' + d.getMinutes().toString().padStart(2, '0') + '</div>'; }
-    last = m.ts;
-    var ac = '';
-    if (m.type === 'ai' || (m.packet && m.packet.id && m.packet.id.indexOf('ai') !== -1) || (m.location && m.location.id && m.location.id.indexOf('ai') !== -1)) {
-        if (role) {if (role.id === 1) ac = '📱'; else if (role.avatar) ac = '<img src="' + role.avatar + '" style="width:100%;height:100%;object-fit:cover;">'; else ac = role.name.charAt(0); } }
-            else { if (app.user.avatar) ac = '<img src="' + app.user.avatar + '" style="width:100%;height:100%;object-fit:cover;">'; else ac = '👤'; }
-            var bg = m.type === 'user' ? 'var(--bubble-me)' : 'var(--bubble-char)'; var align = m.type === 'user' ? 'flex-end' : 'flex-start'; var fd = m.type === 'user' ? 'row-reverse' : 'row';
-            var bodyContent = '';
-            var bubbleStyle = '';
-                        if (m.packet) {
-                var p = m.packet;
-                var isMyPacket = (m.type === 'user');
-                var isSettled = (p.status !== 'sent');
-                
-                var statusText = '';
-                if (isMyPacket) {
-                    statusText = p.status === 'accepted' ? '对方已收下' : (p.status === 'rejected' ? '对方已退回' : '等待对方收款');
-                } else {
-                    statusText = p.status === 'accepted' ? '已收入钱包' : (p.status === 'rejected' ? '已退回' : '收到转账');
-                }
-
-                var canAction = (!isMyPacket && !isSettled);
-
-                bodyContent = '<div class="packet-card' + (isSettled ? ' settled' : '') + '" id="pkt-' + p.id + '" ' + (canAction ? 'onclick="app.handlePacketClick(\'' + p.id + '\')"' : '') + '>' +
-                    '<div class="p-row-top"><div class="p-note">' + (p.note || (isMyPacket ? '转账' : '转账给你')) + '</div></div>' +
-                    '<div class="p-row-bottom">' +
-                        '<div class="p-status-area">' +
-                            '<div class="p-hint-status" id="status-' + p.id + '">' + statusText + '</div>' +
-                            (canAction ? 
-                            '<div class="p-action-links">' +
-                                '<span class="p-opt-lnk" onclick="app.settlePacket(\'' + p.id + '\', \'已收入钱包\', \'收下\', event)">收下</span>' +
-                                '<span class="p-divider">/</span>' +
-                                '<span class="p-opt-lnk" onclick="app.settlePacket(\'' + p.id + '\', \'已退回\', \'退回\', event)">退回</span>' +
-                            '</div>' : '') +
-                        '</div>' +
-                        '<div class="p-amount-box"><span class="p-amount-num">' + p.amount + '</span><span class="p-amount-unit">元</span></div>' +
-                    '</div>' +
-                '</div>';
-                bubbleStyle = 'background:transparent;padding:0;';
-            }
-else if (m.location) {
-    var locName = m.location.name || '未知地点';
-    var locNote = m.location.note || '';
-    bodyContent = '<div class="map-card" style="width:220px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:4px;padding:12px;cursor:default;">' +
-        '<div class="map-visual" style="width:100%;height:50px;background:var(--bg-main);margin-bottom:10px;position:relative;overflow:hidden;border-radius:2px;">' +
-            '<div style="position:absolute;bottom:40%;left:-10%;width:120%;height:1px;background:var(--text-sub);opacity:0.2;transform:rotate(6deg);"></div>' +
-            '<div style="position:absolute;top:-10%;left:65%;width:1px;height:120%;background:var(--text-sub);opacity:0.2;transform:rotate(12deg);"></div>' +
-            '<div style="position:absolute;top:38%;left:60%;width:5px;height:5px;background:var(--text-main);opacity:0.6;border-radius:50%;"></div>' +
-        '</div>' +
-        '<div class="map-text" style="text-align:left;">' +
-            '<div style="font-size:13px;color:var(--text-main);font-weight:500;">' + locName + '</div>' +
-            (locNote ? '<div style="font-size:10px;color:var(--text-sub);margin-top:3px;opacity:0.7;">' + locNote + '</div>' : '') +
-        '</div>' +
-    '</div>';
-    bubbleStyle = 'background:transparent;padding:0;';
-            } 
-             else if (m.sticker) {
-bodyContent = '<div style="width:120px;height:120px;border-radius:8px;background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--text-sub);overflow:hidden;"><img src="' + m.sticker + '" style="max-width:120px;max-height:120px;border-radius:8px;display:block;" onerror="this.style.display=\'none\'"></div>';
-bubbleStyle = 'background:transparent;padding:0;';
+renderChatMessages() {
+    var box = document.getElementById('chat-detail-messages'); if (!box) return;
+    var allMs = app.chats[app.activeRoleId] || []; var role = app.roles.find(function(r) { return r.id === app.activeRoleId; });
+    var SHOW_COUNT = app._chatShowCount || 30;
+    var recentMs = allMs.slice(-SHOW_COUNT);
+    
+    // 记住旧的滚动位置（相对于顶部的距离）
+    var oldScrollTop = box.scrollTop;
+    var oldFirstMsgId = null;
+    var firstMsgElements = box.querySelectorAll('.msg-wrapper');
+    if (firstMsgElements.length > 0 && firstMsgElements[0].getAttribute) {
+        oldFirstMsgId = firstMsgElements[0].getAttribute('data-msg-ts');
+    }
+    
+    var h = '';
+    if (allMs.length > SHOW_COUNT) {
+        h = '<div id="chat-load-more" style="text-align:center;color:var(--text-sub);padding:12px;font-size:13px;cursor:pointer;" onclick="app._chatShowCount = (app._chatShowCount||30) + 20; app.renderChatMessages();">↑ 查看更多历史消息</div>';
+    }
+    recentMs.forEach(function(m) {
+        if (m.ts - (window._lastMsgTs || 0) > 300000) {
+            var d = new Date(m.ts);
+            h += '<div style="text-align:center;color:var(--text-sub);font-size:11px;padding:4px 0;">' + d.getHours() + ':' + d.getMinutes().toString().padStart(2, '0') + '</div>'; }
+        window._lastMsgTs = m.ts;
+        var ac = '';
+        if (m.type === 'ai' || (m.packet && m.packet.id && m.packet.id.indexOf('ai') !== -1) || (m.location && m.location.id && m.location.id.indexOf('ai') !== -1)) {
+            if (role) {if (role.id === 1) ac = '📱'; else if (role.avatar) ac = '<img src="' + role.avatar + '" style="width:100%;height:100%;object-fit:cover;">'; else ac = role.name.charAt(0); } }
+        else { if (app.user.avatar) ac = '<img src="' + app.user.avatar + '" style="width:100%;height:100%;object-fit:cover;">'; else ac = '👤'; }
+        var bg = m.type === 'user' ? 'var(--bubble-me)' : 'var(--bubble-char)'; var align = m.type === 'user' ? 'flex-end' : 'flex-start'; var fd = m.type === 'user' ? 'row-reverse' : 'row';
+        var bodyContent = '';
+        var bubbleStyle = '';
+        if (m.packet) {
+            var p = m.packet;
+            var isMyPacket = (m.type === 'user');
+            var isSettled = (p.status !== 'sent');
+            var statusText = '';
+            if (isMyPacket) {
+                statusText = p.status === 'accepted' ? '对方已收下' : (p.status === 'rejected' ? '对方已退回' : '等待对方收款');
             } else {
-                bodyContent = m.text || '';
-                bubbleStyle = 'background:' + bg + ';padding:10px 14px;color:var(--text-main);border-radius:16px;font-size:15px;line-height:1.5;word-break:break-all;';
+                statusText = p.status === 'accepted' ? '已收入钱包' : (p.status === 'rejected' ? '已退回' : '收到转账');
             }
-            h += '<div style="display:flex;gap:8px;align-self:' + align + ';max-width:80%;flex-direction:' + fd + ';margin-bottom:10px;"><div style="width:32px;height:32px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;overflow:hidden;border:1px solid var(--border-light);">' + ac + '</div><div style="' + bubbleStyle + '" ondblclick="app.deleteMsg(' + m.ts + ')">' + bodyContent + '</div></div>';
-        });
-        var wasAtBottom = (box.scrollTop + box.clientHeight >= box.scrollHeight - 50);
-        box.innerHTML = h;
-        if (wasAtBottom || SHOW_COUNT <= 30) {     requestAnimationFrame(function() {         box.scrollTop = box.scrollHeight;     }); }
-    },
+            var canAction = (!isMyPacket && !isSettled);
+            bodyContent = '<div class="packet-card' + (isSettled ? ' settled' : '') + '" id="pkt-' + p.id + '" ' + (canAction ? 'onclick="app.handlePacketClick(\'' + p.id + '\', this)"' : '') + '>' +
+                '<div class="p-row-top"><div class="p-note">' + (p.note || (isMyPacket ? '转账' : '转账给你')) + '</div></div>' +
+                '<div class="p-row-bottom">' +
+                    '<div class="p-status-area">' +
+                        '<div class="p-hint-status" id="status-' + p.id + '">' + statusText + '</div>' +
+                        (canAction ? 
+                        '<div class="p-action-links">' +
+                            '<span class="p-opt-lnk" onclick="app.settlePacket(\'' + p.id + '\', \'已收入钱包\', \'收下\', event)">收下</span>' +
+                            '<span class="p-divider">/</span>' +
+                            '<span class="p-opt-lnk" onclick="app.settlePacket(\'' + p.id + '\', \'已退回\', \'退回\', event)">退回</span>' +
+                        '</div>' : '') +
+                    '</div>' +
+                    '<div class="p-amount-box"><span class="p-amount-num">' + p.amount + '</span><span class="p-amount-unit">元</span></div>' +
+                '</div>' +
+            '</div>';
+            bubbleStyle = 'background:transparent;padding:0;';
+        }
+        else if (m.location) {
+            var locName = m.location.name || '未知地点';
+            var locNote = m.location.note || '';
+            bodyContent = '<div class="map-card" style="width:220px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:4px;padding:12px;cursor:default;">' +
+                '<div class="map-visual" style="width:100%;height:50px;background:var(--bg-main);margin-bottom:10px;position:relative;overflow:hidden;border-radius:2px;">' +
+                    '<div style="position:absolute;bottom:40%;left:-10%;width:120%;height:1px;background:var(--text-sub);opacity:0.2;transform:rotate(6deg);"></div>' +
+                    '<div style="position:absolute;top:-10%;left:65%;width:1px;height:120%;background:var(--text-sub);opacity:0.2;transform:rotate(12deg);"></div>' +
+                    '<div style="position:absolute;top:38%;left:60%;width:5px;height:5px;background:var(--text-main);opacity:0.6;border-radius:50%;"></div>' +
+                '</div>' +
+                '<div class="map-text" style="text-align:left;">' +
+                    '<div style="font-size:13px;color:var(--text-main);font-weight:500;">' + locName + '</div>' +
+                    (locNote ? '<div style="font-size:10px;color:var(--text-sub);margin-top:3px;opacity:0.7;">' + locNote + '</div>' : '') +
+                '</div>' +
+            '</div>';
+            bubbleStyle = 'background:transparent;padding:0;';
+        } 
+        else if (m.sticker) {
+            bodyContent = '<div style="width:120px;height:120px;border-radius:8px;background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--text-sub);overflow:hidden;"><img src="' + m.sticker + '" style="max-width:120px;max-height:120px;border-radius:8px;display:block;" onerror="this.style.display=\'none\'"></div>';
+            bubbleStyle = 'background:transparent;padding:0;';
+        } else {
+            bodyContent = m.text || '';
+            bubbleStyle = 'background:' + bg + ';padding:10px 14px;color:var(--text-main);border-radius:16px;font-size:15px;line-height:1.5;word-break:break-all;';
+        }
+        h += '<div class="msg-wrapper" data-msg-ts="' + m.ts + '" style="display:flex;gap:8px;align-self:' + align + ';max-width:80%;flex-direction:' + fd + ';margin-bottom:10px;"><div style="width:32px;height:32px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;overflow:hidden;border:1px solid var(--border-light);">' + ac + '</div><div style="' + bubbleStyle + '" ondblclick="app.deleteMsg(' + m.ts + ')">' + bodyContent + '</div></div>';
+    });
+    
+    box.innerHTML = h;
+    
+    // 恢复滚动位置
+    if (oldFirstMsgId) {
+        var newFirstMsg = box.querySelector('.msg-wrapper[data-msg-ts="' + oldFirstMsgId + '"]');
+        if (newFirstMsg) {
+            // 保持原来第一条消息在视口中的位置
+            var newTop = newFirstMsg.offsetTop;
+            box.scrollTop = oldScrollTop;
+        } else {
+            // 如果找不到原来的第一条消息（比如加载更多后原来的消息被顶上去），就滚动到底部
+            box.scrollTop = box.scrollHeight;
+        }
+    } else if (SHOW_COUNT <= 30) {
+        box.scrollTop = box.scrollHeight;
+    }
+},
 
-    sendMessage() {
+sendMessage() {
         var input = $('chat-detail-input'); var text = input.value.trim(); if (!text) return;
         var role = app.roles.find(function(r) { return r.id === app.activeRoleId; }); if (!role) return;
         if (!app.chats[role.id]) app.chats[role.id] = [];
@@ -1026,7 +1748,10 @@ bubbleStyle = 'background:transparent;padding:0;';
         role.lastMsg = text; role.lastTime = app.getClockStr(); 
         $('chat-detail-title').innerText = '对方正在回复...';
         
+        app.showThinkingBubble();   // 显示呼吸圆
+        
 app.fetchAI(text, role).then(function(reply) {
+        app.removeThinkingBubble();   // 移除呼吸圆
 
 var packetMatch = reply.match(/\[ACTION_PACKET:\s*([\d.]+)(?:\s*\|\s*([^\]]+))?\]/);
 var locMatch = reply.match(/\[LOCATION:\s*([^|\]]+)(?:\|([^\]]*))?\]/) || reply.match(/【位置：\s*([^-\n]+)(?:-\s*([^\n\】]+))?】/);
@@ -1261,7 +1986,7 @@ sendLocation: function(name, note) {
         });
     },
 
-    handlePacketClick: function(packetId, card) {
+handlePacketClick: function(packetId, card) {
         if (!card || card.classList.contains('locked')) return;
         var msgs = app.chats[app.activeRoleId] || [];
         var msg = msgs.find(function(m) { return m.packet && m.packet.id === packetId; });
@@ -1288,6 +2013,9 @@ sendLocation: function(name, note) {
         var btn = document.getElementById('pm-open-btn');
         if (btn) { btn.style.display = 'flex'; btn.style.animation = 'none'; }
         document.getElementById('packetModalMask').style.display = 'flex';
+        
+        // 立即锁住卡片，防止重复点击
+        card.classList.add('locked');
     },
 
     closePacketModal: function() { 
@@ -1559,7 +2287,7 @@ updateState: function(mood, concern, impression) {
 addLog: function(entry) {
     var role = app.roles.find(function(r) { return r.id === app.activeRoleId; });
     if (!role || !role.logs) return;
-    role.logs.push({ id: Date.now().toString(), text: entry, timestamp: new Date().toISOString() });
+    role.logs.push({ id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 6), text: entry, timestamp: new Date().toISOString() });
     if (role.logs.length > 30) role.logs = role.logs.slice(-30);
     app.saveAll();
 },
@@ -1595,7 +2323,7 @@ if (tab === 'archive') {
 body.innerHTML =
 '<div class="glass-card role-avatar-row" style="margin-bottom:12px;">' +
     '<div class="role-avatar" onclick="app.pickFile(\'roleAvatar\')">' + (role.avatar ? '<img src="'+role.avatar+'">' : role.name.charAt(0)) + '</div>' +
-    '<div><div class="role-name">' + role.name + '</div><div class="role-sub">' + (role.state && role.state.mood ? role.state.mood : '') + '</div><div class="role-badge">' + app._getRelationStatus(role.id) + '</div></div>' +
+    '<div><div class="role-name" style="cursor:pointer;" onclick="app.editRoleName(' + role.id + ')">' + role.name + '</div><div class="role-sub">' + (role.state && role.state.mood ? role.state.mood : '') + '</div><div class="role-badge">' + app._getRelationStatus(role.id) + '</div></div>' +
 '</div>' +
 (isSystem ? '' : '<div class="role-sec-title"><span>世界线</span></div>' +
 '<div class="glass-card">' +
@@ -1636,13 +2364,14 @@ body.innerHTML =
             '</div>' +
         '</div>' +
         '<div class="role-sec-title"><span>消息趋势</span></div>' +
-        '<div class="glass-card" style="text-align:center;padding:16px;color:var(--text-sub);font-size:12px;">📈 点击展开完整图表</div>' +
-        '<div class="role-sec-title"><span>情绪曲线</span></div>' +
-        '<div class="glass-card" style="text-align:center;padding:16px;color:var(--text-sub);font-size:12px;">🎨 点击展开完整图表</div>';
+'<div class="glass-card" style="text-align:center;padding:8px;"><canvas id="trend-canvas" width="280" height="120" style="width:100%; height:auto; max-width:280px; margin:0 auto;"></canvas></div>' +
+'<div class="role-sec-title"><span>情绪曲线</span></div>' +
+'<div class="glass-card" style="text-align:center;padding:16px;color:var(--text-sub);font-size:12px;">🎨 情绪曲线功能开发中</div>'
         
         setTimeout(function() { app._drawRoleDonut(userPct); }, 50);
-
-    } else if (tab === 'life') {
+        setTimeout(function() { app._drawMessageTrend(role.id); }, 100);
+    }
+    else if (tab === 'life') {
         var mood = (role.state && role.state.mood) ? role.state.mood : '暂无';
         var concern = (role.state && role.state.concern) ? role.state.concern : '暂无';
         var impression = (role.state && role.state.impression) ? role.state.impression : '暂无';
@@ -1664,17 +2393,17 @@ body.innerHTML =
         if (logArr.length === 0) logHtml = '<div style="text-align:center;color:var(--text-sub);padding:12px;font-size:12px;">还没有最近事件</div>';
 
         body.innerHTML =
-        '<div class="role-sec-title"><span>此刻</span>' + (isSystem ? '' : '<span class="role-edit-icon" onclick="app.openRoleEditor(\'state\')">✎</span>') + '</div>' +
+        '<div class="role-sec-title"><span>此刻</span></div>' +
         '<div class="glass-card">' +
-            '<div class="role-state-row"><span class="role-state-label">心情</span><span class="role-state-value">' + mood + '</span></div>' +
-            '<div class="role-state-row"><span class="role-state-label">烦恼</span><span class="role-state-value">' + concern + '</span></div>' +
-            '<div class="role-state-row"><span class="role-state-label">印象</span><span class="role-state-value">' + impression + '</span></div>' +
+'<div class="role-state-row"><span class="role-state-label">心情</span><span class="role-state-value" id="state-mood">' + mood + '</span><span style="margin-left:auto; font-size:11px; color:var(--accent); cursor:pointer;" onclick="app.correctState(\'mood\')">纠正</span></div>' +
+'<div class="role-state-row"><span class="role-state-label">烦恼</span><span class="role-state-value" id="state-concern">' + concern + '</span><span style="margin-left:auto; font-size:11px; color:var(--accent); cursor:pointer;" onclick="app.correctState(\'concern\')">纠正</span></div>' +
+'<div class="role-state-row"><span class="role-state-label">印象</span><span class="role-state-value" id="state-impression">' + impression + '</span><span style="margin-left:auto; font-size:11px; color:var(--accent); cursor:pointer;" onclick="app.correctState(\'impression\')">纠正</span></div>' +
         '</div>' +
 (isSystem ? '' : '<div class="role-sec-title"><span>目标</span><span class="role-edit-icon" onclick="app.openRoleSubPage(\'goals\')">✎</span></div>' +
 '<div class="glass-card">' + goalHtml + '</div>') +
-        '<div class="role-sec-title"><span>最近</span></div>' +
-        '<div class="glass-card">' + logHtml + '</div>' +
-        '<button class="role-btn-full" onclick="app.showModal(\'提示\',\'全部日志功能将在后续版本中完善\',\'知道啦\')">查看全部日志 →</button>';
+'<div class="role-sec-title"><span>最近</span></div>' +
+'<div class="glass-card">' + logHtml + '</div>' +
+'<button class="role-btn-full" onclick="app.openLogManager()">查看全部日志 →</button>';
     }
 
     // 子页面重新渲染
@@ -1703,9 +2432,17 @@ _renderRoleSubPage: function(key) {
     if (key === 'goals') arr = role.goals || [];
     else arr = (role.memories && role.memories[key]) ? role.memories[key] : [];
     var html = '';
-    arr.forEach(function(item, i) {
-        html += '<div class="role-list-item"><span class="role-list-dot"></span><span class="role-list-text">' + item + '</span><span class="role-list-del" onclick="app._roleConfirmDelete(\''+key+'\','+i+')">×</span></div>';
-    });
+    if (key === 'goals') {
+        // 目标列表：显示 ✓ 完成按钮 和 × 删除按钮
+        arr.forEach(function(item, i) {
+            html += '<div class="role-list-item"><span class="role-list-dot"></span><span class="role-list-text">' + item + '</span><span style="margin-left:auto; display:flex; gap:8px;"><span class="role-list-complete" style="font-size:14px; cursor:pointer; color:var(--accent);" onclick="app.completeGoal(' + i + ')">✓</span><span class="role-list-del" onclick="app._roleConfirmDelete(\''+key+'\','+i+')">×</span></span></div>';
+        });
+    } else {
+        // 其他列表（经历/习惯/观点）：只显示 × 删除按钮
+        arr.forEach(function(item, i) {
+            html += '<div class="role-list-item"><span class="role-list-dot"></span><span class="role-list-text">' + item + '</span><span class="role-list-del" onclick="app._roleConfirmDelete(\''+key+'\','+i+')">×</span></div>';
+        });
+    }
     if (arr.length === 0) html += '<div style="text-align:center;color:var(--text-sub);padding:40px;font-size:13px;">还没有任何记录</div>';
     el.innerHTML = html;
 },
@@ -1748,6 +2485,73 @@ addRoleSubItem: function(key) {
     app.saveAll();
     input.value = '';
     app._renderRoleSubPage(key);
+},
+
+aiExtractSubItems: async function(type) {
+    var role = app.roles.find(function(r) { return r.id === app.activeRoleId; });
+    if (!role || role.id === 1) { app.showModal('提示', '系统角色暂不支持', '确定'); return; }
+    if (!app.config.key) { app.showModal('提示', '请先在设置中配置API Key', '确定'); return; }
+    
+    app.showModal('提示', '正在分析聊天记录，请稍候...', '确定');
+    var recentMsgs = (app.chats[role.id] || []).filter(function(m) { return !m.sticker && !m.packet; }).slice(-50);
+    if (recentMsgs.length === 0) { app.showModal('提示', '没有聊天记录可分析', '确定'); return; }
+    
+    var promptMap = {
+        experiences: '请根据以下对话，提取出角色【' + role.name + '】的重要经历（过去发生的事件）。每条一句话，最多5条。直接输出列表，每行一条。',
+        habits: '请根据以下对话，提取出角色【' + role.name + '】的习惯（经常做的事）。每条一句话，最多5条。直接输出列表，每行一条。',
+        views: '请根据以下对话，提取出角色【' + role.name + '】的观点（对事物的看法）。每条一句话，最多5条。直接输出列表，每行一条。',
+        goals: '请根据以下对话，提取出角色【' + role.name + '】的目标（想要达成的事）。每条一句话，最多5条。直接输出列表，每行一条。'
+    };
+    var systemPrompt = promptMap[type] || '提取信息';
+    var conversation = recentMsgs.map(function(m) {
+        var speaker = m.type === 'user' ? (app.user.homeName || '用户') : role.name;
+        return speaker + ': ' + (m.text || '');
+    }).join('\n');
+    
+    try {
+        var cfg = app.config;
+        var response;
+        if (cfg.provider === 'deepseek') {
+            var res = await fetch(cfg.url + '/chat/completions', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: conversation }] })
+            });
+            var data = await res.json();
+            response = data.choices[0].message.content;
+        } else {
+            if (!cfg.proxy) throw new Error('无代理');
+            var res2 = await fetch(cfg.proxy, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: conversation }], key: cfg.key })
+            });
+            var data2 = await res2.json();
+            response = data2.choices[0].message.content;
+        }
+        var lines = response.split('\n').filter(function(l) { return l.trim().length > 0 && !l.match(/^\d+\./); });
+        lines = lines.map(function(l) { return l.replace(/^[-*•]\s*/, '').trim(); }).filter(function(l) { return l; });
+        if (lines.length === 0) { app.showModal('提示', 'AI未提取到有效信息', '确定'); return; }
+        
+        var targetArr;
+        if (type === 'goals') {
+            if (!role.goals) role.goals = [];
+            targetArr = role.goals;
+        } else {
+            if (!role.memories) role.memories = { experiences: [], habits: [], views: [] };
+            if (!role.memories[type]) role.memories[type] = [];
+            targetArr = role.memories[type];
+        }
+        for (var i = 0; i < lines.length; i++) {
+            if (!targetArr.includes(lines[i])) targetArr.push(lines[i]);
+        }
+        app.saveAll();
+        app._renderRoleSubPage(type);
+        if (type === 'goals') app.switchRoleTab('life');
+        else app.switchRoleTab('archive');
+        app.showModal('提取成功', '新增 ' + lines.length + ' 条记录', '确定');
+    } catch(e) {
+        console.error(e);
+        app.showModal('提取失败', e.message || '请检查网络或API配置', '确定');
+    }
 },
 
 _roleConfirmDelete: function(key, index) {
@@ -1902,6 +2706,61 @@ _drawRoleDonut: function(userPct) {
     ctx.lineWidth = lw; ctx.stroke();
 },
 
+_drawMessageTrend: function(roleId) {
+    var canvas = document.getElementById('trend-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var msgs = app.chats[roleId] || [];
+    var now = new Date();
+    var dayMs = 86400000;
+    var last7days = [];
+    for (var i = 6; i >= 0; i--) {
+        var d = new Date(now.getTime() - i * dayMs);
+        var dateStr = (d.getMonth()+1) + '/' + d.getDate();
+        var count = 0;
+        for (var j = 0; j < msgs.length; j++) {
+            var mDate = new Date(msgs[j].ts);
+            if (mDate.toDateString() === d.toDateString()) count++;
+        }
+        last7days.push({ date: dateStr, count: count });
+    }
+    var maxCount = 1;
+    for (var k = 0; k < last7days.length; k++) {
+        if (last7days[k].count > maxCount) maxCount = last7days[k].count;
+    }
+    var w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.beginPath();
+    var accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#7a94a8';
+    ctx.strokeStyle = accentColor;
+    ctx.fillStyle = 'rgba(122,148,168,0.2)';
+    ctx.lineWidth = 2;
+    var stepX = w / 7;
+    var points = [];
+    for (var l = 0; l < last7days.length; l++) {
+        var x = l * stepX + stepX/2;
+        var y = h - (last7days[l].count / maxCount) * (h - 20) - 10;
+        points.push({x: x, y: y});
+        if (l === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, h-10);
+    for (var m = 0; m < points.length; m++) {
+        ctx.lineTo(points[m].x, points[m].y);
+    }
+    ctx.lineTo(points[points.length-1].x, h-10);
+    ctx.fill();
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#1a1a1a';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    for (var n = 0; n < last7days.length; n++) {
+        ctx.fillText(last7days[n].date, points[n].x, h - 2);
+        ctx.fillText(last7days[n].count, points[n].x, points[n].y - 5);
+    }
+},
+
 openRoleSettings: function() {
     var role = app.roles.find(function(r) { return r.id === app.activeRoleId; });
     if (!role) return;
@@ -1909,6 +2768,84 @@ openRoleSettings: function() {
     setTimeout(function() {
         app.switchRoleTab('archive');
     }, 100);
+},
+
+editRoleName: function(roleId) {
+    var role = app.roles.find(function(r) { return r.id === roleId; });
+    if (!role) return;
+    var newName = prompt('请输入备注名（仅显示用，不影响AI识别的角色姓名）', role.name);
+    if (newName && newName.trim()) {
+        role.name = newName.trim();
+        app.saveAll();
+        // 刷新当前页面
+        var activeTab = document.querySelector('#role-settings-view .role-tab.active');
+        if (activeTab) {
+            var tabName = 'archive';
+            if (activeTab.innerText === '关系') tabName = 'relation';
+            if (activeTab.innerText === '生活') tabName = 'life';
+            app.switchRoleTab(tabName);
+        }
+        // 同时刷新聊天列表和聊天详情标题
+        if (app.currentView === 'chat-detail') {
+            document.getElementById('chat-detail-title').innerText = role.name;
+        }
+        app.renderPocketChatList();
+    }
+},
+
+correctState: function(field) {
+    var role = app.roles.find(function(r) { return r.id === app.activeRoleId; });
+    if (!role) return;
+    var current = role.state[field] || '';
+    var fieldName = field === 'mood' ? '心情' : (field === 'concern' ? '烦恼' : '印象');
+    
+    // 使用统一的毛玻璃弹窗
+    var mask = document.getElementById('p-modal-mask');
+    document.getElementById('p-modal-title').innerText = '纠正AI的判断';
+    document.getElementById('p-modal-body').innerHTML = 
+        '<div style="margin-bottom:12px;">当前' + fieldName + '：<span style="font-weight:600;">' + current + '</span></div>' +
+        '<input id="correct-input" type="text" placeholder="输入正确的' + fieldName + '" style="width:100%;padding:12px;background:var(--bg-card);border:none;border-radius:12px;font-size:14px;color:var(--text-main);outline:none;">';
+    
+    var btn = document.getElementById('p-btn-confirm');
+    btn.innerText = '保存纠正';
+    btn.style.display = 'block';
+    btn.onclick = function() {
+        var newVal = document.getElementById('correct-input').value.trim();
+        if (newVal && newVal !== current) {
+            if (!role.corrections) role.corrections = {};
+            role.corrections[field] = { value: newVal, timestamp: Date.now() };
+            role.state[field] = newVal;
+            app.saveAll();
+            app.switchRoleTab('life');
+            app.showModal('已记录', '你的纠正已保存，AI会学习', '确定');
+        } else if (newVal === current) {
+            app.showModal('提示', '输入的内容与当前相同，无需纠正', '确定');
+        } else if (!newVal) {
+            app.showModal('提示', '请输入纠正内容', '确定');
+        }
+        mask.style.display = 'none';
+    };
+    document.getElementById('p-btn-cancel').style.display = 'block';
+    document.getElementById('p-btn-cancel').onclick = function() { mask.style.display = 'none'; };
+    mask.style.display = 'flex';
+},
+
+completeGoal: function(index) {
+    var role = app.roles.find(function(r) { return r.id === app.activeRoleId; });
+    if (!role || !role.goals || index >= role.goals.length) return;
+    var goalText = role.goals[index];
+    app.showModal('完成目标', '确认完成目标：「' + goalText + '」吗？', '确认完成', function() {
+        if (!role.completedGoals) role.completedGoals = [];
+        role.completedGoals.push({ text: goalText, completedAt: Date.now() });
+        role.goals.splice(index, 1);
+        if (!role.logs) role.logs = [];
+        role.logs.unshift({ text: '完成了目标：「' + goalText + '」', timestamp: Date.now() });
+        if (role.logs.length > 30) role.logs = role.logs.slice(0, 30);
+        app.saveAll();
+        app._renderRoleSubPage('goals');
+        app.switchRoleTab('life');
+        app.showModal('目标完成', '已记录到日志', '确定');
+    });
 },
 
     deleteRole(id) {
@@ -1919,12 +2856,81 @@ openRoleSettings: function() {
         });
     },
 
-    confirmCreateRole() {
-        if (app.creatingRole) return; var name = $('new-role-name').value.trim(); if (!name) return; app.creatingRole = true;
-        app.roles.push({     id: Date.now(),     name: name,     avatar: app.tempAvatar || '',     prompt: $('new-role-prompt').value || '你好',     lastMsg: '开始聊天吧',     lastTime: app.getClockStr(),     isSystem: false,     memories: { experiences: [], habits: [], views: [] },     state: { mood: '', concern: '', impression: '' },     goals: [],     logs: [],     stats: { totalMsg: 0, firstChat: '', lastChat: '' } });
-        $('new-role-name').value = ''; $('new-role-prompt').value = ''; app.tempAvatar = ''; $('new-role-av-box').innerHTML = '头像';
-        app.saveAll(); app.creatingRole = false; app.navigateTo('pocket');
-    },
+confirmCreateRole: async function() {
+    if (app.creatingRole) return;
+    var name = document.getElementById('new-role-name').value.trim();
+    if (!name) return;
+    var promptText = document.getElementById('new-role-prompt').value.trim();
+    if (!promptText) {
+        app.showModal('提示', '请填写人设描述', '确定');
+        return;
+    }
+    app.creatingRole = true;
+    app.showModal('提示', '正在创建角色并分析人设...', '请稍候');
+    
+    // 调用AI提取经历/习惯/观点
+    var extracted = { experiences: [], habits: [], views: [] };
+    if (app.config.key) {
+        try {
+            var sysPrompt = '从以下人设描述中提取：经历（过去发生的事件）、习惯（经常做的事）、观点（对事物的看法）。每条一句话。输出格式：经历：xxx；习惯：xxx；观点：xxx。不要有多余解释。';
+            var cfg = app.config;
+            var response;
+            if (cfg.provider === 'deepseek') {
+                var res = await fetch(cfg.url + '/chat/completions', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                    body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: sysPrompt }, { role: 'user', content: promptText }] })
+                });
+                var data = await res.json();
+                response = data.choices[0].message.content;
+            } else if (cfg.proxy) {
+                var res2 = await fetch(cfg.proxy, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: [{ role: 'system', content: sysPrompt }, { role: 'user', content: promptText }], key: cfg.key })
+                });
+                var data2 = await res2.json();
+                response = data2.choices[0].message.content;
+            }
+            if (response) {
+                var expMatch = response.match(/经历[：:]\s*(.+?)(?=习惯|$)/);
+                var habMatch = response.match(/习惯[：:]\s*(.+?)(?=观点|$)/);
+                var vieMatch = response.match(/观点[：:]\s*(.+?)$/);
+                if (expMatch) extracted.experiences = expMatch[1].split(/[;；]/).map(function(s){return s.trim();}).filter(function(s){return s;});
+                if (habMatch) extracted.habits = habMatch[1].split(/[;；]/).map(function(s){return s.trim();}).filter(function(s){return s;});
+                if (vieMatch) extracted.views = vieMatch[1].split(/[;；]/).map(function(s){return s.trim();}).filter(function(s){return s;});
+            }
+        } catch(e) { console.warn(e); }
+    }
+    
+    var newRole = {
+        id: Date.now(),
+        name: name,
+        avatar: app.tempAvatar || '',
+        prompt: promptText,
+        lastMsg: '开始聊天吧',
+        lastTime: app.getClockStr(),
+        isSystem: false,
+        memories: {
+            experiences: extracted.experiences.slice(0,5),
+            habits: extracted.habits.slice(0,5),
+            views: extracted.views.slice(0,5)
+        },
+        state: { mood: '', concern: '', impression: '' },
+        goals: [],
+        logs: [],
+        stats: { totalMsg: 0, firstChat: '', lastChat: '' },
+        corrections: {}
+    };
+    app.roles.push(newRole);
+    document.getElementById('new-role-name').value = '';
+    document.getElementById('new-role-prompt').value = '';
+    app.tempAvatar = '';
+    var avBox = document.getElementById('new-role-av-box');
+    if (avBox) avBox.innerHTML = '头像';
+    app.saveAll();
+    app.creatingRole = false;
+    app.navigateTo('pocket');
+    app.showModal('创建成功', '角色已添加，可手动调整经历/习惯/观点', '确定');
+},
 
     renderPersonaList() {
         var activeEl = document.getElementById('active-persona-name');
@@ -2153,6 +3159,7 @@ testAPI: function() {
     tracesGetCharData(roleId) { var key = 'role_' + roleId; if (!app.tracesData[key]) app.tracesData[key] = { cards: [] }; return app.tracesData[key]; },
 
     tracesRenderCharRow() {
+        app._tracesAlbumLimit = 5; // 每次进入瞬息或切换角色时，重置卡片加载数量
         var chars = app.tracesGetChars(); var row = $('traces-char-row'); if (!row) return;
         if (chars.length === 0) { row.innerHTML = ''; var album = $('traces-album-container'); if (album) { album.innerHTML = '<div style="width:100%;text-align:center;padding:60px 20px;color:var(--text-sub);font-size:14px;line-height:1.8;">还没有创建角色哦～<br>去 Pocket Chat 创建一个吧 ♡</div>'; album.style.display = 'flex'; album.style.justifyContent = 'center'; album.style.alignItems = 'center'; } return; }
         if (!app.tracesActiveCharId || !chars.find(function(c) { return c.id === app.tracesActiveCharId; })) app.tracesActiveCharId = chars[0].id;
@@ -2160,69 +3167,1302 @@ testAPI: function() {
         app.tracesRenderAlbum();
     },
 
+
     tracesSelectChar(roleId) { app.tracesActiveCharId = roleId; app.tracesRenderCharRow(); },
 
     tracesToggleViewMode() { app.tracesViewMode = (app.tracesViewMode === 'grid') ? 'carousel' : 'grid'; localStorage.setItem('pk_tracesViewMode', app.tracesViewMode); var btn = document.getElementById('traces-view-toggle'); if (btn) btn.innerText = app.tracesViewMode === 'grid' ? '⊟' : '⊞'; app.tracesRenderAlbum(); },
 
-    tracesRenderAlbum() {
-        if (!app.tracesActiveCharId) return; var data = app.tracesGetCharData(app.tracesActiveCharId); var container = $('traces-album-container'); if (!container) return;
-        var isGrid = (app.tracesViewMode === 'grid');
-        if (isGrid) { container.style.display = 'grid'; container.style.gridTemplateColumns = 'repeat(2, 1fr)'; container.style.gap = '12px'; container.style.overflowY = 'auto'; container.style.overflowX = 'hidden'; container.style.alignItems = 'start'; container.style.scrollSnapType = 'none'; }
-        else { container.style.display = 'flex'; container.style.gridTemplateColumns = ''; container.style.gap = '16px'; container.style.overflowY = 'hidden'; container.style.overflowX = 'auto'; container.style.alignItems = 'center'; container.style.scrollSnapType = 'x mandatory'; }
-        var html = data.cards.map(function(card) { /* same as before */ return ''; }).join('');
-        if (isGrid) { html += '<div onclick="app.tracesOpenTypeSelect()" style="border:2px dashed #e5e5e5;background:transparent;border-radius:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;height:160px;"><div style="font-size:24px;color:#c7c7cc;">＋</div><p style="font-size:11px;color:var(--text-sub);margin-top:4px;">新建</p></div>'; }
-        else { html += '<div onclick="app.tracesOpenTypeSelect()" style="scroll-snap-align:center;flex:0 0 85%;height:85%;max-height:420px;border:2px dashed #e5e5e5;background:transparent;border-radius:24px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;box-shadow:none;"><div style="font-size:40px;color:#c7c7cc;">＋</div><p style="font-size:13px;color:var(--text-sub);margin-top:6px;">新建瞬息片段</p></div>'; }
+tracesRenderAlbum() {
+    if (!app.tracesActiveCharId) return;
+    var container = $('traces-album-container');
+    if (!container) return;
+    var data = app.tracesGetCharData(app.tracesActiveCharId);
+    var isGrid = (app.tracesViewMode === 'grid');
+    
+    var cards = data.cards || [];
+
+    if (isGrid) {
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        container.style.gap = '12px';
+        container.style.overflowY = 'auto';
+        container.style.overflowX = 'hidden';
+        container.style.padding = '16px';
+        
+        var html = '';
+        cards.forEach(function(card, index) {
+            html += '<div class="traces-card-item" style="background:var(--bg-container); border:1px solid var(--border-box); border-radius:16px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; min-height:140px; height:auto; box-shadow:var(--shadow-card);">' +
+                '<div style="font-size:11px; color:var(--text-light);">' + (card.type === 'chat' ? '对话' : '文章') + '</div>' +
+                '<div style="font-size:14px; font-weight:600; color:var(--text-main); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + (card.title || '') + '</div>' +
+                '<div style="font-size:12px; color:var(--text-sub); margin-top:4px; flex:1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; border-left:2px solid var(--text-light); padding-left:8px;">' + (card.summary || '') + '</div>' +
+                '<div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px;">' +
+                '<span style="padding:4px 12px; background:var(--text-main); color:#fff; border-radius:16px; font-size:11px; cursor:pointer;" onclick="app.tracesOpenReview(\'' + card.id + '\')">回顾</span>' +
+                '<span style="padding:4px 12px; background:var(--bg-box); border-radius:16px; font-size:11px; cursor:pointer;" onclick="app.tracesDeleteCard(\'' + card.id + '\')">删除</span>' +
+                '</div>' +
+                '</div>';
+        });
+        html += '<div onclick="app.tracesOpenTypeSelect()" style="border:2px dashed var(--border-light); background:transparent; border-radius:16px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; min-height:140px; height:auto;"><div style="font-size:24px; color:var(--text-light);">＋</div><p style="font-size:11px; color:var(--text-sub); margin-top:4px;">新建</p></div>';
         container.innerHTML = html;
-        if (!isGrid) { setTimeout(function() { container.scrollLeft = container.scrollWidth; }, 100); }
-    },
+    } else {
+        container.style.display = 'flex';
+        container.style.flexWrap = 'nowrap';
+        container.style.gap = '18px';
+        container.style.overflowX = 'auto';
+        container.style.overflowY = 'hidden';
+        container.style.height = 'calc(100% - 130px)';
+        container.style.alignItems = 'center';
+        container.style.padding = '20px';
+        container.style.boxSizing = 'border-box';
+        
+        var html = '<div onclick="app.tracesOpenTypeSelect()" style="background:var(--bg-box); border:2px dashed var(--border-light); border-radius:24px; display:flex; flex-direction:column; justify-content:center; align-items:center; width:270px; height:420px; color:var(--text-light); cursor:pointer; flex-shrink:0; box-sizing:border-box; backdrop-filter:blur(5px);">' +
+            '<div style="font-size:40px; color:var(--text-light); line-height:1;">＋</div>' +
+            '<p style="font-size:14px; color:var(--text-sub); margin-top:8px; font-weight:500;">新建瞬息片段</p>' +
+            '</div>';
+
+        var limit = app._tracesAlbumLimit || 5;
+        var displayCards = cards.slice(0, limit);
+        for (var i = 0; i < displayCards.length; i++) {
+            var card = displayCards[i];
+            var d = new Date(card.timestamp || Date.now());
+            var dateStr = d.getFullYear() + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getDate().toString().padStart(2, '0');
+            html += '<div class="traces-card-item" style="background:var(--bg-container); border-radius:24px; padding:20px; width:270px; height:420px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid var(--border-box); box-sizing:border-box; flex-shrink:0; box-shadow:var(--shadow-card);">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-light); font-weight:500;">' +
+                '<span>' + (card.type === 'chat' ? '对话记录' : '文学落笔') + '</span>' +
+                '<span>' + dateStr + '</span>' +
+                '</div>' +
+                '<div style="font-size:18px; font-weight:bold; margin-top:12px; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + (card.title || '未命名') + '</div>' +
+                '<div style="font-size:14px; color:var(--text-sub); margin-top:8px; flex:1; display:-webkit-box; -webkit-line-clamp:11; -webkit-box-orient:vertical; overflow:hidden; line-height:1.5; text-align:justify;">' + (card.summary || '暂无故事摘要') + '</div>' +
+                '<div style="display:flex; gap:10px; justify-content:flex-end; margin-top:15px;">' +
+                '<span style="padding:7px 16px; background:var(--text-main); color:#fff; border-radius:14px; font-size:12px; cursor:pointer; font-weight:500; box-shadow:0 2px 6px rgba(0,0,0,0.08);" onclick="app.tracesOpenReview(\'' + card.id + '\')">回顾</span>' +
+                '<span style="padding:7px 16px; background:var(--bg-box); color:var(--text-main); border-radius:14px; font-size:12px; cursor:pointer; font-weight:500; border:1px solid var(--border-light);" onclick="app.tracesDeleteCard(\'' + card.id + '\')">删除</span>' +
+                '</div>' +
+                '</div>';
+        }
+        if (cards.length > limit) {
+            html += '<div onclick="app._tracesAlbumLimit += 5; app.tracesRenderAlbum();" style="background:var(--bg-box); border:1px dashed var(--border-light); border-radius:24px; display:flex; flex-direction:column; justify-content:center; align-items:center; width:120px; height:420px; color:var(--text-sub); cursor:pointer; flex-shrink:0; box-sizing:border-box; backdrop-filter:blur(5px); font-size:13px; font-weight:500;">' +
+            '<div style="margin-bottom:8px; font-size:20px;">👉</div>滑动加载</div>';
+        }
+        container.innerHTML = html;
+        if (limit === 5) {
+            requestAnimationFrame(function() { container.scrollLeft = 0; });
+        }
+    }
+},
+
 
     tracesOpenTypeSelect() { app.tracesContextMessages = []; $('pop-type-overlay').style.display = 'flex'; },
     tracesOpenTypeSelect_step2(mode) { $('pop-type-overlay').style.display = 'none'; if (mode === 'none') { $('pop-type-step2').style.display = 'flex'; } else { app.tracesRenderContextPicker(); } },
 
-    tracesRenderContextPicker() {
-        var roleId = app.tracesActiveCharId; if (!roleId) return;
-        var msgs = (app.chats[roleId] || []).filter(function(m) { return !m.sticker; });
-        if (msgs.length === 0) { alert('该角色还没有聊天记录哦～'); $('pop-type-step2').style.display = 'flex'; return; }
-        var list = $('traces-context-list');
-        var html = '<div style="padding:12px 20px;font-size:13px;color:var(--text-sub);">勾选需要作为前置语境的对话记录：</div>';
-        msgs.slice(-30).reverse().forEach(function(m) {
-            var role = app.roles.find(function(r) { return r.id === roleId; });
-            var speaker = m.type === 'user' ? (app.user.homeName || '用户') : (role ? role.name : '角色');
-            var preview = (m.text || '[表情包]').substring(0, 80);
-            var isChecked = app.tracesContextMessages.indexOf(m) !== -1;
-            html += '<div class="chat-item" style="cursor:pointer;' + (isChecked ? 'background:var(--bg-box);' : '') + '" onclick="app.tracesToggleContextMsg(arguments[0])" data-ts="' + m.ts + '"><div style="width:20px;height:20px;border-radius:50%;border:2px solid ' + (isChecked ? 'var(--soft-green, #8aaa8a)' : 'var(--border-light)') + ';margin-right:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--soft-green, #8aaa8a);">' + (isChecked ? '✓' : '') + '</div><div style="flex:1;min-width:0;"><div style="font-size:13px;color:var(--text-sub);margin-bottom:2px;">' + speaker + '</div><div style="font-size:14px;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + preview + '</div></div></div>';
-        });
-        list.innerHTML = html;
+tracesRenderContextPicker: function() {
+    var roleId = this.tracesActiveCharId;
+    if (!roleId) return;
+    var msgs = (this.chats[roleId] || []).filter(function(m) { return !m.sticker && (m.text || m.packet || m.location); });
+    if (msgs.length === 0) {
+        alert('该角色还没有聊天记录哦～');
+        document.getElementById('pop-type-step2').style.display = 'flex';
+        return;
+    }
+    var list = document.getElementById('traces-context-list');
+    if (!list) return;
+    var html = '<div style="padding:12px 20px;font-size:13px;color:var(--text-sub);">勾选需要作为前置语境的对话记录：</div>';
+    for (var i = 0; i < msgs.length; i++) {
+        var m = msgs[i];
+        var role = this.roles.find(function(r) { return r.id === roleId; });
+        var speaker = m.type === 'user' ? (this.user.homeName || '用户') : (role ? role.name : '角色');
+        var preview = (m.text || '[非文本消息]').substring(0, 80);
+        var isChecked = this.tracesContextMessages && this.tracesContextMessages.some(function(cm) { return cm.ts === m.ts; });
+        html += '<div class="chat-item" style="cursor:pointer;' + (isChecked ? 'background:var(--bg-box);' : '') + '" data-ts="' + m.ts + '" onclick="app.tracesToggleContextMsg(' + i + ')">' +
+            '<div style="width:20px;height:20px;border-radius:50%;border:2px solid ' + (isChecked ? 'var(--accent)' : 'var(--border-light)') + ';margin-right:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;">' + (isChecked ? '✓' : '') + '</div>' +
+            '<div style="flex:1;min-width:0;"><div style="font-size:13px;color:var(--text-sub);margin-bottom:2px;">' + speaker + '</div>' +
+            '<div style="font-size:14px;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + preview + '</div></div></div>';
+    }
+    list.innerHTML = html;
+    document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); });
+    document.getElementById('traces-context-view').classList.add('active');
+    this.currentView = 'traces-context';
+},
+
+tracesToggleContextMsg: function(index) {
+    var roleId = app.tracesActiveCharId;
+    if (!roleId) return;
+    var msgs = (app.chats[roleId] || []).filter(function(m) { return !m.sticker && (m.text || m.packet || m.location); });
+    // 直接用正向索引，不要反转
+    if (index < 0 || index >= msgs.length) return;
+    var msg = msgs[index];
+    if (!app.tracesContextMessages) app.tracesContextMessages = [];
+    var foundIndex = -1;
+    for (var i = 0; i < app.tracesContextMessages.length; i++) {
+        if (app.tracesContextMessages[i].ts === msg.ts) {
+            foundIndex = i;
+            break;
+        }
+    }
+    if (foundIndex === -1) {
+        app.tracesContextMessages.push(msg);
+    } else {
+        app.tracesContextMessages.splice(foundIndex, 1);
+    }
+    app.tracesRenderContextPicker();
+},
+    tracesContextBack() { document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); }); $('traces-view').classList.add('active'); app.currentView = 'traces'; $('pop-type-overlay').style.display = 'flex'; },
+tracesContextConfirm: async function() { 
+    var that = this;
+    
+    // 显示自定义弹窗（只有取消按钮）
+    var mask = document.getElementById('p-modal-mask');
+    document.getElementById('p-modal-title').innerText = 'AI 总结';
+    document.getElementById('p-modal-body').innerText = '正在分析选中的聊天记录，请稍候...';
+    var confirmBtn = document.getElementById('p-btn-confirm');
+    confirmBtn.style.display = 'none';
+    document.getElementById('p-btn-cancel').innerText = '取消';
+    document.getElementById('p-btn-cancel').style.display = 'block';
+    var cancelBtn = document.getElementById('p-btn-cancel');
+    var originalCancelClick = cancelBtn.onclick;
+    cancelBtn.onclick = function() {
+        mask.style.display = 'none';
+        // 退回之前的页面
         document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); });
-        $('traces-context-view').classList.add('active'); app.currentView = 'traces-context';
+        document.getElementById('traces-view').classList.add('active');
+        that.currentView = 'traces';
+        document.getElementById('pop-type-overlay').style.display = 'flex';
+    };
+    mask.style.display = 'flex';
+    
+    // 生成前导剧情的文本摘要
+    if (this.tracesContextMessages && this.tracesContextMessages.length > 0) {
+        var role = this.roles.find(function(r) { return r.id === this.tracesActiveCharId; });
+        var contextText = '';
+        for (var i = 0; i < this.tracesContextMessages.length; i++) {
+            var m = this.tracesContextMessages[i];
+            var speaker = m.type === 'user' ? (this.user.homeName || '用户') : (role ? role.name : '角色');
+            contextText += speaker + '：' + (m.text || '[非文本消息]') + '\n';
+        }
+        
+        if (this.config.key) {
+            try {
+                var summaryPrompt = '请用一段话（100字以内）总结以下对话的核心内容：\n' + contextText;
+                var cfg = this.config;
+                var response;
+                if (cfg.provider === 'deepseek') {
+                    var res = await fetch(cfg.url + '/chat/completions', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                        body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: '你是总结助手，输出简洁自然。' }, { role: 'user', content: summaryPrompt }] })
+                    });
+                    var data = await res.json();
+                    response = data.choices[0].message.content;
+                } else if (cfg.proxy) {
+                    var res2 = await fetch(cfg.proxy, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: [{ role: 'system', content: '你是总结助手，输出简洁自然。' }, { role: 'user', content: summaryPrompt }], key: cfg.key })
+                    });
+                    var data2 = await res2.json();
+                    response = data2.choices[0].message.content;
+                }
+                this.tracesContextSummary = response ? response.trim() : contextText.substring(0, 200);
+            } catch(e) {
+                this.tracesContextSummary = contextText.substring(0, 200);
+            }
+        } else {
+            this.tracesContextSummary = contextText.substring(0, 200);
+        }
+    } else {
+        this.tracesContextSummary = '';
+    }
+    
+    // 关闭 loading 弹窗
+    mask.style.display = 'none';
+    
+    document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); });
+    document.getElementById('traces-view').classList.add('active');
+    this.currentView = 'traces';
+    document.getElementById('pop-type-step2').style.display = 'flex';
+},
+
+tracesStartEditor: function(type) {
+    // 关闭所有弹窗
+    document.getElementById('pop-type-overlay').style.display = 'none';
+    document.getElementById('pop-type-step2').style.display = 'none';
+    if (document.getElementById('traces-context-view')) document.getElementById('traces-context-view').classList.remove('active');
+    
+    this.tracesEditorType = type;
+    this.dialogueTurns = [];      // 对话存储
+    this.articleBlocks = [];      // 文章存储
+    this.tracesEditorStream = [];
+    this.tracesTargetedNodeIndex = null;
+    this.tracesTargetedDOM = null;
+    
+    var role = this.roles.find(function(r) { return r.id === this.tracesActiveCharId; }.bind(this));
+    if (!role) return;
+    
+    var titleEl = document.getElementById('traces-editor-title');
+    if (titleEl) titleEl.innerText = type === 'chat' ? '对话互动 · ' + role.name : '文章故事 · ' + role.name;
+    
+    // 显示/隐藏对应视图
+    var dialogueView = document.getElementById('dialogueView');
+    var articleView = document.getElementById('articleView');
+    var centerBox = document.getElementById('centerSummary');
+    
+    if (type === 'chat') {
+        dialogueView.classList.add('active');
+        articleView.classList.remove('active');
+        document.getElementById('chatScroller').innerHTML = '';
+        document.getElementById('chatInput').value = '';
+        this.dialogueTurns = [];
+    } else {
+        dialogueView.classList.remove('active');
+        articleView.classList.add('active');
+        document.getElementById('articleScroller').innerHTML = '';
+        document.getElementById('articleInput').value = '';
+        this.articleBlocks = [];
+    }
+    
+    // 显示前导剧情（可编辑）
+    if (this.tracesContextSummary && this.tracesContextSummary.length > 0) {
+        centerBox.innerHTML = this.tracesContextSummary;
+        centerBox.classList.add('show');
+    } else {
+        centerBox.innerHTML = '';
+        centerBox.classList.remove('show');
+    }
+    
+    document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); });
+    document.getElementById('traces-editor-view').classList.add('active');
+    this.currentView = 'traces-editor';
+},
+    tracesSendContent: async function() {
+    var input = $('traces-editor-input');
+    var text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.style.height = '44px';
+    var role = app.roles.find(function(r) { return r.id === app.tracesActiveCharId; });
+    if (!role) return;
+    var stage = $('traces-editor-stage');
+    if (app.tracesEditorType === 'chat') {
+        var userNode = {
+            id: 'node_' + Date.now(),
+            type: 'user',
+            content: text,
+            timestamp: Date.now()
+        };
+        app.tracesEditorStream.push(userNode);
+        var userDiv = app.tracesAppendChatBubble(stage, userNode, app.tracesEditorStream.length - 1);
+        stage.scrollTop = stage.scrollHeight;
+        $('traces-editor-title').innerText = role.name + ' 正在回复...';
+        var aiReply = await app.tracesGetAIReply(text, role);
+        if (aiReply) {
+            var aiNode = {
+                id: 'node_' + Date.now(),
+                type: 'ai',
+                content: aiReply,
+                timestamp: Date.now()
+            };
+            app.tracesEditorStream.push(aiNode);
+            app.tracesAppendChatBubble(stage, aiNode, app.tracesEditorStream.length - 1);
+        }
+        $('traces-editor-title').innerText = app.tracesEditorType === 'chat' ? '对话互动 · ' + role.name : '文章故事 · ' + role.name;
+        stage.scrollTop = stage.scrollHeight;
+    } else {
+        var articleNode = {
+            id: 'node_' + Date.now(),
+            type: 'user',
+            content: text,
+            timestamp: Date.now()
+        };
+        app.tracesEditorStream.push(articleNode);
+        app.tracesAppendArticleBlock(stage, articleNode, app.tracesEditorStream.length - 1, true);
+        stage.scrollTop = stage.scrollHeight;
+        $('traces-editor-title').innerText = 'AI 正在生成文章...';
+        var article = await app.tracesGetAIArticle(text, role);
+        if (article) {
+            var aiArticleNode = {
+                id: 'node_' + Date.now(),
+                type: 'ai',
+                content: article,
+                timestamp: Date.now()
+            };
+            app.tracesEditorStream.push(aiArticleNode);
+            app.tracesAppendArticleBlock(stage, aiArticleNode, app.tracesEditorStream.length - 1, false);
+        }
+        $('traces-editor-title').innerText = app.tracesEditorType === 'chat' ? '对话互动 · ' + role.name : '文章故事 · ' + role.name;
+        stage.scrollTop = stage.scrollHeight;
+    }
+},
+
+tracesGetAIReply: async function(userText, role) {
+    if (!app.config.key) {
+        app.showModal('提示', '请先在设置中配置 API Key', '确定');
+        return '（请先在设置中配置 API Key）';
+    }
+    var history = app.tracesEditorStream.filter(function(n) { return n.type !== 'system'; }).slice(-10).map(function(n) {
+        return { role: n.type === 'user' ? 'user' : 'assistant', content: n.content };
+    });
+    var systemPrompt = '你是' + role.name + '。' + (role.prompt || '') + '。这是一次面对面的对话，不是手机聊天。你可以用括号描写动作、神态、心理活动。请用中文回复，对话自然。不要输出任何标签或格式标记。';
+    if (app.tracesContextSummary && app.tracesContextSummary.length > 0) {
+        systemPrompt += '\n【前置剧情】' + app.tracesContextSummary;
+    }
+    var msgs = [{ role: 'system', content: systemPrompt }].concat(history);
+    try {
+        var cfg = app.config;
+        if (cfg.provider === 'deepseek') {
+            var res = await fetch(cfg.url + '/chat/completions', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                body: JSON.stringify({ model: cfg.model, messages: msgs })
+            });
+            var data = await res.json();
+            return data.choices[0].message.content || '';
+        } else if (cfg.proxy) {
+            var res2 = await fetch(cfg.proxy, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: msgs, key: cfg.key })
+            });
+            var data2 = await res2.json();
+            return data2.choices[0].message.content || '';
+        }
+        return '（无法连接AI）';
+    } catch(e) {
+        console.warn(e);
+        return '（网络错误，请稍后再试）';
+    }
+},
+
+tracesGetAIArticle: async function(guideText, role) {
+    if (!app.config.key) {
+        app.showModal('提示', '请先在设置中配置 API Key', '确定');
+        return '（请先在设置中配置 API Key）';
+    }
+    // 获取之前的对话历史（文章模式下，取所有用户引导和AI生成的内容）
+    var history = app.tracesEditorStream.filter(function(n) { return n.type !== 'system'; }).slice(-6).map(function(n) {
+        return { role: n.type === 'user' ? 'user' : 'assistant', content: n.content };
+    });
+    var systemPrompt = '你是' + role.name + '。' + (role.prompt || '') + '。请根据用户的引导诉求，写一段完整的故事或文章（300-800字）。用中文，风格优美自然。直接输出文章内容，不要加任何解释或标签。';
+    if (app.tracesContextSummary && app.tracesContextSummary.length > 0) {
+        systemPrompt += '\n【前置剧情】' + app.tracesContextSummary;
+    }
+    var msgs = [{ role: 'system', content: systemPrompt }].concat(history);
+    msgs.push({ role: 'user', content: guideText });
+    try {
+        var cfg = app.config;
+        if (cfg.provider === 'deepseek') {
+            var res = await fetch(cfg.url + '/chat/completions', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                body: JSON.stringify({ model: cfg.model, messages: msgs })
+            });
+            var data = await res.json();
+            return data.choices[0].message.content || '';
+        } else if (cfg.proxy) {
+            var res2 = await fetch(cfg.proxy, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: msgs, key: cfg.key })
+            });
+            var data2 = await res2.json();
+            return data2.choices[0].message.content || '';
+        }
+        return '（无法连接AI）';
+    } catch(e) {
+        console.warn(e);
+        return '（网络错误，请稍后再试）';
+    }
+},
+    tracesAutoReply() { /* same */ },
+    // ========== 对话模式函数 ==========
+appendChatBubble: function(sender, text, id) {
+    var scroller = document.getElementById('chatScroller');
+    if (!scroller) return;
+    var wrapper = document.createElement('div');
+    wrapper.className = 'msg-wrapper ' + sender;
+    wrapper.id = id;
+    
+    var bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + sender;
+    bubble.innerHTML = this.tracesParseInline(text);
+    
+    var moreTrigger = document.createElement('div');
+    moreTrigger.className = 'msg-more-trigger';
+    moreTrigger.innerText = '…';
+    moreTrigger.onclick = (function(sender, id) { 
+        return function() { app.openEditorMenu(sender, id); }; 
+    })(sender, id);
+    
+    wrapper.appendChild(bubble);
+    wrapper.appendChild(moreTrigger);
+    scroller.appendChild(wrapper);
+    
+    if (!this.dialogueTurns) this.dialogueTurns = [];
+    this.dialogueTurns.push({id: id, sender: sender, text: text});
+    scroller.scrollTop = scroller.scrollHeight;
+},
+
+sendDialogueTurn: function() {
+    var input = document.getElementById('chatInput');
+    var val = input.value.trim();
+    if (!val) return;
+    
+    var myId = 'msg_' + Date.now();
+    this.appendChatBubble('me', val, myId);
+    input.value = '';
+    input.style.height = '38px';
+    
+    var role = this.roles.find(function(r) { return r.id === this.tracesActiveCharId; }.bind(this));
+    if (!role) return;
+    
+    // 收集最近对话作为上下文
+    var recentHistory = (this.dialogueTurns || []).slice(-6).map(function(t) {
+        return { role: t.sender === 'me' ? 'user' : 'assistant', content: t.text };
+    });
+    
+    var systemPrompt = '你是' + role.name + '。' + (role.prompt || '') + '。这是一次面对面的对话，你可以用括号描写动作、神态、心理活动。请用中文回复，对话自然。';
+    if (this.tracesContextSummary && this.tracesContextSummary.length > 0) {
+        systemPrompt += '\n【前置剧情】' + this.tracesContextSummary;
+    }
+    var msgs = [{ role: 'system', content: systemPrompt }].concat(recentHistory);
+    
+    app.showThinkingBubble();   // 显示呼吸圆
+    
+    this.tracesGetAIReplySimple(msgs).then(function(reply) {
+        app.removeThinkingBubble();   // 移除呼吸圆
+        if (reply) {
+            var aiId = 'msg_' + (Date.now() + 1);
+            this.appendChatBubble('ai', reply, aiId);
+        }
+    }.bind(this));
+},
+
+tracesGetAIReplySimple: async function(msgs) {
+    if (!this.config.key) {
+        this.showModal('提示', '请先在设置中配置 API Key', '确定');
+        return '（请先在设置中配置 API Key）';
+    }
+    try {
+        var cfg = this.config;
+        if (cfg.provider === 'deepseek') {
+            var res = await fetch(cfg.url + '/chat/completions', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                body: JSON.stringify({ model: cfg.model, messages: msgs })
+            });
+            var data = await res.json();
+            return data.choices[0].message.content || '';
+        } else if (cfg.proxy) {
+            var res2 = await fetch(cfg.proxy, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: msgs, key: cfg.key })
+            });
+            var data2 = await res2.json();
+            return data2.choices[0].message.content || '';
+        }
+        return '（无法连接AI）';
+    } catch(e) {
+        console.warn(e);
+        return '（网络错误，请稍后再试）';
+    }
+},
+
+// ========== 文章模式函数 ==========
+appendArticleBlock: function(type, text, id) {
+    var scroller = document.getElementById('articleScroller');
+    if (!scroller) return;
+    var block = document.createElement('div');
+    block.id = id;
+    
+    if (type === 'me') {
+        block.className = 'article-guide-block';
+        block.innerHTML = '<div class="article-block-title">我的引导诉求</div>' +
+            '<div class="user-raw-text-box">' + this.tracesParseInline(text) + '</div>' +
+            '<div class="block-more-trigger" onclick="app.openEditorMenu(\'me_article\', \'' + id + '\')">…</div>';
+    } else {
+        block.className = 'article-output-block';
+        block.innerHTML = '<div class="article-block-title">屿野落笔章节</div>' +
+            '<div class="article-output-box">' + this.tracesParseInline(text) + '</div>' +
+            '<div class="block-more-trigger" onclick="app.openEditorMenu(\'ai_article\', \'' + id + '\')">…</div>';
+    }
+    scroller.appendChild(block);
+    scroller.scrollTop = scroller.scrollHeight;
+    
+    if (!this.articleBlocks) this.articleBlocks = [];
+    this.articleBlocks.push({id: id, type: type, text: text});
+},
+
+sendArticleTurn: function() {
+    var input = document.getElementById('articleInput');
+    var val = input.value.trim();
+    if (!val) return;
+    
+    var myId = 'art_me_' + Date.now();
+    this.appendArticleBlock('me', val, myId);
+    input.value = '';
+    input.style.height = '38px';
+    
+    var role = this.roles.find(function(r) { return r.id === this.tracesActiveCharId; }.bind(this));
+    if (!role) return;
+    
+    var systemPrompt = '你是' + role.name + '。' + (role.prompt || '') + '。请根据用户的引导诉求，写一段完整的故事或文章（300-800字）。用中文，风格优美自然。直接输出文章内容，不要加任何解释或标签。';
+    if (this.tracesContextSummary && this.tracesContextSummary.length > 0) {
+        systemPrompt += '\n【前置剧情】' + this.tracesContextSummary;
+    }
+    var msgs = [{ role: 'system', content: systemPrompt }, { role: 'user', content: val }];
+    
+    app.showThinkingBubble();   // 显示呼吸圆
+    
+    this.tracesGetAIReplySimple(msgs).then(function(reply) {
+        app.removeThinkingBubble();   // 移除呼吸圆
+        if (reply) {
+            var aiId = 'art_ai_' + (Date.now() + 1);
+            this.appendArticleBlock('ai', reply, aiId);
+        }
+    }.bind(this));
+},
+
+// ========== 菜单弹窗 ==========
+openEditorMenu: function(type, id) {
+    this.currentEditorTargetId = id;
+    this.currentEditorTargetType = type;
+    var titleEl = document.getElementById('menuTitle');
+    var slot = document.getElementById('menuOptionsSlot');
+    if (!slot) return;
+    slot.innerHTML = '';
+    
+    if (type === 'me' || type === 'me_article') {
+        titleEl.innerText = '调整我的内容';
+        slot.innerHTML = '<button class="sheet-btn" onclick="app.editEditorNode()">改写</button>' +
+            '<button class="sheet-btn" onclick="app.deleteEditorNode()">删除</button>';
+    } else if (type === 'ai' || type === 'ai_article') {
+        titleEl.innerText = '调整 AI 内容';
+        slot.innerHTML = '<button class="sheet-btn" onclick="app.editEditorNode()">改写</button>' +
+            '<button class="sheet-btn" onclick="app.regenerateEditorNode()">重说</button>' +
+            '<button class="sheet-btn" onclick="app.deleteEditorNode()">删除</button>';
+    }
+    document.getElementById('actionMenuMask').classList.add('show');
+},
+
+editEditorNode: function() {
+    this.closeActionSheet();
+    var targetElem = document.getElementById(this.currentEditorTargetId);
+    if (!targetElem) return;
+    var textNode = targetElem.querySelector('.chat-bubble, .article-output-box, .user-raw-text-box');
+    if (!textNode) return;
+    var oldText = textNode.innerText;
+    
+    // 保存原始HTML
+    var originalHtml = textNode.innerHTML;
+    
+    // 让文字变成可编辑状态
+    textNode.contentEditable = "true";
+    textNode.classList.add('editable-active-focus');
+    textNode.focus();
+    
+    // 失去焦点时保存
+    var saveHandler = function() {
+        textNode.contentEditable = "false";
+        textNode.classList.remove('editable-active-focus');
+        var newText = textNode.innerText.trim();
+        if (newText && newText !== oldText) {
+            textNode.innerHTML = app.tracesParseInline(newText);
+            // 更新存储
+            if (app.currentEditorTargetType === 'me' || app.currentEditorTargetType === 'ai') {
+                var turn = app.dialogueTurns.find(function(t) { return t.id === app.currentEditorTargetId; });
+                if (turn) turn.text = newText;
+            } else {
+                var block = app.articleBlocks.find(function(b) { return b.id === app.currentEditorTargetId; });
+                if (block) block.text = newText;
+            }
+        } else if (!newText) {
+            // 如果删空了，恢复原内容
+            textNode.innerHTML = originalHtml;
+        }
+        textNode.removeEventListener('blur', saveHandler);
+    };
+    
+    textNode.addEventListener('blur', saveHandler);
+    
+    // 按 Enter 键时保存并取消编辑
+    var keyHandler = function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            textNode.blur();
+            textNode.removeEventListener('keydown', keyHandler);
+        }
+    };
+    textNode.addEventListener('keydown', keyHandler);
+},
+
+deleteEditorNode: function() {
+    this.closeActionSheet();
+    var targetElem = document.getElementById(this.currentEditorTargetId);
+    if (targetElem) targetElem.remove();
+    if (this.currentEditorTargetType === 'me' || this.currentEditorTargetType === 'ai') {
+        this.dialogueTurns = this.dialogueTurns.filter(function(t) { return t.id !== this.currentEditorTargetId; }.bind(this));
+    } else {
+        this.articleBlocks = this.articleBlocks.filter(function(b) { return b.id !== this.currentEditorTargetId; }.bind(this));
+    }
+},
+
+regenerateEditorNode: function() {
+    this.closeActionSheet();
+    var role = this.roles.find(function(r) { return r.id === this.tracesActiveCharId; }.bind(this));
+    if (!role) return;
+    
+    // 找到上一个用户消息
+    var prevUserText = '';
+    if (this.currentEditorTargetType === 'ai') {
+        var index = this.dialogueTurns.findIndex(function(t) { return t.id === this.currentEditorTargetId; }.bind(this));
+        for (var i = index - 1; i >= 0; i--) {
+            if (this.dialogueTurns[i].sender === 'me') {
+                prevUserText = this.dialogueTurns[i].text;
+                break;
+            }
+        }
+    } else if (this.currentEditorTargetType === 'ai_article') {
+        var blockIndex = this.articleBlocks.findIndex(function(b) { return b.id === this.currentEditorTargetId; }.bind(this));
+        for (var j = blockIndex - 1; j >= 0; j--) {
+            if (this.articleBlocks[j].type === 'me') {
+                prevUserText = this.articleBlocks[j].text;
+                break;
+            }
+        }
+    }
+    
+    if (!prevUserText) return;
+    
+    var systemPrompt = '你是' + role.name + '。' + (role.prompt || '') + '。';
+    if (this.currentEditorTargetType === 'ai_article') {
+        systemPrompt += '请根据用户的引导诉求，写一段完整的故事或文章。用中文，风格优美自然。直接输出文章内容。';
+    } else {
+        systemPrompt += '这是一次面对面的对话，你可以用括号描写动作、神态、心理活动。请用中文回复，对话自然。';
+    }
+    if (this.tracesContextSummary && this.tracesContextSummary.length > 0) {
+        systemPrompt += '\n【前置剧情】' + this.tracesContextSummary;
+    }
+    var msgs = [{ role: 'system', content: systemPrompt }, { role: 'user', content: prevUserText }];
+    
+    this.tracesGetAIReplySimple(msgs).then(function(newReply) {
+        if (newReply) {
+            var targetElem = document.getElementById(this.currentEditorTargetId);
+            if (targetElem) {
+                var textNode = targetElem.querySelector('.chat-bubble, .article-output-box');
+                if (textNode) {
+                    textNode.innerHTML = this.tracesParseInline(newReply);
+                    if (this.currentEditorTargetType === 'ai') {
+                        var turn = this.dialogueTurns.find(function(t) { return t.id === this.currentEditorTargetId; }.bind(this));
+                        if (turn) turn.text = newReply;
+                    } else {
+                        var block = this.articleBlocks.find(function(b) { return b.id === this.currentEditorTargetId; }.bind(this));
+                        if (block) block.text = newReply;
+                    }
+                }
+            }
+        }
+    }.bind(this));
+},
+
+closeActionSheet: function() {
+    document.getElementById('actionMenuMask').classList.remove('show');
+},
+closeStageOverlay: function() {
+    var overlay = document.getElementById('stageOverlay');
+    if (overlay) {
+        overlay.classList.remove('stage-open');
+    }
+    this.temporaryPayload = null;
+},
+// ========== 生成卡片和飞出动画 ==========
+triggerFinalGeneration: function() {
+    var structuredData = [];
+    var mode = this.tracesEditorType;
+    
+    if (mode === 'chat') {
+        if (!this.dialogueTurns || this.dialogueTurns.length === 0) {
+            this.showModal('提示', '还没有任何对话内容', '确定');
+            return;
+        }
+        structuredData = JSON.parse(JSON.stringify(this.dialogueTurns));
+    } else {
+        if (!this.articleBlocks || this.articleBlocks.length === 0) {
+            this.showModal('提示', '还没有任何文章内容', '确定');
+            return;
+        }
+        var aiBlocks = this.articleBlocks.filter(function(b) { return b.type === 'ai'; });
+        aiBlocks.forEach(function(b) {
+            structuredData.push({ text: b.text });
+        });
+    }
+    
+    var loader = document.getElementById('traces-article-writing-loader');
+    if (loader) loader.classList.add('show');
+    
+    // 生成标题和摘要
+    this._generateFinalTitleAndSummary(structuredData, mode).then(function(result) {
+        if (loader) loader.classList.remove('show');
+        document.getElementById('cardTitle').innerText = result.title;
+        document.getElementById('cardSummary').value = result.summary;
+        this.temporaryPayload = {
+            title: result.title,
+            summary: result.summary,
+            mode: mode,
+            rawData: structuredData
+        };
+        document.getElementById('stageOverlay').classList.add('stage-open');
+    }.bind(this)).catch(function() {
+        if (loader) loader.classList.remove('show');
+        document.getElementById('cardTitle').innerText = mode === 'chat' ? '对话记录' : '文章片段';
+        document.getElementById('cardSummary').value = '一段美好的回忆';
+        this.temporaryPayload = {
+            title: mode === 'chat' ? '对话记录' : '文章片段',
+            summary: '一段美好的回忆',
+            mode: mode,
+            rawData: structuredData
+        };
+        document.getElementById('stageOverlay').classList.add('stage-open');
+    }.bind(this));
+},
+
+_generateFinalTitleAndSummary: async function(structuredData, mode) {
+    var role = this.roles.find(function(r) { return r.id === this.tracesActiveCharId; }.bind(this));
+    if (!role) return { title: mode === 'chat' ? '对话记录' : '文章片段', summary: '一段美好的回忆' };
+    
+    var contentText = '';
+    if (mode === 'chat') {
+        for (var i = 0; i < structuredData.length; i++) {
+            var turn = structuredData[i];
+            var speaker = turn.sender === 'me' ? (this.user.homeName || '用户') : role.name;
+            contentText += speaker + '：' + turn.text + '\n';
+        }
+    } else {
+        for (var j = 0; j < structuredData.length; j++) {
+            contentText += structuredData[j].text + '\n\n';
+        }
+    }
+    
+    if (contentText.length === 0) {
+        return { title: mode === 'chat' ? '对话记录' : '文章片段', summary: '一段美好的回忆' };
+    }
+    
+    var prompt = '根据以下内容，生成一个简短的标题（10字以内）和一段核心主旨（40字以内）。输出格式：标题：xxx；主旨：xxx';
+    if (this.tracesContextSummary && this.tracesContextSummary.length > 0) {
+        prompt = '【前置剧情】' + this.tracesContextSummary + '\n' + prompt;
+    }
+    
+    var title = '';
+    var summary = '';
+    
+    if (this.config.key) {
+        try {
+            var cfg = this.config;
+            var response;
+            if (cfg.provider === 'deepseek') {
+                var res = await fetch(cfg.url + '/chat/completions', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                    body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: '你是总结助手。' }, { role: 'user', content: prompt + '\n' + contentText }] })
+                });
+                var data = await res.json();
+                response = data.choices[0].message.content;
+            } else if (cfg.proxy) {
+                var res2 = await fetch(cfg.proxy, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: [{ role: 'system', content: '你是总结助手。' }, { role: 'user', content: prompt + '\n' + contentText }], key: cfg.key })
+                });
+                var data2 = await res2.json();
+                response = data2.choices[0].message.content;
+            }
+            if (response) {
+                var titleMatch = response.match(/标题[：:]\s*(.+?)(?=主旨|$)/);
+                var summaryMatch = response.match(/主旨[：:]\s*(.+?)$/);
+                if (titleMatch) title = titleMatch[1].trim().substring(0, 10);
+                if (summaryMatch) summary = summaryMatch[1].trim().substring(0, 40);
+            }
+        } catch(e) {
+            console.warn(e);
+        }
+    }
+    
+    if (!title) title = mode === 'chat' ? '对话记录' : '文章片段';
+    if (!summary) summary = '一段美好的回忆';
+    
+    return { title: title, summary: summary };
+},
+
+commitCardFlyAway: function() {
+    if (!this.temporaryPayload) return;
+    
+    // 修复：cardTitle 是 div contenteditable，用 innerText
+    var finalTitle = document.getElementById('cardTitle').innerText.trim();
+    // 修复：cardSummary 也是 div contenteditable，不是 textarea，不能用 .value
+    var finalSummaryEl = document.getElementById('cardSummary');
+    var finalSummary = finalSummaryEl.innerText.trim();
+    
+    if (!finalTitle) finalTitle = '未命名';
+    if (!finalSummary) finalSummary = '无摘要';
+    
+    var roleId = this.tracesActiveCharId;
+    if (!roleId) return;
+    
+    var cardId = 'card_' + Date.now();
+    var newCard = {
+        id: cardId,
+        title: finalTitle,
+        summary: finalSummary,
+        type: this.temporaryPayload.mode,
+        nodes: this.temporaryPayload.rawData,
+        timestamp: Date.now()
+    };
+    
+    var charData = this.tracesGetCharData(roleId);
+    charData.cards.unshift(newCard);
+    this.saveAll();
+    
+    // 飞出动画
+    var flyCard = document.getElementById('flyCard');
+    if (flyCard) {
+        flyCard.classList.add('fly-away-anim');
+    }
+    
+    var stageOverlay = document.getElementById('stageOverlay');
+    
+        setTimeout(function() {
+            if (stageOverlay) {
+                stageOverlay.classList.remove('stage-open');
+            }
+            if (flyCard) {
+                flyCard.classList.remove('fly-away-anim');
+            }
+            this.tracesExitEditor();
+            this.tracesRenderAlbum();
+            this.temporaryPayload = null;
+        }.bind(this), 600);
+},
+    tracesParseInline(text) { if (!text) return ''; return text.replace(/([（\(][^）\)]*[）\)])/g, '<span class="chat-bracket-styled">$1</span>'); },
+   tracesAppendChatBubble: function(stage, nodeData, index) {
+    var div = document.createElement('div');
+    div.className = nodeData.type === 'user' ? 'msg-wrapper me' : 'msg-wrapper ai';
+    div.setAttribute('data-node-id', nodeData.id);
+    div.setAttribute('data-node-index', index);
+    var bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + (nodeData.type === 'user' ? 'me' : 'ai');
+    bubble.innerHTML = app.tracesParseInline(nodeData.content);
+    var moreTrigger = document.createElement('div');
+    moreTrigger.className = 'msg-more-trigger';
+    moreTrigger.innerText = '…';
+    moreTrigger.onclick = (function(idx) { return function() { app.tracesOpenActionMenu(idx); }; })(index);
+    div.appendChild(bubble);
+    div.appendChild(moreTrigger);
+    stage.appendChild(div);
+    return div;
+},
+    tracesAppendChatBubble: function(stage, nodeData, index) {
+        var div = document.createElement('div');
+        div.className = nodeData.type === 'user' ? 'msg-wrapper me' : 'msg-wrapper ai';
+        div.setAttribute('data-node-id', nodeData.id);
+        div.setAttribute('data-node-index', index);
+        
+        var bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + (nodeData.type === 'user' ? 'me' : 'ai');
+        bubble.innerHTML = app.tracesParseInline(nodeData.content);
+        
+        var moreTrigger = document.createElement('div');
+        moreTrigger.className = 'msg-more-trigger';
+        moreTrigger.innerText = '…';
+        moreTrigger.onclick = (function(idx) { return function() { app.tracesOpenActionMenu(idx); }; })(index);
+        
+        div.appendChild(bubble);
+        div.appendChild(moreTrigger);
+        stage.appendChild(div);
+        return div;
     },
 
-    tracesToggleContextMsg(event) { /* same */ },
-    tracesContextBack() { document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); }); $('traces-view').classList.add('active'); app.currentView = 'traces'; $('pop-type-overlay').style.display = 'flex'; },
-    tracesContextConfirm() { document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); }); $('traces-view').classList.add('active'); app.currentView = 'traces'; $('pop-type-step2').style.display = 'flex'; },
+    tracesOpenActionMenu: function(index, el) {
+    app.tracesTargetedNodeIndex = index;
+    app.tracesTargetedDOM = el;
+    var node = app.tracesEditorStream[index];
+    if (!node) return;
+    var slot = document.getElementById('menuOptionsSlot');
+    var titleEl = document.getElementById('menuTitle');
+    if (node.type === 'user') {
+        titleEl.innerText = '调整我的内容';
+        slot.innerHTML = '<button class="sheet-btn" onclick="app.tracesEditNode()">改写</button><button class="sheet-btn" onclick="app.tracesDeleteNode()">删除</button>';
+    } else {
+        titleEl.innerText = '调整 AI 内容';
+        slot.innerHTML = '<button class="sheet-btn" onclick="app.tracesEditNode()">改写</button><button class="sheet-btn" onclick="app.tracesRegenerateNode()">重说</button><button class="sheet-btn" onclick="app.tracesDeleteNode()">删除</button>';
+    }
+    document.getElementById('actionMenuMask').classList.add('show');
+},
 
-    tracesStartEditor(type) { /* same */ },
-    tracesSendContent() { /* same */ },
-    tracesAutoReply() { /* same */ },
-    tracesParseInline(text) { if (!text) return ''; return text.replace(/\(([^)]+)\)|（([^）]+)）/g, function(match) { return '<span style="font-size:12px;color:var(--text-sub);font-style:italic;">' + match + '</span>'; }); },
-    tracesAppendChatBubble(stage, nodeData, index) { /* same */ },
-    tracesAppendArticleBlock(stage, nodeData, index, isMe) { /* same */ },
-    tracesOpenActionMenu(index, el) { /* same */ },
-    tracesCloseActionSheet() { $('pop-action-overlay').style.display = 'none'; },
-    tracesEditNode() { /* same */ },
-    tracesUpdateEditCounter() { /* same */ },
-    tracesCloseEditPanel() { /* same */ },
-    tracesSubmitEdit() { /* same */ },
-    tracesDeleteNode() { /* same */ },
-    tracesRegenerateNode() { /* same */ },
-    tracesOpenPreview() { /* same */ },
-    tracesAIGeneratePreview(validStream) { /* same */ },
-    tracesClosePreview() { $('pop-preview-overlay').style.display = 'none'; },
-    tracesSaveAndAnimate() { /* same */ },
-    tracesExitEditor() { /* same */ },
-    tracesOpenReview(cardId) { /* same */ },
-    tracesExitReview() { /* same */ },
-    tracesDeleteCard(cardId) { /* same */ },
+tracesCloseActionSheet: function() { document.getElementById('actionMenuMask').classList.remove('show'); },
+
+tracesCloseEditPanel: function() {
+    // 这个函数已经不需要了，因为改成了原地编辑
+    // 但保留以防其他地方调用
+    var activeElement = document.activeElement;
+    if (activeElement && activeElement.contentEditable === 'true') {
+        activeElement.blur();
+    }
+},
+
+tracesEditNode: function() {
+    app.tracesCloseActionSheet();
+    var node = app.tracesEditorStream[app.tracesTargetedNodeIndex];
+    if (!node) return;
+    var oldText = node.content;
+    var inputArea = document.createElement('textarea');
+    inputArea.value = oldText;
+    inputArea.style.cssText = 'width:100%;height:120px;background:var(--bg-card);border:none;border-radius:12px;padding:12px;font-size:14px;color:var(--text-main);outline:none;resize:none;';
+    var mask = document.getElementById('p-modal-mask');
+    document.getElementById('p-modal-title').innerText = '编辑内容';
+    document.getElementById('p-modal-body').innerHTML = '';
+    document.getElementById('p-modal-body').appendChild(inputArea);
+    var btn = document.getElementById('p-btn-confirm');
+    btn.innerText = '保存';
+    btn.style.display = 'block';
+    btn.onclick = function() {
+        var newText = inputArea.value.trim();
+        if (newText) {
+            node.content = newText;
+            app.saveAll();
+            var stage = $('traces-editor-stage');
+            stage.innerHTML = '';
+            for (var i = 0; i < app.tracesEditorStream.length; i++) {
+                var n = app.tracesEditorStream[i];
+                if (app.tracesEditorType === 'chat') {
+                    app.tracesAppendChatBubble(stage, n, i);
+                } else {
+                    var isMe = (n.type === 'user');
+                    app.tracesAppendArticleBlock(stage, n, i, isMe);
+                }
+            }
+        }
+        mask.style.display = 'none';
+    };
+    document.getElementById('p-btn-cancel').style.display = 'block';
+    mask.style.display = 'flex';
+},
+
+tracesDeleteNode: function() {
+    app.tracesCloseActionSheet();
+    if (app.tracesTargetedNodeIndex !== null && app.tracesTargetedNodeIndex < app.tracesEditorStream.length) {
+        app.tracesEditorStream.splice(app.tracesTargetedNodeIndex, 1);
+        var stage = $('traces-editor-stage');
+        stage.innerHTML = '';
+        for (var i = 0; i < app.tracesEditorStream.length; i++) {
+            var n = app.tracesEditorStream[i];
+            if (app.tracesEditorType === 'chat') {
+                app.tracesAppendChatBubble(stage, n, i);
+            } else {
+                var isMe = (n.type === 'user');
+                app.tracesAppendArticleBlock(stage, n, i, isMe);
+            }
+        }
+    }
+},
+
+tracesRegenerateNode: function() {
+    app.tracesCloseActionSheet();
+    var role = app.roles.find(function(r) { return r.id === app.tracesActiveCharId; });
+    if (!role) return;
+    var node = app.tracesEditorStream[app.tracesTargetedNodeIndex];
+    if (!node) return;
+    var oldUserText = '';
+    for (var i = app.tracesTargetedNodeIndex - 1; i >= 0; i--) {
+        if (app.tracesEditorStream[i].type === 'user') {
+            oldUserText = app.tracesEditorStream[i].content;
+            break;
+        }
+    }
+    if (oldUserText) {
+        app.tracesGetAIReply(oldUserText, role).then(function(newReply) {
+            if (newReply) {
+                node.content = newReply;
+                var stage = $('traces-editor-stage');
+                stage.innerHTML = '';
+                for (var j = 0; j < app.tracesEditorStream.length; j++) {
+                    var n = app.tracesEditorStream[j];
+                    if (app.tracesEditorType === 'chat') {
+                        app.tracesAppendChatBubble(stage, n, j);
+                    } else {
+                        var isMe = (n.type === 'user');
+                        app.tracesAppendArticleBlock(stage, n, j, isMe);
+                    }
+                }
+            }
+        });
+    }
+},
+
+tracesOpenPreview: function() {
+    if (this.tracesEditorStream.length === 0) {
+        this.showModal('提示', '还没有任何内容', '确定');
+        return;
+    }
+    // 显示 loading
+    var loader = document.getElementById('traces-article-writing-loader');
+    if (loader) loader.classList.add('show');
+    
+    // 调用 AI 生成标题和摘要
+    this._generateTitleAndSummary().then(function(result) {
+        if (loader) loader.classList.remove('show');
+        document.getElementById('traces-preview-title').value = result.title;
+        document.getElementById('traces-preview-summary').value = result.summary;
+        document.getElementById('pop-preview-overlay').style.display = 'flex';
+    }.bind(this)).catch(function() {
+        if (loader) loader.classList.remove('show');
+        document.getElementById('traces-preview-title').value = this.tracesEditorType === 'chat' ? '对话记录' : '文章片段';
+        document.getElementById('traces-preview-summary').value = '一段美好的回忆';
+        document.getElementById('pop-preview-overlay').style.display = 'flex';
+    }.bind(this));
+},
+
+_generateTitleAndSummary: async function() {
+    var role = this.roles.find(function(r) { return r.id === this.tracesActiveCharId; }.bind(this));
+    if (!role) return { title: '未命名', summary: '无摘要' };
+    
+    // 收集所有对话/文章内容
+    var contentText = '';
+    for (var i = 0; i < this.tracesEditorStream.length; i++) {
+        var n = this.tracesEditorStream[i];
+        var speaker = n.type === 'user' ? (this.user.homeName || '用户') : role.name;
+        contentText += speaker + '：' + n.content + '\n';
+    }
+    
+    if (contentText.length === 0) {
+        return { title: this.tracesEditorType === 'chat' ? '对话记录' : '文章片段', summary: '一段美好的回忆' };
+    }
+    
+    var prompt = '根据以下内容，生成一个简短的标题（10字以内）和一段核心主旨（40字以内）。输出格式：标题：xxx；主旨：xxx';
+    if (this.tracesContextSummary && this.tracesContextSummary.length > 0) {
+        prompt = '【前置剧情】' + this.tracesContextSummary + '\n' + prompt;
+    }
+    
+    var title = '';
+    var summary = '';
+    
+    if (this.config.key) {
+        try {
+            var cfg = this.config;
+            var response;
+            if (cfg.provider === 'deepseek') {
+                var res = await fetch(cfg.url + '/chat/completions', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                    body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: '你是总结助手。' }, { role: 'user', content: prompt + '\n' + contentText }] })
+                });
+                var data = await res.json();
+                response = data.choices[0].message.content;
+            } else if (cfg.proxy) {
+                var res2 = await fetch(cfg.proxy, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: [{ role: 'system', content: '你是总结助手。' }, { role: 'user', content: prompt + '\n' + contentText }], key: cfg.key })
+                });
+                var data2 = await res2.json();
+                response = data2.choices[0].message.content;
+            }
+            if (response) {
+                var titleMatch = response.match(/标题[：:]\s*(.+?)(?=主旨|$)/);
+                var summaryMatch = response.match(/主旨[：:]\s*(.+?)$/);
+                if (titleMatch) title = titleMatch[1].trim().substring(0, 10);
+                if (summaryMatch) summary = summaryMatch[1].trim().substring(0, 40);
+            }
+        } catch(e) {
+            console.warn(e);
+        }
+    }
+    
+    if (!title) title = this.tracesEditorType === 'chat' ? '对话记录' : '文章片段';
+    if (!summary) summary = '一段美好的回忆';
+    
+    return { title: title, summary: summary };
+},
+
+tracesClosePreview: function() {
+    document.getElementById('pop-preview-overlay').style.display = 'none';
+},
+
+
+tracesAIGeneratePreview: async function(stream) {
+    var role = app.roles.find(function(r) { return r.id === app.tracesActiveCharId; });
+    if (!role) return;
+    var conversationText = '';
+    for (var i = 0; i < stream.length; i++) {
+        var n = stream[i];
+        var speaker = n.type === 'user' ? (app.user.homeName || '用户') : role.name;
+        conversationText += speaker + '：' + n.content + '\n';
+    }
+    var prompt = '根据以下对话/内容，生成一个简短的标题（10字以内）和一段核心主旨（50字以内）。输出格式：标题：xxx；主旨：xxx';
+    if (app.tracesContextSummary && app.tracesContextSummary.length > 0) {
+        prompt = '【前置剧情】' + app.tracesContextSummary + '\n' + prompt;
+    }
+    var title = '';
+    var summary = '';
+    if (app.config.key) {
+        try {
+            var cfg = app.config;
+            var response;
+            if (cfg.provider === 'deepseek') {
+                var res = await fetch(cfg.url + '/chat/completions', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                    body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: '你是总结助手。' }, { role: 'user', content: prompt + '\n' + conversationText }] })
+                });
+                var data = await res.json();
+                response = data.choices[0].message.content;
+            } else if (cfg.proxy) {
+                var res2 = await fetch(cfg.proxy, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: [{ role: 'system', content: '你是总结助手。' }, { role: 'user', content: prompt + '\n' + conversationText }], key: cfg.key })
+                });
+                var data2 = await res2.json();
+                response = data2.choices[0].message.content;
+            }
+            if (response) {
+                var titleMatch = response.match(/标题[：:]\s*(.+?)(?=主旨|$)/);
+                var summaryMatch = response.match(/主旨[：:]\s*(.+?)$/);
+                if (titleMatch) title = titleMatch[1].trim();
+                if (summaryMatch) summary = summaryMatch[1].trim();
+            }
+        } catch(e) { console.warn(e); }
+    }
+    if (!title) title = app.tracesEditorType === 'chat' ? '对话记录' : '文章片段';
+    if (!summary) summary = '一段美好的回忆';
+    document.getElementById('traces-preview-title').value = title;
+    document.getElementById('traces-preview-summary').value = summary;
+    $('pop-preview-overlay').style.display = 'flex';
+},
+
+tracesClosePreview: function() { $('pop-preview-overlay').style.display = 'none'; },
+
+tracesSaveAndAnimate: function() {
+    var title = document.getElementById('traces-preview-title').value.trim();
+    var summary = document.getElementById('traces-preview-summary').value.trim();
+    if (!title) title = '未命名';
+    if (!summary) summary = '无摘要';
+    var roleId = app.tracesActiveCharId;
+    if (!roleId) return;
+    var cardId = 'card_' + Date.now();
+    var newCard = {
+        id: cardId,
+        title: title,
+        summary: summary,
+        type: app.tracesEditorType,
+        nodes: app.tracesEditorStream.slice(),
+        timestamp: Date.now()
+    };
+    var charData = app.tracesGetCharData(roleId);
+    charData.cards.unshift(newCard);
+    app.saveAll();
+    app.tracesClosePreview();
+    app.tracesExitEditor();
+    app.tracesRenderAlbum();
+    var animLayer = $('traces-anim-layer');
+    if (animLayer) {
+        document.getElementById('traces-anim-title').innerText = title;
+        document.getElementById('traces-anim-summary').innerText = summary;
+        animLayer.style.display = 'flex';
+        setTimeout(function() {
+            animLayer.style.display = 'none';
+        }, 1600);
+    }
+},
+
+    tracesExitEditor: function() {
+        document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); });
+        $('traces-view').classList.add('active');
+        app.currentView = 'traces';
+        app.tracesEditorStream = [];
+        // 注意：不清空 tracesContextSummary 和 tracesContextMessages，下次新建还能用
+    },
+
+tracesOpenReview: function(cardId) {
+    var roleId = app.tracesActiveCharId;
+    if (!roleId) return;
+    var charData = app.tracesGetCharData(roleId);
+    var card = null;
+    for (var i = 0; i < charData.cards.length; i++) {
+        if (charData.cards[i].id === cardId) {
+            card = charData.cards[i];
+            break;
+        }
+    }
+    if (!card) return;
+    var stage = document.getElementById('traces-review-stage');
+    if (!stage) return;
+    stage.innerHTML = '';
+    
+    // 添加标题
+    var titleDiv = document.createElement('div');
+    titleDiv.style.cssText = 'font-family:var(--font-serif); font-size:20px; font-weight:600; color:var(--text-main); padding:4px; margin-bottom:12px;';
+    titleDiv.innerText = card.title;
+    stage.appendChild(titleDiv);
+    
+    // 添加摘要
+    var summaryDiv = document.createElement('div');
+    summaryDiv.style.cssText = 'font-family:var(--font-serif); font-size:13px; color:var(--text-sub); line-height:1.6; padding:14px; background:rgba(255,255,255,0.5); border:1px solid var(--border-light); border-radius:16px; margin-bottom:20px;';
+    summaryDiv.innerHTML = app.tracesParseInline(card.summary);
+    stage.appendChild(summaryDiv);
+    
+    // 添加内容
+    if (card.type === 'chat') {
+        var scrollerBox = document.createElement('div');
+        scrollerBox.style.cssText = 'display:flex; flex-direction:column; gap:16px;';
+        for (var j = 0; j < card.nodes.length; j++) {
+            var node = card.nodes[j];
+            // 修复：使用 node.sender 而不是 node.type
+            var isUser = (node.sender === 'me');
+            var bubble = document.createElement('div');
+            bubble.style.cssText = isUser ? 
+                'align-self:flex-end; background:var(--bubble-me); color:var(--text-main); border-bottom-right-radius:4px; padding:14px 18px; border-radius:16px; font-family:var(--font-serif); font-size:14.5px; line-height:1.6; max-width:80%;' :
+                'align-self:flex-start; background:var(--bubble-char); color:var(--text-main); border-top-left-radius:4px; padding:14px 18px; border-radius:16px; font-family:var(--font-serif); font-size:14.5px; line-height:1.6; max-width:80%;';
+            bubble.innerHTML = app.tracesParseInline(node.text || node.content || '');
+            scrollerBox.appendChild(bubble);
+        }
+        stage.appendChild(scrollerBox);
+    } else {
+        var textContainer = document.createElement('div');
+        textContainer.style.cssText = 'font-family:var(--font-serif); font-size:15px; color:var(--text-main); line-height:1.8; white-space:pre-wrap;';
+        var combinedText = '';
+        for (var k = 0; k < card.nodes.length; k++) {
+            // 文章模式下，取 ai 类型的内容，或者直接取 text
+            if (card.nodes[k].type === 'ai' || card.nodes[k].sender === 'ai') {
+                combinedText += (card.nodes[k].text || card.nodes[k].content || '') + '\n\n';
+            } else if (typeof card.nodes[k] === 'object' && card.nodes[k].text) {
+                combinedText += card.nodes[k].text + '\n\n';
+            }
+        }
+        if (!combinedText) {
+            combinedText = '暂无内容';
+        }
+        textContainer.innerHTML = app.tracesParseInline(combinedText);
+        stage.appendChild(textContainer);
+    }
+    
+    document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); });
+    document.getElementById('traces-review-view').classList.add('active');
+    app.currentView = 'traces-review';
+},
+
+tracesExitReview: function() {
+    document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); });
+    $('traces-view').classList.add('active');
+    app.currentView = 'traces';
+},
+
+tracesDeleteCard: function(cardId) {
+    var that = this;
+    app.showModal('确认删除', '确定删除这张卡片吗？', '确定删除', function() {
+        var roleId = that.tracesActiveCharId;
+        if (!roleId) return;
+        var charData = that.tracesGetCharData(roleId);
+        for (var i = 0; i < charData.cards.length; i++) {
+            if (charData.cards[i].id === cardId) {
+                charData.cards.splice(i, 1);
+                break;
+            }
+        }
+        that.saveAll();
+        // 保存当前滚动位置
+        var container = document.getElementById('traces-album-container');
+        var oldScrollLeft = container ? container.scrollLeft : 0;
+        that.tracesRenderAlbum();
+        // 恢复滚动位置
+        if (container && !that.tracesViewMode === 'grid') {
+            setTimeout(function() { container.scrollLeft = oldScrollLeft; }, 50);
+        }
+    });
+},
+
 
 renderWorldbookListWithToggle() {
     var container = document.getElementById('worldbook-list');
@@ -2351,15 +4591,257 @@ deleteWorldbook(id) {
         app.showModal('已恢复', '背景已恢复为系统默认配色 ✨', '确定');
     },
 
+checkDailyLog: function() {
+    var lastLogDate = localStorage.getItem('last_daily_log_date');
+    var today = new Date().toDateString();
+    if (lastLogDate === today) return;
+    var roles = app.roles.filter(function(r) { return !r.isSystem && r.id !== 1; });
+    if (roles.length === 0) return;
+    if (!app.config.key) return;
+    setTimeout(function() { app.generateDailyLogs(roles); }, 3000);
+},
+generateDailyLogs: async function(roles) {
+    for (var idx = 0; idx < roles.length; idx++) {
+        var role = roles[idx];
+        var yesterdayMsgs = (app.chats[role.id] || []).filter(function(m) {
+            var d = new Date(m.ts);
+            var today = new Date();
+            var yesterday = new Date(today.getTime() - 86400000);
+            return d.toDateString() === yesterday.toDateString();
+        });
+        if (yesterdayMsgs.length === 0) continue;
+        var conversation = '';
+        for (var i = 0; i < yesterdayMsgs.length && i < 20; i++) {
+            var m = yesterdayMsgs[i];
+            var speaker = m.type === 'user' ? (app.user.homeName || '用户') : role.name;
+            conversation += speaker + ': ' + (m.text || '') + '\n';
+        }
+        var prompt = '根据以下对话，用一句话总结昨天发生的重要事件或情绪变化（不超过100字）。只输出总结，不要加任何前缀。';
+        try {
+            var cfg = app.config;
+            var response;
+            if (cfg.provider === 'deepseek') {
+                var res = await fetch(cfg.url + '/chat/completions', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+                    body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: prompt }, { role: 'user', content: conversation }] })
+                });
+                var data = await res.json();
+                response = data.choices[0].message.content;
+            } else if (cfg.proxy) {
+                var res2 = await fetch(cfg.proxy, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cfg.url + '/chat/completions', model: cfg.model, messages: [{ role: 'system', content: prompt }, { role: 'user', content: conversation }], key: cfg.key })
+                });
+                var data2 = await res2.json();
+                response = data2.choices[0].message.content;
+            }
+            if (response) {
+                var summary = response.trim().substring(0, 100);
+                if (!role.logs) role.logs = [];
+                role.logs.unshift({ text: summary, timestamp: Date.now() });
+                if (role.logs.length > 30) role.logs = role.logs.slice(0, 30);
+                app.saveAll();
+            }
+        } catch(e) { console.warn(e); }
+    }
+    localStorage.setItem('last_daily_log_date', new Date().toDateString());
+},
+
+openLogManager: function() {
+    var role = app.roles.find(function(r) { return r.id === app.activeRoleId; });
+    if (!role) return;
+    app.currentLogRoleId = role.id;
+    app.renderLogManager();
+    app.navigateTo('log-manager');
+},
+
+renderLogManager: function() {
+    var container = document.getElementById('log-manager-list');
+    var countSpan = document.getElementById('log-manager-count');
+    var role = app.roles.find(function(r) { return r.id === app.currentLogRoleId; });
+    if (!role || !role.logs || role.logs.length === 0) {
+        if (container) container.innerHTML = '<div style="text-align:center;color:var(--text-sub);padding:60px;">暂无日志记录</div>';
+        if (countSpan) countSpan.innerText = '共 0 条';
+        return;
+    }
+    var logs = role.logs.slice().reverse();
+    if (countSpan) countSpan.innerText = '共 ' + logs.length + ' 条';
+    
+    // 存储当前显示的日志id列表，用于全选
+    app.currentDisplayedLogIds = logs.map(function(log) { return log.id; });
+    
+    var html = '';
+    for (var i = 0; i < logs.length; i++) {
+        var log = logs[i];
+        var date = new Date(log.timestamp);
+        var dateStr = (date.getMonth()+1) + '/' + date.getDate() + ' ' + date.getHours().toString().padStart(2,'0') + ':' + date.getMinutes().toString().padStart(2,'0');
+        var isSelected = app.selectedLogIds && app.selectedLogIds.indexOf(log.id) !== -1;
+        html += '<div class="log-item" data-log-id="' + log.id + '" style="display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-light);">' +
+            '<div class="log-checkbox" data-id="' + log.id + '" style="flex-shrink:0; width:22px; height:22px; border:2px solid var(--border-box); border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--accent);">' + (isSelected ? '✓' : '') + '</div>' +
+            '<div style="flex:1;">' +
+                '<div style="font-size:11px; color:var(--text-sub);">' + dateStr + '</div>' +
+                '<div style="font-size:13px; color:var(--text-main); line-height:1.5; margin-top:4px;">' + (log.text || '') + '</div>' +
+            '</div>' +
+            '<div style="flex-shrink:0;">' +
+                '<span style="font-size:13px; color:#ff4d4d; cursor:pointer;" onclick="app.deleteSingleLog(\'' + log.id + '\')">删除</span>' +
+            '</div>' +
+        '</div>';
+    }
+    if (container) container.innerHTML = html;
+    
+    // 重新绑定复选框点击事件
+    var checkboxes = document.querySelectorAll('.log-checkbox');
+    for (var j = 0; j < checkboxes.length; j++) {
+        var cb = checkboxes[j];
+        var logId = cb.getAttribute('data-id');
+        cb.onclick = function(e) {
+            e.stopPropagation();
+            var lid = this.getAttribute('data-id');
+            app.toggleLogSelectById(lid);
+        };
+    }
+    
+    var batchBtn = document.getElementById('log-batch-delete-btn');
+    if (batchBtn) {
+        var selectedCount = app.selectedLogIds ? app.selectedLogIds.length : 0;
+        batchBtn.style.display = selectedCount > 0 ? 'block' : 'none';
+    }
+},
+
+toggleLogSelectById: function(logId) {
+    if (!app.selectedLogIds) app.selectedLogIds = [];
+    var pos = app.selectedLogIds.indexOf(logId);
+    if (pos === -1) {
+        app.selectedLogIds.push(logId);
+    } else {
+        app.selectedLogIds.splice(pos, 1);
+    }
+    app.renderLogManager();
+},
+
+toggleSelectAllLogs: function() {
+    var role = app.roles.find(function(r) { return r.id === app.currentLogRoleId; });
+    if (!role || !role.logs) return;
+    var allIds = role.logs.map(function(log) { return log.id; });
+    if (app.selectedLogIds && app.selectedLogIds.length === allIds.length && allIds.every(function(id) { return app.selectedLogIds.indexOf(id) !== -1; })) {
+        app.selectedLogIds = [];
+    } else {
+        app.selectedLogIds = allIds.slice();
+    }
+    app.renderLogManager();
+},
+
+batchDeleteLogs: function() {
+    var role = app.roles.find(function(r) { return r.id === app.currentLogRoleId; });
+    if (!role || !role.logs || !app.selectedLogIds || app.selectedLogIds.length === 0) return;
+    var count = app.selectedLogIds.length;
+    app.showModal('确认删除', '确定删除选中的 ' + count + ' 条日志吗？', '确定删除', function() {
+        role.logs = role.logs.filter(function(log) { return app.selectedLogIds.indexOf(log.id) === -1; });
+        app.selectedLogIds = [];
+        app.saveAll();
+        app.renderLogManager();
+        if (app.currentView === 'role-settings') {
+            app.switchRoleTab('life');
+        }
+        app.showModal('删除完成', '已删除 ' + count + ' 条日志', '确定');
+    });
+},
+
+deleteSingleLog: function(logId) {
+    var role = app.roles.find(function(r) { return r.id === app.currentLogRoleId; });
+    if (!role || !role.logs) return;
+    var log = role.logs.find(function(l) { return l.id === logId; });
+    if (!log) return;
+    var logText = log.text;
+    app.showModal('确认删除', '确定删除这条日志吗？\n' + logText.substring(0, 50) + (logText.length > 50 ? '...' : ''), '确定删除', function() {
+        role.logs = role.logs.filter(function(l) { return l.id !== logId; });
+        if (app.selectedLogIds) {
+            var idx = app.selectedLogIds.indexOf(logId);
+            if (idx !== -1) app.selectedLogIds.splice(idx, 1);
+        }
+        app.saveAll();
+        app.renderLogManager();
+        if (app.currentView === 'role-settings') {
+            app.switchRoleTab('life');
+        }
+        app.showModal('删除完成', '日志已删除', '确定');
+    });
+},
+
+clearAllLogs: function() {
+    var role = app.roles.find(function(r) { return r.id === app.currentLogRoleId; });
+    if (!role || !role.logs || role.logs.length === 0) return;
+    app.showModal('确认清空', '确定清空所有日志吗？此操作不可撤销。', '确定清空', function() {
+        role.logs = [];
+        app.selectedLogIds = [];
+        app.saveAll();
+        app.renderLogManager();
+        if (app.currentView === 'role-settings') {
+            app.switchRoleTab('life');
+        }
+        app.showModal('清空完成', '所有日志已清空', '确定');
+    });
+},
+
+
+batchDeleteLogs: function() {
+    var role = app.roles.find(function(r) { return r.id === app.currentLogRoleId; });
+    if (!role || !role.logs || !app.selectedLogIndices || app.selectedLogIndices.length === 0) return;
+    var count = app.selectedLogIndices.length;
+    app.showModal('确认删除', '确定删除选中的 ' + count + ' 条日志吗？', '确定删除', function() {
+        var indices = app.selectedLogIndices.slice().sort(function(a,b){return b-a;});
+        for (var i = 0; i < indices.length; i++) {
+            role.logs.splice(indices[i], 1);
+        }
+        app.selectedLogIndices = [];
+        app.saveAll();
+        app.renderLogManager();
+        if (app.currentView === 'role-settings') {
+            app.switchRoleTab('life');
+        }
+        app.showModal('删除完成', '已删除 ' + count + ' 条日志', '确定');
+    });
+},
+
+deleteSingleLog: function(displayIndex) {
+    var role = app.roles.find(function(r) { return r.id === app.currentLogRoleId; });
+    if (!role || !role.logs) return;
+    var realIndex = role.logs.length - 1 - displayIndex;
+    var logText = role.logs[realIndex].text;
+    app.showModal('确认删除', '确定删除这条日志吗？\n' + logText.substring(0, 50) + (logText.length > 50 ? '...' : ''), '确定删除', function() {
+        role.logs.splice(realIndex, 1);
+        app.saveAll();
+        app.renderLogManager();
+        if (app.currentView === 'role-settings') {
+            app.switchRoleTab('life');
+        }
+        app.showModal('删除完成', '日志已删除', '确定');
+    });
+},
+
+clearAllLogs: function() {
+    var role = app.roles.find(function(r) { return r.id === app.currentLogRoleId; });
+    if (!role || !role.logs || role.logs.length === 0) return;
+    app.showModal('确认清空', '确定清空所有日志吗？此操作不可撤销。', '确定清空', function() {
+        role.logs = [];
+        app.saveAll();
+        app.renderLogManager();
+        if (app.currentView === 'role-settings') {
+            app.switchRoleTab('life');
+        }
+        app.showModal('清空完成', '所有日志已清空', '确定');
+    });
+},
+
     initSplash() { var splash = $('js-splash-screen'); if (!splash) return; setTimeout(function() { splash.classList.add('gale-hit'); }, 700); setTimeout(function() { splash.classList.add('fade-out'); }, 2500); },
 
     init() {
-        var savedTheme = localStorage.getItem('pk_theme'); if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-        app.applyBackgrounds(); app.updateHomeUI(); app.initSplash(); app.checkPendingLetter(); app.updateMailboxBadge();
+    var savedTheme = localStorage.getItem('pk_theme'); if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    app.applyBackgrounds(); app.checkDailyLog(); app.updateHomeUI(); app.initSplash(); app.checkPendingLetter(); app.updateMailboxBadge();
 
-        document.getElementById('closeLetterBtn').onclick = function() { document.getElementById('fullOverlay').classList.remove('active'); app.updateMailboxBadge(); };
-        setInterval(function() { if (app.currentView === 'home') { var clock = $('home-clock'); if (clock) clock.innerText = app.getClockStr(); } }, 30000);
-    }
+    document.getElementById('closeLetterBtn').onclick = function() { document.getElementById('fullOverlay').classList.remove('active'); app.updateMailboxBadge(); };
+    setInterval(function() { if (app.currentView === 'home') { var clock = $('home-clock'); if (clock) clock.innerText = app.getClockStr(); } }, 30000);
+}
 };
 
 window.addEventListener('DOMContentLoaded', function() { app.init(); });
